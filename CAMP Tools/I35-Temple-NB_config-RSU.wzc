@@ -1,0 +1,45 @@
+###
+#             ... DO NOT MODIFY THIS CONFIGURATION FILE ...
+#
+#             THE FILE WILL BE OVER WRITTEN BY THE WZ CONFIG USER INPUT 
+#             'Config_UI' PROGRAM...
+#
+#             UPDATED: 2019/08/29 - 14:18:30
+###
+
+[SERIALPORT]
+serialbaudrate = 115200
+datarate = 10
+serialport = COM4
+serialtimeout = 1
+
+[FILES]
+cfginputfile = C:/CAMP/V2I Projects/V2I - SA Extension 2/Task 14 - WZ Mapping/WZ Map+Viz+Msg Builder_v1.0 Distribution/IOO - Web Distribution/I35-Temple-NB_config-RSU.wzc
+cfgoutputfile = C:/CAMP/V2I Projects/V2I - SA Extension 2/Task 14 - WZ Mapping/WZ Map+Viz+Msg Builder_v1.0 Distribution/IOO - Web Distribution/I35-Temple-NB_config-RSU.wzc
+vehiclepathdatadir = C:/CAMP/V2I Projects/V2I - SA Extension 2/Task 14 - WZ Mapping/WZ Map+Viz+Msg Builder_v1.0 Distribution/IOO - Web Distribution/WZ_VehPathData
+vehiclepathdatafile = WZ_Path_Data_I35-Temple-NB-20181120_RSU.csv
+
+[LANES]
+description = I-35 Temple NB (W: RSU location)
+numberoflanes = 3
+averagelanewidth = 3.66
+approachlanepadding = 0.0
+workzonelanepadding = 0.0
+vehiclepathdatalane = 2
+
+[SPEED]
+normalspeed = 65
+referencepointspeed = 60
+workerspresentspeed = 60
+
+[CAUSE]
+causecode = 3
+subcausecode = 0
+
+[SCHEDULE]
+wzstartdate = 2018-11-8
+wzstarttime = 0:0
+wzenddate = 2019-11-8
+wzendtime = 23:59
+wzdaysofweek = Sun,Mon,Tue,Wed,Thu,Fri,Sat
+

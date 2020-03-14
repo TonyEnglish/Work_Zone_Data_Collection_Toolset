@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	 CAMP xml file for RSZW/LC Mapping Project
+	 Message segment file 1 of 1...
+
+	 Version 1.5 - June, 2018
+	 for RSMv5.1 ASN
+	 File Name: ./WZ_MapMsg/RSZW_MAP_xml_File-20191115-144841-1_of_1.exer
+	 Created: 11/15/2019 - 14:48:31
+
+-->
+<MessageFrame>
+  <messageId>33</messageId>
+  <value>
+    <RoadsideSafetyMessage>
+      <version>1</version>
+
+      <commonContainer>
+<!--
+		 ...Event ID...(no Message ID)
+-->
+        <eventInfo>
+          <eventID>00006aed</eventID>
+<!--
+		 ...Message segmentation... 
+-->
+          <msgSegmentInfo>
+            <totalMsgSegments>1</totalMsgSegments>
+            <thisSegmentNum>1</thisSegmentNum>
+          </msgSegmentInfo>
+<!--
+		 ...Event start Date & Time...
+-->
+          <startDateTime>
+            <year>2019</year>
+            <month>11</month>
+            <day>8</day>
+            <hour>0</hour>
+            <minute>0</minute>
+            <offset>-300</offset>
+          </startDateTime>
+<!--
+		 ...Event end Date and Time...
+-->
+          <endDateTime>
+            <year>2019</year>
+            <month>11</month>
+            <day>10</day>
+            <hour>23</hour>
+            <minute>59</minute>
+          </endDateTime>
+<!--
+		 ...Cause/Sub cause codes...
+-->
+          <causeCode>3</causeCode>
+          <subCauseCode>0</subCauseCode>
+        </eventInfo>
+<!--
+		 ...Region Info Section...
+-->
+        <regionInfo>
+<!--
+		 ...Applicable Heading / Tolerance...
+-->
+          <applicableHeading>
+            <heading>45</heading>
+            <tolerance>20</tolerance>
+          </applicableHeading>
+<!--
+		 ...Reference Point - Lat/Long in Micro Degrees...
+-->
+          <referencePoint>
+            <lat>404742350</lat>
+            <long>-1049692566</long>
+            <elevation>1514</elevation>
+          </referencePoint>
+<!--
+		 ...Reference Point Type...
+-->
+          <referencePointType><startOfEvent/></referencePointType>
+          <descriptiveName>This is a Default Config File, Can't be Modified</descriptiveName>
+
+<!--
+		  ...Speed Limit at the Ref. Point...
+-->
+          <speedLimit>
+            <type><vehicleMaxSpeed/></type>
+            <speed>60</speed>
+            <speedUnits><mph/></speedUnits>
+          </speedLimit>
+
+<!--
+		...Event Length...
+-->
+          <eventLength>11</eventLength>
+
+<!--
+		...Start of Approach Region...
+-->
+<!--    ...APPROACH LANES: Map Waypoints...
+            Total nodes per lane - 4
+-->
+          <approachRegion>
+            <roadwayGeometry>
+              <scale>1</scale>
+              <rsmLanes>
+<!--
+		    Approach Lane #1    
+-->
+                <RSMLane>
+                  <laneID>1</laneID>
+                  <lanePosition>1</lanePosition>
+                  <laneName>Lane #1</laneName>
+                  <laneGeometry>
+                    <nodeSet>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 1/1  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404742760</lat>
+                            <long>-1049693264</long>
+                            <elevation>1514</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 1/2  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404741876</lat>
+                            <long>-1049694425</long>
+                            <elevation>1515</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 1/3  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404741326</lat>
+                            <long>-1049695119</long>
+                            <elevation>1516</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 1/4  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404739868</lat>
+                            <long>-1049695269</long>
+                            <elevation>1516</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                    </nodeSet>
+                  </laneGeometry>
+                </RSMLane>
+<!--
+		    Approach Lane #2    
+-->
+                <RSMLane>
+                  <laneID>2</laneID>
+                  <lanePosition>2</lanePosition>
+                  <laneName>Lane #2</laneName>
+                  <laneGeometry>
+                    <nodeSet>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 2/1  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404742530</lat>
+                            <long>-1049692965</long>
+                            <elevation>1514</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 2/2  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404741680</lat>
+                            <long>-1049694087</long>
+                            <elevation>1515</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 2/3  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404741188</lat>
+                            <long>-1049694734</long>
+                            <elevation>1516</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 2/4  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404740184</lat>
+                            <long>-1049695176</long>
+                            <elevation>1516</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                    </nodeSet>
+                  </laneGeometry>
+                </RSMLane>
+<!--
+		    Approach Lane #3    
+-->
+                <RSMLane>
+                  <laneID>3</laneID>
+                  <lanePosition>3</lanePosition>
+                  <laneName>Lane #3</laneName>
+                  <laneGeometry>
+                    <nodeSet>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 3/1  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404742300</lat>
+                            <long>-1049692666</long>
+                            <elevation>1514</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 3/2  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404741483</lat>
+                            <long>-1049693750</long>
+                            <elevation>1515</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 3/3  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404741050</lat>
+                            <long>-1049694350</long>
+                            <elevation>1516</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>					<!--  Approach Lane#/Node# - 3/4  -->
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>404740500</lat>
+                            <long>-1049695083</long>
+                            <elevation>1516</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                    </nodeSet>
+                  </laneGeometry>
+                </RSMLane>
+              </rsmLanes>
+            </roadwayGeometry>
+          </approachRegion>
+        </regionInfo>
+      </commonContainer>
+
+<!--
+		...END of COMMON CONTAINER...		-->
+
+<!--   ...Work Zone Lanes: Map way points...   -->
+
+      <rszContainer>
+        <speedLimit>
+          <type><vehicleMaxSpeed/></type>
+          <speed>60</speed>
+          <speedUnits><mph/></speedUnits>
+        </speedLimit>
+
+<!--	 ...S T A R T   of   L A N E   G E O M E T R Y...
+                Total node points per lane - 9
+-->
+        <rszRegion>
+          <roadwayGeometry>
+            <scale>10</scale>
+            <rsmLanes>
+<!--
+	    ...Work Zone Lane #1...
+-->
+              <RSMLane>
+                <laneID>1</laneID>
+                <lanePosition>1</lanePosition>
+                <laneName>Left Lane: Lane #1</laneName>
+                <laneWidth>360</laneWidth>
+                <laneGeometry>
+                  <nodeSet>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 1/1  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404742808</lat>
+                          <long>-1049693167</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 1/2 ... Lane is closed ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404743952</lat>
+                          <long>-1049691559</long>
+                          <elevation>1515</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <taperLeft><false/></taperLeft>
+                        <taperRight><true/></taperRight>
+                        <laneClosed><true/></laneClosed>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 1/3 ... Lane is closed ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404745452</lat>
+                          <long>-1049689319</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 1/4 ... Lane is closed ... ... Workers Present ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404745519</lat>
+                          <long>-1049689195</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <speedLimit>
+                          <type><vehicleMaxSpeed/></type>
+                            <speed>45</speed>
+                            <speedUnits><mph/></speedUnits>
+                        </speedLimit>
+                        <peoplePresent><true/></peoplePresent>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 1/5 ... Lane is closed ... ... Workers Present ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404746546</lat>
+                          <long>-1049687502</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 1/6 ... Lane is closed ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404747137</lat>
+                          <long>-1049686324</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <speedLimit>
+                          <type><vehicleMaxSpeed/></type>
+                            <speed>60</speed>
+                            <speedUnits><mph/></speedUnits>
+                        </speedLimit>
+                        <peoplePresent><false/></peoplePresent>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 1/7 ... Lane is closed ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404747814</lat>
+                          <long>-1049684938</long>
+                          <elevation>1513</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 1/8  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404748500</lat>
+                          <long>-1049683182</long>
+                          <elevation>1515</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <taperLeft><true/></taperLeft>
+                        <taperRight><false/></taperRight>
+                        <laneClosed><false/></laneClosed>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 1/9  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404748840</lat>
+                          <long>-1049682299</long>
+                          <elevation>1516</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                  </nodeSet>
+                </laneGeometry>
+                <connectsTo>
+                  <LaneID>1</LaneID>
+                  <LaneID>2</LaneID>
+                </connectsTo>
+              </RSMLane>
+<!--
+	    ...Work Zone Lane #2...
+-->
+              <RSMLane>
+                <laneID>2</laneID>
+                <lanePosition>2</lanePosition>
+                <laneName>Lane #2</laneName>
+                <laneWidth>360</laneWidth>
+                <laneGeometry>
+                  <nodeSet>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 2/1  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404742579</lat>
+                          <long>-1049692867</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 2/2  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404743726</lat>
+                          <long>-1049691254</long>
+                          <elevation>1515</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 2/3  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404745217</lat>
+                          <long>-1049689026</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 2/4 ... Workers Present ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404745276</lat>
+                          <long>-1049688914</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <speedLimit>
+                          <type><vehicleMaxSpeed/></type>
+                            <speed>45</speed>
+                            <speedUnits><mph/></speedUnits>
+                        </speedLimit>
+                        <peoplePresent><true/></peoplePresent>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 2/5 ... Lane is closed ... ... Workers Present ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404746289</lat>
+                          <long>-1049687242</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <taperLeft><false/></taperLeft>
+                        <taperRight><true/></taperRight>
+                        <laneClosed><true/></laneClosed>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 2/6 ... Lane is closed ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404746868</lat>
+                          <long>-1049686087</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <speedLimit>
+                          <type><vehicleMaxSpeed/></type>
+                            <speed>60</speed>
+                            <speedUnits><mph/></speedUnits>
+                        </speedLimit>
+                        <peoplePresent><false/></peoplePresent>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 2/7  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404747540</lat>
+                          <long>-1049684710</long>
+                          <elevation>1513</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <taperLeft><true/></taperLeft>
+                        <taperRight><false/></taperRight>
+                        <laneClosed><false/></laneClosed>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 2/8  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404748225</lat>
+                          <long>-1049682958</long>
+                          <elevation>1515</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 2/9  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404748562</lat>
+                          <long>-1049682083</long>
+                          <elevation>1516</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                  </nodeSet>
+                </laneGeometry>
+                <connectsTo>
+                  <LaneID>2</LaneID>
+                  <LaneID>3</LaneID>
+                </connectsTo>
+              </RSMLane>
+<!--
+	    ...Work Zone Lane #3...
+-->
+              <RSMLane>
+                <laneID>3</laneID>
+                <lanePosition>3</lanePosition>
+                <laneName>Right Lane: Lane #3</laneName>
+                <laneWidth>360</laneWidth>
+                <laneGeometry>
+                  <nodeSet>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 3/1  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404742350</lat>
+                          <long>-1049692566</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 3/2  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404743500</lat>
+                          <long>-1049690950</long>
+                          <elevation>1515</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 3/3  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404744983</lat>
+                          <long>-1049688733</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 3/4 ... Workers Present ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404745033</lat>
+                          <long>-1049688633</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <speedLimit>
+                          <type><vehicleMaxSpeed/></type>
+                            <speed>45</speed>
+                            <speedUnits><mph/></speedUnits>
+                        </speedLimit>
+                        <peoplePresent><true/></peoplePresent>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 3/5 ... Workers Present ...  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404746033</lat>
+                          <long>-1049686983</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 3/6  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404746600</lat>
+                          <long>-1049685850</long>
+                          <elevation>1514</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <speedLimit>
+                          <type><vehicleMaxSpeed/></type>
+                            <speed>60</speed>
+                            <speedUnits><mph/></speedUnits>
+                        </speedLimit>
+                        <peoplePresent><false/></peoplePresent>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 3/7  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404747266</lat>
+                          <long>-1049684483</long>
+                          <elevation>1513</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 3/8  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404747950</lat>
+                          <long>-1049682733</long>
+                          <elevation>1515</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>					<!--  WZ Lane#/Node# - 3/9  -->
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>404748283</lat>
+                          <long>-1049681866</long>
+                          <elevation>1516</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                  </nodeSet>
+                </laneGeometry>
+              </RSMLane>
+            </rsmLanes>
+          </roadwayGeometry>
+        </rszRegion>
+      </rszContainer>
+    </RoadsideSafetyMessage>
+  </value>
+</MessageFrame>

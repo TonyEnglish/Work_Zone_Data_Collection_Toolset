@@ -1,0 +1,473 @@
+RSM DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN
+
+-- Roadside Safety Message is abbreviated as RSM in type definitions and comments below
+RoadsideSafetyMessage ::= SEQUENCE {
+    version                Version DEFAULT 1,   -- Message versioning info, DEFAULT to version 1
+
+    -- This mandatory container describes generic information about the event.
+    commonContainer        CommonContainer, 
+
+    -- The following application containers describe use-case specific
+    -- information about the event.
+    rszContainer           ReducedSpeedZoneContainer  OPTIONAL,
+    curveContainer         CurveContainer             OPTIONAL,
+
+    -- The following container definitions provided by SwRI
+    staticSignageContainer StaticSignageContainer     OPTIONAL, -- 
+    situationalContainer   SituationalContainer       OPTIONAL, -- this is a catch-all until some content is moved to higher frames
+    dynamicInfoContainer   DynamicInfoContainer       OPTIONAL, -- traditional "DMS"-type display
+    incidentsContainer     IncidentsContainer         OPTIONAL, -- merge with WorkZone
+
+    regional               SEQUENCE 
+        (SIZE(1..4)) OF DSRC.RegionalExtension {{REGION.Reg-RoadsideSafetyMessage}} OPTIONAL,
+    ...
+}
+
+-- CommonContainer is mandatory and applies to all RSMs
+CommonContainer ::= SEQUENCE {
+    eventInfo         EventInfo,                     -- New container includes eventID, start/end date/times, eventRecurrance, causeCodes
+    regionInfo        RegionInfo,                    -- This is new, includes referencePoint, applicableHeding, roadWidth (pathWidth), approachLanes (approachRegion)
+    ...    
+}
+
+-- Contains info related to event start/end date/times, recurrence, cause codes (moved here from top level of CommonContainer)
+EventInfo ::= SEQUENCE {
+    eventID           DSRC.TemporaryID,               -- Randomly assigned ID for this event
+    msgSegmentInfo    MsgSegmentInfo        OPTIONAL, -- Info about message segments for this event
+    startDateTime     DSRC.DDateTime,                 -- Event start date and time
+    endDateTime       DSRC.DDateTime        OPTIONAL, -- Event end date and time (applies to current message instance). 
+                                                      -- endDateTime can be omitted if indefinite or unknown,  
+                                                      -- Can be used to calculate the validity time duration of the message.
+    eventRecurrence   SEQUENCE                        -- Indicates the date/time periods for which an event is active. 
+       (SIZE(1..5, ...)) OF EventRecurrence OPTIONAL, -- Up to 5 periods may be defined. 
+    causeCode         CauseCode,                      -- List of possible events
+    subCauseCode      SubCauseCode          OPTIONAL, -- List of possible events (use-case specific)
+    ...
+}
+
+-- Note: All message segments corresponding to the same event must have the same eventID in EventInfo
+MsgSegmentInfo ::= SEQUENCE {
+    totalMsgSegments  SegmentCount,               -- Number of message segments for this event
+    thisSegmentNum    SegmentCount                -- Segment number for this message
+}
+
+SegmentCount ::= INTEGER(1..127)
+
+-- Contains info related to event heading, location, reference point, length, speed (moved here from top level of CommonContainer)
+RegionInfo ::= SEQUENCE {
+    applicableHeading  ApplicableHeading,               -- Provide so map matching algs can easily determine direction of travel
+    referencePoint     DSRC.Position3D,                 -- Reference position, may be start of event (default) or arbitrary location.
+    referencePointType ReferencePointType   OPTIONAL,   -- startOfEvent or arbitrary. If not provided, default to startOfEvent.
+    descriptiveName    DSRC.DescriptiveName OPTIONAL,   -- Plain text (human readable) name of roadway or region (might be IA5String)
+    speedLimit         RSMSpeedLimit        OPTIONAL,   -- Speed limit at the reference position
+    eventLength        EventLength          OPTIONAL,   -- Len of event in meters (dist of travel)
+    approachRegion     AreaType             OPTIONAL,   -- Note: approachLanes has been replaced with AreaType
+    ...
+}
+
+-- Provides choice of methods to describe a region, i.e., lane based or other more general region definitions (e.g. polygon, etc.)
+AreaType ::= CHOICE {
+    broadRegion            BroadRegion,            -- Polygon or Circle
+    roadwayGeometry        RsmGeometry,            -- Sequence of lanes with attributes
+    paths                  PathList,               -- One or more coarse "lanes" (or roads) with a width
+    ...
+}
+
+BroadRegion ::= CHOICE {
+    polygon            Polygon,
+    circle             DSRC.Circle,
+    ...
+}
+
+Polygon ::= SEQUENCE (SIZE(3..50)) OF NodePointLLE -- May be defined by abs lat/lon/elev or offsets
+  
+PathList ::= SEQUENCE (SIZE(1..10)) OF Path
+  
+Path ::= SEQUENCE {
+    pathWidth         INTEGER (0..1000), -- width of the above Path in units of 10cm
+    pathPoints        PathPoints,
+    ...
+}
+
+PathPoints ::= SEQUENCE (SIZE(2..50)) OF DSRC.Position3D
+
+-- Optional container describing a zone where reduced speed is required, maybe a workzone or other type of zone (e.g., school).
+-- Abbreviated as rsz or RSZ in various comments and type definitions below.
+-- 
+-- If geometry is available, then the zone may be fully defined using rszRegion+rsmGeometry and associated supplemental attributes elements.
+-- If geometry is not available, then the zone may be defined using the laneStatus, peoplePresent and speedLimit elements.
+-- The peoplePresent and speedLimit elements may also be used if they are not included in rszRegion+rsmGeometry.
+ReducedSpeedZoneContainer ::= SEQUENCE {
+    laneStatus             SEQUENCE
+        (SIZE(1..10, ...)) OF LaneInfo                OPTIONAL, -- Lane status (open/closed) and closure offset from ref point
+    peoplePresent          PeoplePresent              OPTIONAL, -- TRUE: people are present, FALSE: people are not present
+    speedLimit             RSMSpeedLimit              OPTIONAL, -- Speed limit assoc with event if not spec in rsmGeometry (supplementalAttributes)
+    roadClosureDescription ITIS.ITIScodes(769..895)   OPTIONAL, -- J2540 DE_Closures
+    roadWorkDescription    ITIS.ITIScodes(1025..1061) OPTIONAL, -- J2540 DE_Roadwork
+    flagman                DSRC.PublicSafetyDirectingTrafficSubType OPTIONAL,
+    trucksEnteringLeaving  BOOLEAN                    OPTIONAL,
+    rszRegion              AreaType                   OPTIONAL, -- Describes region of reduced speed zone
+    ...
+}
+
+-- For each lane, status (open/closed) and closure offset from reference point
+LaneInfo ::= SEQUENCE {
+    lanePosition      LanePosition,                     -- Where lanePosition 1 is always the leftmost lane
+    laneClosed        LaneClosed,                       -- TRUE:lane closed, FALSE:lane open
+    laneCloseOffset   DSRC.ObstacleDistance OPTIONAL,   -- Distance from ref point to lane closure in meters
+    ...
+}
+
+-- Optional container describing conditions that may be present in a curve of the roadway
+CurveContainer ::= SEQUENCE {
+    advisorySpeed     DSRC.SpeedAdvice,                -- Recommended speed limit for the curve
+    frictCoef         FrictCoef             OPTIONAL,  -- Coefficient of kinetic friction
+    surfaceCondition  SurfaceCondition      OPTIONAL,  -- Enum value describing current road condition
+    material          Material              OPTIONAL,  -- Enum value describing material type
+    minRadius         Radius                OPTIONAL,  -- Minimum radius of the curve in meters
+    bankAngle         BankAngle             OPTIONAL,  -- Bank angle present at min radius of the curve
+    obstaclePresent   Activity              OPTIONAL,  -- TRUE: obstacle present, FALSE: no info avail
+    reducedVisibility Activity              OPTIONAL,  -- TRUE: reduced visibility, FALSE: no info avail
+    curveRegion       AreaType              OPTIONAL,  -- Describes geometry of lanes or polygon in the curve
+    ...
+}
+
+-- Describes the geometry of a reduced speed zone or a curve (or any other set of lanes that may be required in the future).
+RsmGeometry ::= SEQUENCE {
+    scale             RsmScale              OPTIONAL,   -- If scaling of nodelist is desired (applies to all rsmLanes)
+    rsmLanes          SEQUENCE 
+        (SIZE(1..10, ...)) OF RSMLane,                  -- Lane specific information for from 1 to 10 lanes
+    ...                   
+}
+
+-- RSMLane replaces J2735's GenericLane 
+RSMLane ::= SEQUENCE { 
+    laneID             DSRC.LaneID,                     -- The unique ID number assigned to this lane
+    lanePosition       LanePosition         OPTIONAL,   -- Lane number, where lane 1 is leftmost lane
+    laneName           DSRC.DescriptiveName OPTIONAL,   -- Human readable, typically used for debug use only 
+    laneWidth          DSRC.LaneWidth       OPTIONAL,   -- Absolute width of lane in 1 cm increments (e.g., 1200 = 12 m). When using referenceLane laneWidth required.
+    laneGeometry       LaneGeometry         OPTIONAL,   -- Choice between the referenceLane method or the nodeset method
+    connectsTo         SEQUENCE
+        (SIZE(1..16, ...)) OF DSRC.LaneID   OPTIONAL,   -- A list of other lanes connecting to RSM lanes
+    ...
+}
+
+-- Choose how the lane geometry is described: explitly defined using nodes, or identify another lane with the same geometry.
+-- TODO: Add some text discussing how to describe a curved lane using the referenceLane approach.
+LaneGeometry ::= CHOICE {
+    referenceLane      DSRC.LaneID,    -- Use node definitions from the lane identified by referenceLane 
+    nodeSet            NodeSetLLE,     -- Use the nodes specified in a node set to describe lane geometry
+    ...
+}
+
+-- Replaces J2735's NodeSetXY in the RSM
+-- Spatial path and attribute information along the node path
+NodeSetLLE ::= SEQUENCE (SIZE(2..63)) OF NodeLLE
+
+-- Replaces J2735's NodeXY in the RSM
+NodeLLE ::= SEQUENCE {
+    nodePoint         NodePointLLE,                     -- A choice of using absolute lat/long/elev or offsets
+    nodeAttributes    NodeAttributeSetLLE   OPTIONAL,   -- Any optional Attributes which are needed
+    ... 
+}
+
+-- Replaces J2735's NodeOffsetPointXY in the RSM
+NodePointLLE ::= CHOICE {
+    -- Nodes with lat/long/elev content
+    node-3Dabsolute   DSRC.Position3D,  -- Absolute lat/long/elevation
+    node-3Doffset     Offset3D,         -- Offsets of fractional deg (lat/long) and meters (elev)
+    ...
+}
+
+-- Provides lat/long/elev offsets from the previous node in the node set 
+Offset3D ::= SEQUENCE {
+    lat-offset        LatOffset,        -- Offset from previous node latitude
+    long-offset       LongOffset,       -- Offset from previous node longitude
+    elev-offset       ElevOffset,       -- Offset from previous node elevation
+    ...
+}
+
+-- Use scale (Zoom) to to modify the units for nodes' latitude and longitude (but not elevation). 
+-- For example the default units specified for latitude and longitude are tenths of microdegrees. 
+-- A scale value set to 10 causes the units to be converted to microdegrees. 
+-- The scale factor is not applied to the elevation if present.
+-- Offset units are recommended as follows, set scale appropriately:
+-- For reduced speed zone: microdegrees, providing approx. 100 cm resolution (scale=10).
+-- For curves: 0.1 microdegrees, providing approx. 10 cm resolution (scale=1)
+LatOffset  ::= INTEGER (-16384..16383) -- Offset in microdegrees (rsz) or 0.1 microdegrees (curves)
+LongOffset ::= INTEGER (-16384..16383) -- Offset in microdegrees (rsz) or 0.1 microdegrees (curves)
+ElevOffset ::= INTEGER (-4096..4095)   -- Offset in increments of 0.1 meters (scale not applied)
+
+-- Include any optional attributes needed to further describe a lane.
+NodeAttributeSetLLE ::= SEQUENCE {
+    speedLimit      RSMSpeedLimit  OPTIONAL,   -- Reference regulatory speed limit used in this lane
+    width           DSRC.LaneWidth OPTIONAL,   -- Absolute width of lane in 1 cm increments (e.g., 1200 = 12 m)
+    taperLeft       TaperLeft      OPTIONAL,   -- Used when lane is closing or shifting to the left
+    taperRight      TaperRight     OPTIONAL,   -- Used when lane is closing or shifting to the right
+    laneClosed      LaneClosed     OPTIONAL,   -- TRUE if lane is closed
+    peoplePresent   PeoplePresent  OPTIONAL,   -- TRUE: people are present, FALSE: people are not present
+    ...
+}
+
+--
+-- The following are various data frames and elements used above.
+--
+Activity ::= BOOLEAN                -- TRUE: Relevant activity is occurring, FALSE: Unknown what is happening
+
+ApplicableHeading ::= SEQUENCE {
+    heading           HeadingDeg,   -- Heading in 1 degree increments, message applies to heading +/- tolerance
+    tolerance         Tolerance,    -- Tolerance in 1 degree increments
+    ...
+}
+
+BankAngle ::= INTEGER (-63..64)     -- Bank angle of the curve at the minimum radius in degrees
+
+-- These codes defined in ETSI EN 302 637-3
+-- TODO: Create new codes and define in J2735 or somewhere?
+CauseCode ::= INTEGER {
+    reserved (0),
+    trafficCondition (1),
+    accident (2),
+    roadwor (3),
+    adverseWeatherCondition-Adhesion (6),
+    hazardousLocation-SurfaceCondition (9),
+    hazardousLocation-ObstacleOnTheRoad (10),
+    hazardousLocation-AnimalOnTheRoad (11),
+    humanPresenceOnTheRoad (12),
+    wrongWayDriving (14),
+    rescueAndRecoveryWorkInProgress (15),
+    adverseWeatherCondition-ExtremeWeatherCondition (17),
+    adverseWeatherCondition-Visibility (18),
+    adverseWeatherCondition-Precipitation (19),
+    slowVehicle (26),
+    dangerousEndOfQueue (27),
+    vehicleBreakdown (91),
+    postCrash (92),
+    humanProblem (93),
+    stationaryVehicle (94),
+    emergencyVehicleApproaching (95),
+    hazardousLocation-DangerousCurve (96),
+    collisionRisk (97),
+    signalViolation (98),
+    dangerousSituation (99)
+} (0..255)
+
+-- Unsigned 16-bit integer representing zone length in meters
+EventLength ::= INTEGER (0..65535)    
+
+-- Defines applicable periods for an event.
+EventRecurrence ::= SEQUENCE {
+    startTime   DSRC.DTime  OPTIONAL,  -- Time of day this period starts
+    endTime     DSRC.DTime  OPTIONAL,  -- Time of day this period ends
+    startDate   DSRC.DDate  OPTIONAL,  -- Date this period starts
+    endDate     DSRC.DDate  OPTIONAL,  -- Date this period ends
+    -- Define days of the week for applicable periods (used by EventRecurrence)
+    monday      BOOLEAN,
+    tuesday     BOOLEAN,
+    wednesday   BOOLEAN,
+    thursday    BOOLEAN,
+    friday      BOOLEAN,
+    saturday    BOOLEAN,
+    sunday      BOOLEAN,
+    -- exclusion: TRUE: The period defined here is excluded, i.e., the period is NOT applicable to the event
+    exclusion   BOOLEAN     OPTIONAL,  
+    ...
+}
+
+FrictCoef ::= INTEGER (0..100)
+
+HeadingDeg ::= INTEGER (0..360)  -- Heading in 1 degree increments
+        
+LaneClosed ::= BOOLEAN           -- TRUE: Lane is closed, FALSE: lane is not closed
+
+LanePosition ::= INTEGER (1..15) -- Lane position where lane 1 is always leftmost lane
+
+Material ::= ENUMERATED {
+    asphalt         (0),
+    concrete        (1),
+    gravel          (2),
+    brushedConcrete (3),
+    ...
+}
+
+-- Indicates the presence of people in a reduced speed zone or a curve 
+PeoplePresent ::= BOOLEAN      -- TRUE: Indicates people are present, FALSE: People are not present 
+
+Radius ::= INTEGER (0..1023)   -- Minimum radius of the curve in meters
+
+RsmScale ::= INTEGER (1..100)  -- Scale factor (zoom) applied to node offsets
+
+-- New DF for RSM, replaces J2735's RegulatorySpeedLimit
+RSMSpeedLimit ::= SEQUENCE {
+    type        DSRC.SpeedLimitType DEFAULT vehicleMaxSpeed, -- The type of regulatory speed which follows
+    speed       Speed,                                       -- The speed in units chosen below
+    speedUnits  SpeedUnits DEFAULT mph,                      -- Units of speed, e.g., mph, kph, 0.02 m/sec
+    ...
+}
+
+-- Speed limit value, units specified elsewhere (see SpeedUnits)
+-- If units selected is mpsXpt02 (0.02 m/sec), then max speed is approx. 365 MPH
+Speed ::= INTEGER (0..8191)
+
+-- Use this to determine units to be applied to speed value.
+SpeedUnits ::= ENUMERATED {
+    mph,            -- Miles per hour
+    kph,            -- Kilometers per hour
+    mpsXpt02,       -- 0.02 meters per second (reads as mps times point 02)
+    ...
+}
+
+-- Unsigned 8-bit integer value, application dependent
+SubCauseCode ::= INTEGER (0..255)    
+
+SurfaceCondition ::= ENUMERATED {
+    dry        (0),
+    moist      (1),
+    wet        (2),
+    flowing    (3),
+    ice        (4),
+    snow       (5),
+    frost      (6),
+    ...
+}
+
+ReferencePointType ::= ENUMERATED {
+    startOfEvent (0),
+    arbitrary    (1),
+    ...
+}
+
+Tolerance ::= INTEGER (0..360)  -- In 1 degree increments
+
+TaperLeft ::= BOOLEAN           -- TRUE: Lane is closing or shifting to the left
+
+TaperRight ::= BOOLEAN          -- TRUE: Lane is closing or shifting to the right
+
+Version ::= INTEGER (0..255)    -- Eight bits of version info
+
+--
+-- The following use-case specific container definitions
+--
+
+StaticSignageContainer ::= SEQUENCE {
+    speedLimit                 RSMSpeedLimit           OPTIONAL,
+    mileMarker                 REAL                    OPTIONAL,
+    itisGenericSign            DSRC.GenericSignage     OPTIONAL, -- Restrict (or recommend) J2540 sign sequences (ITIS phrases)
+    mutcdCode                  DSRC.MUTCDCode          OPTIONAL, -- "regulatory", "warning", "guide", etc (typically implied/derived by sign designation below)
+    mutcdSignDesignation       IA5String(SIZE(1..120)) OPTIONAL, -- Alphanumeric MUTCD sign designation 
+    -- Identify nominal subset of all signs, minimal subset to support
+    ...
+}   
+  
+SituationalContainer ::= CHOICE {
+    obstructions               Obstructions,      -- Location, size, lanes, etc
+    overheightVehicle          OverheightVehicle, -- Clearance location, clearance height, location/path, measured height of vehicle
+    travelTime                 TravelTime,        -- Start/end, typical/actual
+    roadClosure                RoadClosure,       -- Merge with CAMP RSZW
+    railCrossing               RailCrossing,      -- Activity (gate/signal/train), duration
+    ...
+}
+
+DynamicInfoContainer ::= SEQUENCE {
+    priority                   ENUMERATED {low-priority (0), medium-priority (1), high-priority (2), critical (3)},
+    typeOfInfo                 TypeOfDynamicInfo,
+    dmsSignString              IA5String(SIZE(1..100)) OPTIONAL,
+    congestionInfo             SEQUENCE  
+        (SIZE(1..30)) OF CongestionInfo                OPTIONAL,
+    situationalInfo            SituationalContainer    OPTIONAL, -- For work zone, travel time, etc... info
+    incidentsInfo              IncidentsContainer      OPTIONAL, -- For incidents info
+    ...     
+}  
+   
+IncidentsContainer ::= SEQUENCE {
+    description                ITIS.ITIScodes(513..531),      -- J2540 DE_AccidentsAndIncidents
+    responderType              SEQUENCE 
+        (SIZE(1..5)) OF ITIS.ResponderGroupAffected OPTIONAL,
+    affectedLanes              RegionInfo           OPTIONAL,
+    advisorySpeed              DSRC.AdvisorySpeed   OPTIONAL,
+    congestionInfo             CongestionInfo       OPTIONAL, -- Include DynamicInfoContainer?
+    ...     
+}  
+  
+-- 
+-- Start of Data Frames and elements used by use-case specific containers
+--
+   
+CongestionInfo ::= SEQUENCE {
+    queueAheadWarning          BOOLEAN,
+    associatedLane             RSMLane                 OPTIONAL, --Single roadsegment with which queue info is associated; omit if defining for all lanes
+    startOfQueue               RegionInfo,
+    lengthOfQueue              DSRC.ObstacleDistance   OPTIONAL, -- TODO: Technically wrong DE to use, but is the only J2735 element with sufficient length (GrossDistance max is 1km)
+                                                                 -- Should define new, more generic, distance element
+    speedLimit                 RSMSpeedLimit           OPTIONAL,
+    averageVehicleSpeed        DSRC.Velocity           OPTIONAL,
+    normalConditions           BOOLEAN                 OPTIONAL,
+    unexpectedConditionDesc    IA5String(SIZE(1..100)) OPTIONAL, -- Text description of unexpected event or ITIS Code
+    ...
+}  
+
+ManyDayOfWeek ::= SEQUENCE (SIZE(1..7)) OF AddGrpB.DayOfWeek --An 'array' of time and day of week or date when repeating event is active
+  
+Obstructions ::= SEQUENCE { 
+    detection                  DSRC.ObstacleDetection,
+    roadSegmentID              DSRC.RoadSegmentReferenceID,         -- link to outside map
+    description                ITIS.ITIScodes(1282..1319) OPTIONAL, -- J2540 DE_Obstructions
+    location                   ITIS.ITIScodes(7937..8030) OPTIONAL, -- J2540 DE_GenericLocations
+    affectedLanes              RegionInfo                 OPTIONAL,
+    reducedspeed               DSRC.AdvisorySpeed         OPTIONAL,
+    affectedvehicles           DSRC.DisabledVehicle       OPTIONAL,
+    ...
+}  
+  
+OverheightVehicle ::= SEQUENCE {
+    roadSegmentID              DSRC.RoadSegmentReferenceID,
+    point                      DSRC.Position3D,
+    intersection               DSRC.IntersectionReferenceID OPTIONAL,
+    vehicleHeight              DSRC.VehicleHeight           OPTIONAL, --Limited Range, consider expanding
+    clearanceHeight            DSRC.VehicleHeight,                    --Limited Range
+    heightViolation            ENUMERATED {not-in-violation (0), in-violation (1), less-than-15-cm (2), unknown (3)},
+    ...
+} 
+  
+RailCrossing ::= SEQUENCE {
+    crossingSignalOn           BOOLEAN                    OPTIONAL,
+    crossingGateDown           BOOLEAN                    OPTIONAL,
+    approachingTrain           BOOLEAN                    OPTIONAL,    
+    trainCrossingInProgress    BOOLEAN,
+    durationTime               DSRC.MinutesDuration       OPTIONAL, --Estimated duration of crossing
+    durationDescription        ITIS.ITIScodes(1537..1543) OPTIONAL, -- J2540 DE_DelayStatusCancellation
+    ...
+} 
+  
+RoadClosure ::= SEQUENCE {
+    description                ITIS.ITIScodes(769..895),      -- J2540 DE_Closures
+    affectedLanes              RegionInfo,
+    temporaryClosureDuration   DSRC.MinutesDuration OPTIONAL,
+    indefiniteClosure          BOOLEAN              OPTIONAL, -- Moved to TimeInfoContainer (TODO: comment seems unclear)
+    ...
+}  
+  
+TravelTime ::= SEQUENCE {
+    travelOrigin               RegionInfo,
+    travelDestination          RegionInfo,
+    distanceToDestination      DSRC.ObstacleDistance,           --Only J2735 element with sufficient length (GrossDistance max is 1km)
+    typicalDuration            DSRC.MinutesDuration   OPTIONAL,
+    actualDuration             DSRC.MinutesDuration   OPTIONAL,
+    dmsSignString              IA5String(SIZE(1..80)) OPTIONAL, --Simple string as may appear on DMS Sign
+    ...
+} 
+  
+TypeOfDynamicInfo ::= ENUMERATED {
+    road-work      (0),
+    road-closure   (1),
+    travel-time    (2),
+    congestion     (3),
+    incident       (4),
+    obstruction    (5),
+    weather-alert  (6),
+    special-event  (7),
+    ...
+}    
+
+END
