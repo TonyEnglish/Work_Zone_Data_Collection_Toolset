@@ -73,7 +73,7 @@ print ("\n\n *** CAMP V2I-SA Work Zone Mapping - Vehicle Path Data Acquisition v
 
 try:
     portNum     = 'COM3'
-    baudRate    = 4800
+    baudRate    = 115200
     timeOut     = 1
     ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)       #open serial port
 
