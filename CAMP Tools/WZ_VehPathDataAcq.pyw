@@ -486,7 +486,42 @@ def gotQuit():
 
 #---------------------------------------------------------------------
 
-   
+
+###
+#  Update GPS comm port
+###
+def commSelect(*args):
+    portNum= tkvar.get()
+
+###
+#  Check for GPS computer
+###
+def checkForGPS(root, portNum):
+    ports = serial.tools.list_ports.comports(include_links=False)
+    gpsFound = False
+    if len(ports)==0:
+        messagebox.showerror("GPS Receiver Missing", "*** GPS Receiver missing ***\n\n")
+    if (len(ports)>=1):
+        for port in ports:
+            if ("1546:01A6" in port.hwid):
+                portNum = "com4" #port.device
+                #gpsFound = True
+        if (not gpsFound):
+            mainframe = Frame(root)
+            # Add a grid
+            mainframe.pack()
+            mainframe.columnconfigure(0, weight=1)
+            mainframe.rowconfigure(0, weight=1)
+            mainframe.pack(pady=100, padx=100)
+            # Create a Tkinter variable
+            tkvar = StringVar(root)
+            tkvar.set(ports[0].device) #default is first comm port
+            popupMenu = OptionMenu(mainframe, tkvar, *ports)
+            Label(mainframe, text="Choose a comm port").pack()
+            popupMenu.pack()
+            tkvar.trace('w', commSelect)
+        return portNum
+
 ###
 #   Few Variables... also used in different functions...
 ###
@@ -675,28 +710,14 @@ appMsgWin.place(x=50, y=440)
 try:
     xPos = 50
     yPos = 450
-    portNum     = 'COM3'
+    portNum     = 'COM4'
     baudRate    = 115200
     timeOut     = 1
-    ports = serial.tools.list_ports.comports(include_links=False)
-    if (len(ports)==1 and portNum==ports[0].device and "1546:01A6" in ports[0].hwid):
-        print("one comm port; and matching documented port; and matching ublox hwid of 1546:01A6")
+    portNum = checkForGPS(root, portNum)
     ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
     msgStr      = "Vehicle Path Data Acquisition is Ready - You May Start Data Logging"
     displayStatusMsg(xPos, yPos, msgStr)                                                        #system ready
-    mainframe = Frame(root)
-    # Add a grid
-    mainframe.pack()
-    mainframe.columnconfigure(0, weight=1)
-    mainframe.rowconfigure(0, weight=1)
-    mainframe.pack(pady=100, padx=100)
-    # Create a Tkinter variable
-    tkvar = StringVar(root)
 
-    tkvar.set(ports[0].device) #default is first comm port
-    popupMenu = OptionMenu(mainframe, tkvar, *ports)
-    Label(mainframe, text="Choose a comm port").pack()
-    popupMenu.pack()
 except SerialException:
 
     messagebox.showerror("GPS Receiver", "*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n"   \
