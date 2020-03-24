@@ -1,0 +1,382 @@
+{
+  "MessageFrame": {
+    "messageId": "33",
+    "value": {
+      "RoadsideSafetyMessage": {
+        "version": "1",
+        "commonContainer": {
+          "eventInfo": {
+            "eventID": "0000191d",
+            "msgSegmentInfo": {
+              "totalMsgSegments": "1",
+              "thisSegmentNum": "1"
+            },
+            "startDateTime": {
+              "year": "2019",
+              "month": "11",
+              "day": "8",
+              "hour": "0",
+              "minute": "0",
+              "offset": "-300"
+            },
+            "endDateTime": {
+              "year": "2019",
+              "month": "11",
+              "day": "10",
+              "hour": "23",
+              "minute": "59"
+            },
+            "causeCode": "3",
+            "subCauseCode": "0"
+          },
+          "regionInfo": {
+            "applicableHeading": {
+              "heading": "42",
+              "tolerance": "20"
+            },
+            "referencePoint": {
+              "lat": "404739505",
+              "long": "-1049692628",
+              "elevation": "1511"
+            },
+            "referencePointType": {
+              "startOfEvent": null
+            },
+            "descriptiveName": "tony's house",
+            "speedLimit": {
+              "type": {
+                "vehicleMaxSpeed": null
+              },
+              "speed": "60",
+              "speedUnits": {
+                "mph": null
+              }
+            },
+            "eventLength": "11",
+            "approachRegion": {
+              "roadwayGeometry": {
+                "scale": "1",
+                "rsmLanes": {
+                  "RSMLane": [
+                    {
+                      "laneID": "1",
+                      "lanePosition": "1",
+                      "laneName": "Lane #1",
+                      "laneGeometry": {
+                        "nodeSet": {
+                          "NodeLLE": [
+                            {
+                              "nodePoint": {
+                                "node-3Dabsolute": {
+                                  "lat": "404739713",
+                                  "long": "-1049692950",
+                                  "elevation": "1512"
+                                }
+                              }
+                            },
+                            {
+                              "nodePoint": {
+                                "node-3Dabsolute": {
+                                  "lat": "404739786",
+                                  "long": "-1049692778",
+                                  "elevation": "1511"
+                                }
+                              }
+                            },
+                            {
+                              "nodePoint": {
+                                "node-3Dabsolute": {
+                                  "lat": "404739645",
+                                  "long": "-1049692939",
+                                  "elevation": "1512"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "laneID": "2",
+                      "lanePosition": "2",
+                      "laneName": "Lane #2",
+                      "laneGeometry": {
+                        "nodeSet": {
+                          "NodeLLE": [
+                            {
+                              "nodePoint": {
+                                "node-3Dabsolute": {
+                                  "lat": "404739496",
+                                  "long": "-1049692635",
+                                  "elevation": "1512"
+                                }
+                              }
+                            },
+                            {
+                              "nodePoint": {
+                                "node-3Dabsolute": {
+                                  "lat": "404739475",
+                                  "long": "-1049692660",
+                                  "elevation": "1511"
+                                }
+                              }
+                            },
+                            {
+                              "nodePoint": {
+                                "node-3Dabsolute": {
+                                  "lat": "404739441",
+                                  "long": "-1049692608",
+                                  "elevation": "1512"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "rszContainer": {
+          "speedLimit": {
+            "type": {
+              "vehicleMaxSpeed": null
+            },
+            "speed": "60",
+            "speedUnits": {
+              "mph": null
+            }
+          },
+          "rszRegion": {
+            "roadwayGeometry": {
+              "scale": "10",
+              "rsmLanes": {
+                "RSMLane": [
+                  {
+                    "laneID": "1",
+                    "lanePosition": "1",
+                    "laneName": "Left Lane: Lane #1",
+                    "laneWidth": "360",
+                    "laneGeometry": {
+                      "nodeSet": {
+                        "NodeLLE": [
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739721",
+                                "long": "-1049692944",
+                                "elevation": "1511"
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739443",
+                                "long": "-1049692381",
+                                "elevation": "1513"
+                              }
+                            },
+                            "nodeAttributes": {
+                              "taperLeft": {
+                                "false": null
+                              },
+                              "taperRight": {
+                                "true": null
+                              },
+                              "laneClosed": {
+                                "true": null
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739184",
+                                "long": "-1049693095",
+                                "elevation": "1513"
+                              }
+                            },
+                            "nodeAttributes": {
+                              "speedLimit": {
+                                "type": {
+                                  "vehicleMaxSpeed": null
+                                },
+                                "speed": "45",
+                                "speedUnits": {
+                                  "mph": null
+                                }
+                              },
+                              "peoplePresent": {
+                                "true": null
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739255",
+                                "long": "-1049692465",
+                                "elevation": "1515"
+                              }
+                            },
+                            "nodeAttributes": {
+                              "speedLimit": {
+                                "type": {
+                                  "vehicleMaxSpeed": null
+                                },
+                                "speed": "60",
+                                "speedUnits": {
+                                  "mph": null
+                                }
+                              },
+                              "peoplePresent": {
+                                "false": null
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739870",
+                                "long": "-1049692993",
+                                "elevation": "1515"
+                              }
+                            },
+                            "nodeAttributes": {
+                              "taperLeft": {
+                                "true": null
+                              },
+                              "taperRight": {
+                                "false": null
+                              },
+                              "laneClosed": {
+                                "false": null
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404740202",
+                                "long": "-1049692825",
+                                "elevation": "1514"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "connectsTo": {
+                      "LaneID": [
+                        "1",
+                        "2"
+                      ]
+                    }
+                  },
+                  {
+                    "laneID": "2",
+                    "lanePosition": "2",
+                    "laneName": "Right Lane: Lane #2",
+                    "laneWidth": "360",
+                    "laneGeometry": {
+                      "nodeSet": {
+                        "NodeLLE": [
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739505",
+                                "long": "-1049692628",
+                                "elevation": "1511"
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739351",
+                                "long": "-1049692790",
+                                "elevation": "1513"
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739433",
+                                "long": "-1049692823",
+                                "elevation": "1513"
+                              }
+                            },
+                            "nodeAttributes": {
+                              "speedLimit": {
+                                "type": {
+                                  "vehicleMaxSpeed": null
+                                },
+                                "speed": "45",
+                                "speedUnits": {
+                                  "mph": null
+                                }
+                              },
+                              "peoplePresent": {
+                                "true": null
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739466",
+                                "long": "-1049692788",
+                                "elevation": "1515"
+                              }
+                            },
+                            "nodeAttributes": {
+                              "speedLimit": {
+                                "type": {
+                                  "vehicleMaxSpeed": null
+                                },
+                                "speed": "60",
+                                "speedUnits": {
+                                  "mph": null
+                                }
+                              },
+                              "peoplePresent": {
+                                "false": null
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404739673",
+                                "long": "-1049692656",
+                                "elevation": "1515"
+                              }
+                            }
+                          },
+                          {
+                            "nodePoint": {
+                              "node-3Dabsolute": {
+                                "lat": "404740095",
+                                "long": "-1049692423",
+                                "elevation": "1514"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
