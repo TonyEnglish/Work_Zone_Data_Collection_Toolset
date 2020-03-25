@@ -1,0 +1,260 @@
+{
+  "road_event_feed_info": {
+    "feed_update_date": "2020-03-25T10:33:22Z",
+    "metadata": "https://fake-site.ltd/dummy-metadata.txt",
+    "version": "2.0"
+  },
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "unknown",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 2,
+        "reduced_speed_limit": "60",
+        "workers_present": false,
+        "vehicle_impact": "all_lanes_open",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.9692944,
+            40.4739721
+          ],
+          [
+            -104.9692381,
+            40.4739443
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "unknown",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 2,
+        "reduced_speed_limit": "60",
+        "workers_present": false,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "closed"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.9692381,
+            40.4739443
+          ],
+          [
+            -104.9693095,
+            40.4739184
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "unknown",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 2,
+        "reduced_speed_limit": 45,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "closed"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.9693095,
+            40.4739184
+          ],
+          [
+            -104.9692465,
+            40.4739255
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "unknown",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 2,
+        "reduced_speed_limit": 60,
+        "workers_present": false,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "closed"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.9692465,
+            40.4739255
+          ],
+          [
+            -104.9692993,
+            40.473987
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "unknown",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 2,
+        "reduced_speed_limit": "60",
+        "workers_present": false,
+        "vehicle_impact": "all_lanes_open",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "merge-left"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.9692993,
+            40.473987
+          ],
+          [
+            -104.9692825,
+            40.4740202
+          ]
+        ]
+      }
+    }
+  ]
+}

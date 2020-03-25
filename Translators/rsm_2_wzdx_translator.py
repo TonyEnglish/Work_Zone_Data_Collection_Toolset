@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as ET 
 import json
-from json2xml import json2xml
+#from json2xml import json2xml
 import xmltodict
+from datetime import datetime
 #with open('rsm.json', 'r') as f:
 
 
@@ -9,7 +10,7 @@ def wzdx_creator(message):
     RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
     wzd = {}
     wzd['road_event_feed_info'] = {}
-    wzd['road_event_feed_info']['feed_update_date'] = 'unknown'
+    wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     wzd['road_event_feed_info']['metadata'] = 'https://fake-site.ltd/dummy-metadata.txt'
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
@@ -21,18 +22,8 @@ def wzdx_collapser(features): #Collapse identical nodes together to reduce overa
     new_nodes = []
     new_nodes.append(features[0])
     for i in range(1, len(features)):
-        if features[i]['properties'] == features[i-1]['properties'] or i == len(features): #Current and next nodes are identical, combine and keep coordinates
-            print('same')
-            if len(new_nodes[-1]['geometry']['coordinates']) == 1:
-                new_nodes[-1]['geometry']['coordinates'].append(features[i]['geometry']['coordinates'][0])
-            else:
-                new_nodes[-1]['geometry']['coordinates'][1] = features[i]['geometry']['coordinates'][0]
-        else: #New node, append to list
-            if len(new_nodes[-1]['geometry']['coordinates']) == 1:
-                new_nodes[-1]['geometry']['coordinates'].append(features[i]['geometry']['coordinates'][0])
-            else:
-                new_nodes[-1]['geometry']['coordinates'][1] = features[i]['geometry']['coordinates'][0]
-            print('new')
+        new_nodes[-1]['geometry']['coordinates'].append(features[i]['geometry']['coordinates'][0]) #Add coordinates of next node to end of previous node
+        if features[i]['properties'] != features[i-1]['properties'] and i != len(features)-1: #Only add unique nodes to output list
             new_nodes.append(features[i])
     return new_nodes
 
@@ -57,10 +48,10 @@ def extract_nodes(RSM):
             reduced_speed_limit = round(reduced_speed_limit*0.6214)
         people_present = False #initialization
         geometry = {}
-        geometry['type'] = 'MultiPoint'
+        geometry['type'] = 'LineString'
         for j in range(len(lanes)):
             lane = {}
-            lane['lane_id'] = lanes[j]['laneID']
+            #lane['lane_id'] = lanes[j]['laneID']
             #lane['road_event_id'] = ''
             lane['lane_number'] = int(lanes[j]['lanePosition'])
             lane['lane_edge_reference'] = 'left' #This is an assumed value
@@ -99,8 +90,8 @@ def extract_nodes(RSM):
             if lane['lane_number'] == 1:
                 lane_coordinate = []
                 if point.get('node-3Dabsolute') is not None: #Store coordinates of node for use later
-                    lane_coordinate.append(point['node-3Dabsolute']['lat'])
-                    lane_coordinate.append(point['node-3Dabsolute']['long'])
+                    lane_coordinate.append(int(point['node-3Dabsolute']['long'])/10000000)
+                    lane_coordinate.append(int(point['node-3Dabsolute']['lat'])/10000000)
                 else: #Node is defined as offset (node-3Doffset), this is not yet supported
                     lane_coordinate.append(0)
                     lane_coordinate.append(0)
@@ -133,10 +124,10 @@ def extract_nodes(RSM):
             lanes_wzdx.append(lane)
 
         # road_event_id
-        lanes_obj['road_event_id'] = 'unknown'
+        #lanes_obj['road_event_id'] = 'unknown'
 
         # feed_info_id
-        lanes_obj['feed_info_id'] = 'unknown'
+        #lanes_obj['feed_info_id'] = 'unknown'
 
         # road_name
         lanes_obj['road_name'] = 'unknown'
@@ -190,7 +181,7 @@ def extract_nodes(RSM):
         #Maybe use cause code??
         lanes_obj['types_of_work'] = []
         #if cause_code == 3: #No other options are available
-        lanes_obj['types_of_work'].append({'type_name': 'roadside-work'})
+        lanes_obj['types_of_work'].append({'type_name': 'roadside-work', 'is_architectual_change': False})
 
         lanes_obj['lanes'] = lanes_wzdx
 
@@ -212,5 +203,5 @@ with open('RSZW_MAP_xml_File-20191208-110718-1_of_1.exer', 'r') as frsm:
     #with open('RSM_example.json', 'w') as frsm_json:
     #    frsm_json.write(json.dumps(rsm_obj, indent=2))
     wzdx = wzdx_creator(rsm_obj)
-    with open('wzdx_test.xml', 'w') as fwzdx:
+    with open('wzdx_test.geojson', 'w') as fwzdx:
         fwzdx.write(json.dumps(wzdx, indent=2))
