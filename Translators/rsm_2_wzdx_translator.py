@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import json
 #from json2xml import json2xml
 import xmltodict
-import datetime
+from datetime import datetime
 #with open('rsm.json', 'r') as f:
 
 
@@ -10,7 +10,7 @@ def wzdx_creator(message):
     RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
     wzd = {}
     wzd['road_event_feed_info'] = {}
-    wzd['road_event_feed_info']['feed_update_date'] = 'unknown'
+    wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     wzd['road_event_feed_info']['metadata'] = 'https://fake-site.ltd/dummy-metadata.txt'
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
@@ -90,8 +90,8 @@ def extract_nodes(RSM):
             if lane['lane_number'] == 1:
                 lane_coordinate = []
                 if point.get('node-3Dabsolute') is not None: #Store coordinates of node for use later
-                    lane_coordinate.append(int(point['node-3Dabsolute']['lat'])/10000000)
                     lane_coordinate.append(int(point['node-3Dabsolute']['long'])/10000000)
+                    lane_coordinate.append(int(point['node-3Dabsolute']['lat'])/10000000)
                 else: #Node is defined as offset (node-3Doffset), this is not yet supported
                     lane_coordinate.append(0)
                     lane_coordinate.append(0)
@@ -181,7 +181,7 @@ def extract_nodes(RSM):
         #Maybe use cause code??
         lanes_obj['types_of_work'] = []
         #if cause_code == 3: #No other options are available
-        lanes_obj['types_of_work'].append({'type_name': 'roadside-work'})
+        lanes_obj['types_of_work'].append({'type_name': 'roadside-work', 'is_architectual_change': False})
 
         lanes_obj['lanes'] = lanes_wzdx
 
