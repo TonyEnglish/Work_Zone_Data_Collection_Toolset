@@ -505,7 +505,7 @@ def checkForGPS(root, portNum):
         for port in ports:
             if ("1546:01A6" in port.hwid):
                 portNum = "com4" #port.device
-                #gpsFound = True
+                gpsFound = True
         if (not gpsFound):
             mainframe = Frame(root)
             # Add a grid
