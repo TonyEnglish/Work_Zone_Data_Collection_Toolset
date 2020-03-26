@@ -3,6 +3,7 @@ import json
 #from json2xml import json2xml
 import xmltodict
 from datetime import datetime
+import uuid
 #with open('rsm.json', 'r') as f:
 
 
@@ -11,7 +12,7 @@ def wzdx_creator(message):
     wzd = {}
     wzd['road_event_feed_info'] = {}
     wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    wzd['road_event_feed_info']['metadata'] = 'https://fake-site.ltd/dummy-metadata.txt'
+    #wzd['road_event_feed_info']['metadata'] = 'https://fake-site.ltd/dummy-metadata.txt'
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
     wzd['features'] = wzdx_collapser(extract_nodes(RSM))
@@ -21,10 +22,26 @@ def wzdx_collapser(features): #Collapse identical nodes together to reduce overa
     #return features
     new_nodes = []
     new_nodes.append(features[0])
+    directions = []
     for i in range(1, len(features)):
         new_nodes[-1]['geometry']['coordinates'].append(features[i]['geometry']['coordinates'][0]) #Add coordinates of next node to end of previous node
         if features[i]['properties'] != features[i-1]['properties'] and i != len(features)-1: #Only add unique nodes to output list
             new_nodes.append(features[i])
+    long_dif = new_nodes[-1]['geometry']['coordinates'][-1][0] - new_nodes[0]['geometry']['coordinates'][0][0]
+    lat_dif = new_nodes[-1]['geometry']['coordinates'][-1][1] - new_nodes[0]['geometry']['coordinates'][0][1]
+    if abs(long_dif) > abs(lat_dif):
+        if long_dif > 0:
+            direction = 'eastbound'
+        else:
+            direction = 'westbound'
+    elif lat_dif > 0:
+        direction = 'northbound'
+    else:
+        direction = 'southbound'
+    for i in range(len(new_nodes)):
+        new_nodes[i]['properties']['direction'] = direction
+
+    
     return new_nodes
 
 def form_len(string):
@@ -124,7 +141,7 @@ def extract_nodes(RSM):
             lanes_wzdx.append(lane)
 
         # road_event_id
-        #lanes_obj['road_event_id'] = 'unknown'
+        lanes_obj['road_event_id'] = str(uuid.uuid4())
 
         # feed_info_id
         #lanes_obj['feed_info_id'] = 'unknown'
