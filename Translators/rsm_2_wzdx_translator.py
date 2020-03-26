@@ -9,13 +9,16 @@ import uuid
 
 def wzdx_creator(message):
     RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
+    ids = True # Enables ids linking tables together within file
     wzd = {}
     wzd['road_event_feed_info'] = {}
+    if ids:
+        wzd['road_event_feed_info']['feed_info_id'] = str(uuid.uuid4())
     wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     #wzd['road_event_feed_info']['metadata'] = 'https://fake-site.ltd/dummy-metadata.txt'
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
-    wzd['features'] = wzdx_collapser(extract_nodes(RSM))
+    wzd['features'] = wzdx_collapser(extract_nodes(RSM, wzd, ids))
     return wzd
 
 def wzdx_collapser(features): #Collapse identical nodes together to reduce overall number of nodes
@@ -48,7 +51,7 @@ def form_len(string):
     num = int(string)
     return format(num, '02d')
 
-def extract_nodes(RSM):
+def extract_nodes(RSM, wzd, ids):
     lanes = RSM['rszContainer']['rszRegion']['roadwayGeometry']['rsmLanes']['RSMLane']
     num_lanes = len(lanes)
     nodes = lanes[0]['laneGeometry']['nodeSet']['NodeLLE']
@@ -66,12 +69,18 @@ def extract_nodes(RSM):
         people_present = False #initialization
         geometry = {}
         geometry['type'] = 'LineString'
+        road_event_id = str(uuid.uuid4())
         for j in range(len(lanes)):
             lane = {}
-            #lane['lane_id'] = lanes[j]['laneID']
-            #lane['road_event_id'] = ''
+            if ids:
+                lane['lane_id'] = str(uuid.uuid4())
+
+                lane['road_event_id'] = road_event_id
+
             lane['lane_number'] = int(lanes[j]['lanePosition'])
+
             lane['lane_edge_reference'] = 'left' #This is an assumed value
+
             lane_type = 'middle-lane' #left-lane, right-lane, middle-lane, right-exit-lane, left-exit-lane, ... (exit lanes, merging lanes, turning lanes)
             if lane['lane_edge_reference'] == 'left':
                 if lane['lane_number'] == 1:
@@ -84,7 +93,7 @@ def extract_nodes(RSM):
                 elif lane['lane_number'] == num_lanes:
                     lane_type = 'left-lane'
             lane['lane_type'] = lane_type
-            #lane['lane_description'] = lanes[j]['laneName']
+
             node_contents = lanes[j]['laneGeometry']['nodeSet']['NodeLLE'][i]
             lane_status = 'open' #Can be open, closed, shift-left, shift-right, merge-right, merge-left, alternating-one-way
 
@@ -118,10 +127,16 @@ def extract_nodes(RSM):
             #lane['lane_restrictions'] = []#no-trucks, travel-peak-hours-only, hov-3, hov-2, no-parking
                 #reduced-width, reduced-height, reduced-length, reduced-weight, axle-load-limit, gross-weight-limit, towing-prohibited, permitted-oversize-loads-prohibited
             # Restrictions will be added later
-            #if restr['restriction_type'] in ['reduced-width', 'reduced-height', 'reduced-length', 'reduced-weight', 'axle-load-limit', 'gross-weight-limit']:
-            #    restr['restriction_value'] = restriction['restriction_value']
-            #    restr['restriction_units'] = restriction['restriction_units']
-            #for lane_restriction in 
+            # for lane_restriction in lane_restrictions
+                # if restr['restriction_type'] in ['reduced-width', 'reduced-height', 'reduced-length', 'reduced-weight', 'axle-load-limit', 'gross-weight-limit']:
+                    # lane_restriction = {}
+                    # if ids:
+                        # lane_restriction['lane_restriction_id'] = str(uuid.uuid4())
+                        # lane_restriction['lane_id'] = lane['lane_id']
+                    # lane_restriction['restriction_type'] = 
+                    # lane_restriction['restriction_value'] = 
+                    # lane_restriction['restriction_units'] = 
+                    # lane['lane_restrictions'].append(lane_restriction)
 
             # Reduced Speed Limit
             if node_contents.get('nodeAttributes', {}).get('speedLimit', {}).get('type', {}).get('vehicleMaxSpeed', {}) == None:
@@ -140,11 +155,12 @@ def extract_nodes(RSM):
 
             lanes_wzdx.append(lane)
 
-        # road_event_id
-        lanes_obj['road_event_id'] = str(uuid.uuid4())
+        if ids:
+            # road_event_id
+            lanes_obj['road_event_id'] = road_event_id
 
-        # feed_info_id
-        #lanes_obj['feed_info_id'] = 'unknown'
+            # feed_info_id
+            lanes_obj['feed_info_id'] = wzd['road_event_feed_info']['feed_info_id']
 
         # road_name
         lanes_obj['road_name'] = 'unknown'
@@ -198,7 +214,13 @@ def extract_nodes(RSM):
         #Maybe use cause code??
         lanes_obj['types_of_work'] = []
         #if cause_code == 3: #No other options are available
-        lanes_obj['types_of_work'].append({'type_name': 'roadside-work', 'is_architectual_change': False})
+        types_of_work = {}
+        if ids:
+            types_of_work['types_of_work_id'] = str(uuid.uuid4())
+            types_of_work['road_event_id'] = road_event_id
+        types_of_work['type_name'] = 'roadside-work'
+        types_of_work['is_architectual_change'] = False
+        lanes_obj['types_of_work'].append(types_of_work)
 
         lanes_obj['lanes'] = lanes_wzdx
 

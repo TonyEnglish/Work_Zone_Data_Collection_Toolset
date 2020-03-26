@@ -1,6 +1,6 @@
 {
   "road_event_feed_info": {
-    "feed_update_date": "2020-03-25T17:02:43Z",
+    "feed_update_date": "2020-03-26T17:03:18Z",
     "version": "2.0"
   },
   "type": "FeatureCollection",
@@ -8,7 +8,6 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "9a78d3b2-ddae-424c-8c5e-c5b31b864387",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
@@ -59,7 +58,6 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "0f4b1028-94bd-46bf-9557-442546e01771",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
@@ -110,7 +108,6 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "33d99315-4e2c-4189-879a-17dbfe8bb038",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
@@ -161,7 +158,6 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "5f8bcaf2-358b-4e63-9ee6-4dbdedfe0f43",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
@@ -212,7 +208,6 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "748fd495-1172-4ca5-b46a-c55d8fa62b09",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
