@@ -18,18 +18,19 @@ def wzdx_creator(message):
     #wzd['road_event_feed_info']['metadata'] = 'https://fake-site.ltd/dummy-metadata.txt'
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
-    wzd['features'] = wzdx_collapser(extract_nodes(RSM, wzd, ids))
+    wzd['features'] = wzdx_collapser(extract_nodes(RSM, wzd, ids), RSM)
     return wzd
 
-def wzdx_collapser(features): #Collapse identical nodes together to reduce overall number of nodes
+def wzdx_collapser(features, RSM): #Collapse identical nodes together to reduce overall number of nodes
     #return features
     new_nodes = []
     new_nodes.append(features[0])
-    directions = []
+    #directions = []
     for i in range(1, len(features)):
         new_nodes[-1]['geometry']['coordinates'].append(features[i]['geometry']['coordinates'][0]) #Add coordinates of next node to end of previous node
         if features[i]['properties'] != features[i-1]['properties'] and i != len(features)-1: #Only add unique nodes to output list
             new_nodes.append(features[i])
+
     long_dif = new_nodes[-1]['geometry']['coordinates'][-1][0] - new_nodes[0]['geometry']['coordinates'][0][0]
     lat_dif = new_nodes[-1]['geometry']['coordinates'][-1][1] - new_nodes[0]['geometry']['coordinates'][0][1]
     if abs(long_dif) > abs(lat_dif):
@@ -41,6 +42,13 @@ def wzdx_collapser(features): #Collapse identical nodes together to reduce overa
         direction = 'northbound'
     else:
         direction = 'southbound'
+
+    # heading = int(RSM['regionInfo']['applicableHeading']['heading'])
+    # tol = int(RSM['regionInfo']['applicableHeading']['tolerance'])
+    # if abs(heading) + abs(tol) < 45:
+    #     direction = 'northbound'
+    # elif abs(heading) + 
+
     for i in range(len(new_nodes)):
         new_nodes[i]['properties']['direction'] = direction
 

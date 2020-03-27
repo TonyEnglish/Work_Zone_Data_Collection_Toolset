@@ -1,6 +1,7 @@
 {
   "road_event_feed_info": {
-    "feed_update_date": "2020-03-26T17:03:18Z",
+    "feed_info_id": "c3735749-0a7e-49d4-a57f-deeb8fcd1a99",
+    "feed_update_date": "2020-03-27T17:14:29Z",
     "version": "2.0"
   },
   "type": "FeatureCollection",
@@ -8,6 +9,8 @@
     {
       "type": "Feature",
       "properties": {
+        "road_event_id": "ca1a6f00-71b4-4bad-aa74-5c0bc60fd562",
+        "feed_info_id": "c3735749-0a7e-49d4-a57f-deeb8fcd1a99",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
@@ -22,18 +25,24 @@
         "end_date": "2019-11-10T23:59:00Z",
         "types_of_work": [
           {
+            "types_of_work_id": "65f5d8f5-6eed-40e8-baf5-88f3b6902c91",
+            "road_event_id": "ca1a6f00-71b4-4bad-aa74-5c0bc60fd562",
             "type_name": "roadside-work",
             "is_architectual_change": false
           }
         ],
         "lanes": [
           {
+            "lane_id": "8e7777a6-23c4-4dbb-ab95-6d2c41b79cde",
+            "road_event_id": "ca1a6f00-71b4-4bad-aa74-5c0bc60fd562",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_type": "left-lane",
             "lane_status": "open"
           },
           {
+            "lane_id": "7ef4d063-6210-4a6e-b627-4cfc78ace1a3",
+            "road_event_id": "ca1a6f00-71b4-4bad-aa74-5c0bc60fd562",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_type": "right-lane",
@@ -58,6 +67,8 @@
     {
       "type": "Feature",
       "properties": {
+        "road_event_id": "4f622be1-a0af-4bea-997c-5fec8702f236",
+        "feed_info_id": "c3735749-0a7e-49d4-a57f-deeb8fcd1a99",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
@@ -72,18 +83,24 @@
         "end_date": "2019-11-10T23:59:00Z",
         "types_of_work": [
           {
+            "types_of_work_id": "41a8bcf3-d178-46c6-a563-cfdaf7ff0b46",
+            "road_event_id": "4f622be1-a0af-4bea-997c-5fec8702f236",
             "type_name": "roadside-work",
             "is_architectual_change": false
           }
         ],
         "lanes": [
           {
+            "lane_id": "d716481a-bb67-4b30-bc6e-9c85b4e19a23",
+            "road_event_id": "4f622be1-a0af-4bea-997c-5fec8702f236",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_type": "left-lane",
             "lane_status": "closed"
           },
           {
+            "lane_id": "0dc18f08-56d8-40a2-9efa-585c4c1a45d3",
+            "road_event_id": "4f622be1-a0af-4bea-997c-5fec8702f236",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_type": "right-lane",
@@ -108,6 +125,8 @@
     {
       "type": "Feature",
       "properties": {
+        "road_event_id": "de494867-ba31-431b-b772-ec4e4b7ee80d",
+        "feed_info_id": "c3735749-0a7e-49d4-a57f-deeb8fcd1a99",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
@@ -122,18 +141,24 @@
         "end_date": "2019-11-10T23:59:00Z",
         "types_of_work": [
           {
+            "types_of_work_id": "95a14e9a-80a0-409a-a4a9-4b24e7de5a0d",
+            "road_event_id": "de494867-ba31-431b-b772-ec4e4b7ee80d",
             "type_name": "roadside-work",
             "is_architectual_change": false
           }
         ],
         "lanes": [
           {
+            "lane_id": "3d19b0da-cd1d-460d-bbf7-22a0279e4670",
+            "road_event_id": "de494867-ba31-431b-b772-ec4e4b7ee80d",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_type": "left-lane",
             "lane_status": "closed"
           },
           {
+            "lane_id": "0041387a-f78a-4032-a918-907d5442c98b",
+            "road_event_id": "de494867-ba31-431b-b772-ec4e4b7ee80d",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_type": "right-lane",
@@ -158,6 +183,8 @@
     {
       "type": "Feature",
       "properties": {
+        "road_event_id": "97cbf581-a2db-4329-a43e-c3802ea0318a",
+        "feed_info_id": "c3735749-0a7e-49d4-a57f-deeb8fcd1a99",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
@@ -172,18 +199,24 @@
         "end_date": "2019-11-10T23:59:00Z",
         "types_of_work": [
           {
+            "types_of_work_id": "61ac1032-25c7-4324-96e0-cc97bcf9e3c0",
+            "road_event_id": "97cbf581-a2db-4329-a43e-c3802ea0318a",
             "type_name": "roadside-work",
             "is_architectual_change": false
           }
         ],
         "lanes": [
           {
+            "lane_id": "f8b9e9d5-85d4-4827-aeb1-3a574dae90ef",
+            "road_event_id": "97cbf581-a2db-4329-a43e-c3802ea0318a",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_type": "left-lane",
             "lane_status": "closed"
           },
           {
+            "lane_id": "953d231a-4007-4747-a90b-ca3f57613571",
+            "road_event_id": "97cbf581-a2db-4329-a43e-c3802ea0318a",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_type": "right-lane",
@@ -208,6 +241,8 @@
     {
       "type": "Feature",
       "properties": {
+        "road_event_id": "21dea6ac-3cc4-4797-8d81-b4d2d9ece5d0",
+        "feed_info_id": "c3735749-0a7e-49d4-a57f-deeb8fcd1a99",
         "road_name": "unknown",
         "direction": "northbound",
         "beginning_accuracy": "estimated",
@@ -222,18 +257,24 @@
         "end_date": "2019-11-10T23:59:00Z",
         "types_of_work": [
           {
+            "types_of_work_id": "3ff377ba-38b2-4820-b120-4037794aa51f",
+            "road_event_id": "21dea6ac-3cc4-4797-8d81-b4d2d9ece5d0",
             "type_name": "roadside-work",
             "is_architectual_change": false
           }
         ],
         "lanes": [
           {
+            "lane_id": "09462eeb-0b5b-41e7-8fbc-3f3131c0d82a",
+            "road_event_id": "21dea6ac-3cc4-4797-8d81-b4d2d9ece5d0",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_type": "left-lane",
             "lane_status": "merge-left"
           },
           {
+            "lane_id": "91332ab7-2f8d-4b32-8af7-ea3246737791",
+            "road_event_id": "21dea6ac-3cc4-4797-8d81-b4d2d9ece5d0",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_type": "right-lane",

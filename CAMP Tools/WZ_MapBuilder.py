@@ -37,6 +37,7 @@ import  datetime                                        #Date and Time methods..
 import  time                                            #do I need time???
 import  math                                            #math library for math functions
 import  random                                          #random number generator
+import  xmltodict                                       #dict to xml converter
 
 from    wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
 
@@ -498,14 +499,14 @@ def build_XML_file():
 #   Introductory lines...
 ###
       
-        xmlFile.write ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + \
-                       "<!-- \n" + \
-                       "\t CAMP xml file for RSZW/LC Mapping Project\n" + \
-                       "\t Message segment file "+ str(currSeg)+" of "+str(totSeg)+"...\n\n" + \
-                       "\t Version 1.5 - June, 2018\n" + \
-                       "\t for RSMv5.1 ASN\n" + \
-                       "\t File Name: "+xml_outFile+"\n" + \
-                       "\t Created: "+cDT+"\n\n-->\n")
+        # xmlFile.write ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + \
+        #                "<!-- \n" + \
+        #                "\t CAMP xml file for RSZW/LC Mapping Project\n" + \
+        #                "\t Message segment file "+ str(currSeg)+" of "+str(totSeg)+"...\n\n" + \
+        #                "\t Version 1.5 - June, 2018\n" + \
+        #                "\t for RSMv5.1 ASN\n" + \
+        #                "\t File Name: "+xml_outFile+"\n" + \
+        #                "\t Created: "+cDT+"\n\n-->\n")
 
 ###
 #   Build common container...
@@ -536,7 +537,7 @@ def build_XML_file():
 ###
 
    
-        build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
+        commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
                       speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
 
         #if currSeg == 1:
@@ -557,7 +558,18 @@ def build_XML_file():
 #   Build WZ container
 ###
 
-        build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
+        rszContainer = build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
+
+        message = {}
+        message['MessageFrame'] = {}
+        message['MessageFrame']['messageId'] = idList[0]
+        message['MessageFrame']['value'] = {}
+        message['MessageFrame']['value']['RoadsideSafetyMessage'] = {}
+        message['MessageFrame']['value']['RoadsideSafetyMessage']['version'] = 1
+        message['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer'] = commonContainer
+        message['MessageFrame']['value']['RoadsideSafetyMessage']['rszContainer'] = rszContainer
+        rsm_xml = xmltodict.unparse(message, short_empty_elements=True, pretty=True)
+        xmlFile.write(rsm_xml)
     
 ###
 #   Done, finito, close files
