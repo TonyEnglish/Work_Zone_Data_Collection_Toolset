@@ -9,7 +9,7 @@ import uuid
 
 def wzdx_creator(message):
     RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
-    ids = True # Enables ids linking tables together within file
+    ids = False # Enables ids linking tables together within file
     wzd = {}
     wzd['road_event_feed_info'] = {}
     if ids:
@@ -30,6 +30,9 @@ def wzdx_collapser(features, RSM): #Collapse identical nodes together to reduce 
         new_nodes[-1]['geometry']['coordinates'].append(features[i]['geometry']['coordinates'][0]) #Add coordinates of next node to end of previous node
         if features[i]['properties'] != features[i-1]['properties'] and i != len(features)-1: #Only add unique nodes to output list
             new_nodes.append(features[i])
+            print('new')
+        else:
+            print('old')
 
     long_dif = new_nodes[-1]['geometry']['coordinates'][-1][0] - new_nodes[0]['geometry']['coordinates'][0][0]
     lat_dif = new_nodes[-1]['geometry']['coordinates'][-1][1] - new_nodes[0]['geometry']['coordinates'][0][1]
@@ -241,7 +244,7 @@ def extract_nodes(RSM, wzd, ids):
         nodes_wzdx.append(lanes_obj_properties)
     return nodes_wzdx
 
-with open('RSZW_MAP_xml_File-20191208-110718-1_of_1.exer', 'r') as frsm:
+with open('C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_MapMsg/RSZW_MAP_xml_File-20200327-180656-1_of_1.exer', 'r') as frsm:
     #rsm = rsm_creator('heh')
     #f.write(json2xml.Json2xml(rsm).to_xml())
     #rsm_xml = xmltodict.unparse(rsm, pretty=True)
