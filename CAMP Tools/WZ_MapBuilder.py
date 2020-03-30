@@ -568,7 +568,7 @@ def build_XML_file():
         message['MessageFrame']['value']['RoadsideSafetyMessage']['version'] = 1
         message['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer'] = commonContainer
         message['MessageFrame']['value']['RoadsideSafetyMessage']['rszContainer'] = rszContainer
-        rsm_xml = xmltodict.unparse(message, short_empty_elements=True, pretty=True)
+        rsm_xml = xmltodict.unparse(message, short_empty_elements=True, pretty=True, indent="  ")
         xmlFile.write(rsm_xml)
     
 ###
