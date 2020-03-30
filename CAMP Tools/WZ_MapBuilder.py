@@ -536,7 +536,6 @@ def build_XML_file():
 #   Build xml for common container...
 ###
 
-   
         commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
                       speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
 
@@ -557,7 +556,6 @@ def build_XML_file():
 ###
 #   Build WZ container
 ###
-
         rszContainer = build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
 
         message = {}

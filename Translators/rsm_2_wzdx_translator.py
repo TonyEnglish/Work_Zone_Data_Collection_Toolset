@@ -1,9 +1,12 @@
 import xml.etree.ElementTree as ET 
 import json
-#from json2xml import json2xml
 import xmltodict
 from datetime import datetime
 import uuid
+try:
+    from defusedexpat import pyexpat as expat
+except ImportError:
+    from xml.parsers import expat
 #with open('rsm.json', 'r') as f:
 
 
@@ -244,7 +247,7 @@ def extract_nodes(RSM, wzd, ids):
         nodes_wzdx.append(lanes_obj_properties)
     return nodes_wzdx
 
-with open('C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_MapMsg/RSZW_MAP_xml_File-20200327-180656-1_of_1.exer', 'r') as frsm:
+with open('C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_MapMsg/RSZW_MAP_xml_File-20200330-102959-1_of_1.exer', 'r') as frsm:
     #rsm = rsm_creator('heh')
     #f.write(json2xml.Json2xml(rsm).to_xml())
     #rsm_xml = xmltodict.unparse(rsm, pretty=True)

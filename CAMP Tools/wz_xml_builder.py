@@ -364,7 +364,7 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
     if currSeg == 1:
         # commonContainer['regionInfo']['#comment'] = '\n\t\t...Start of Approach Region...\n'
         # commonContainer['regionInfo']['#comment'] = ('    ...APPROACH LANES: Map Waypoints...\n' + \
-        #                6*tab+'Total nodes per lane - '+str(len(arrayMapPt))+'\n')
+                    #    6*tab+'Total nodes per lane - '+str(len(arrayMapPt))+'\n')
         # xmlFile.write ("\n<!--\n\t\t...Start of Approach Region...\n-->\n")             ###comment in XML file
         # xmlFile.write ("<!--    ...APPROACH LANES: Map Waypoints...\n" + \
         #                6*tab+"Total nodes per lane - "+str(len(arrayMapPt))+"\n" + \
@@ -702,7 +702,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 ###       
 
     # rszContainer['#comment'] = '<!--\t ...S T A R T   of   L A N E   G E O M E T R Y...\n' + \
-    #                8*tab+'Total node points per lane - '+str(len(arrayMapPt))+'\n'
+                #    8*tab+'Total node points per lane - '+str(len(arrayMapPt))+'\n'
     # xmlFile.write ("<!--\t ...S T A R T   of   L A N E   G E O M E T R Y...\n" + \
     #                8*tab+"Total node points per lane - "+str(len(arrayMapPt))+"\n" + \
     #                "-->\n") 
