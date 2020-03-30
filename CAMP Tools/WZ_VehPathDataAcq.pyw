@@ -26,6 +26,7 @@ import      io                                      #serial i/o function
 import      string                                  #string functions
 import      csv                                     #CSV file read/write
 import      os.path
+import serial.tools.list_ports                      #used to enumerate COMM ports
 
 from        serial import SerialException           #serial port exception
 
@@ -485,7 +486,42 @@ def gotQuit():
 
 #---------------------------------------------------------------------
 
-   
+
+###
+#  Update GPS comm port
+###
+def commSelect(*args):
+    portNum= tkvar.get()
+
+###
+#  Check for GPS computer
+###
+def checkForGPS(root, portNum):
+    ports = serial.tools.list_ports.comports(include_links=False)
+    gpsFound = False
+    if len(ports)==0:
+        messagebox.showerror("GPS Receiver Missing", "*** GPS Receiver missing ***\n\n")
+    if (len(ports)>=1):
+        for port in ports:
+            if ("1546:01A6" in port.hwid):
+                portNum = port.device
+                gpsFound = True
+        if (not gpsFound):
+            mainframe = Frame(root)
+            # Add a grid
+            mainframe.pack()
+            mainframe.columnconfigure(0, weight=1)
+            mainframe.rowconfigure(0, weight=1)
+            mainframe.pack(pady=100, padx=100)
+            # Create a Tkinter variable
+            tkvar = StringVar(root)
+            tkvar.set(ports[0].device) #default is first comm port
+            popupMenu = OptionMenu(mainframe, tkvar, *ports)
+            Label(mainframe, text="Choose a comm port").pack()
+            popupMenu.pack()
+            tkvar.trace('w', commSelect)
+        return portNum
+
 ###
 #   Few Variables... also used in different functions...
 ###
@@ -677,10 +713,11 @@ try:
     portNum     = 'COM4'
     baudRate    = 115200
     timeOut     = 1
+    portNum = checkForGPS(root, portNum)
     ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
     msgStr      = "Vehicle Path Data Acquisition is Ready - You May Start Data Logging"
     displayStatusMsg(xPos, yPos, msgStr)                                                        #system ready
-    
+
 except SerialException:
 
     messagebox.showerror("GPS Receiver", "*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n"   \

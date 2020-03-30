@@ -48,6 +48,8 @@
 #   Following function constructs the "Common Container" based on RSM.4.4 ASN.1 Definition 
 ###
 
+import xmltodict
+
 def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,refPoint,appHeading,hTolerance, \
                   speedLimit,rW,eL,lS,arrayMapPt,msgSegList,currSeg,descName):
 
@@ -93,22 +95,31 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
     tab = "\t"                                                                              #define tab char equal editor's tab value...
     tab = "  "                                                                              #define tab char equal to 2 spaces...
  
+    # message = {}
+    # message['MessageFrame'] = {}
 
 ###
 #   RSM: MessageFrame...  Following are REPEATED for all Message Segments...
 ###
 
-    xmlFile.write ("<MessageFrame>\n"  + \
-                   1*tab+"<messageId>"+str(idList[0])+"</messageId>\n"   + \
-                   1*tab+"<value>\n")
+    # message['MessageFrame']['messageId'] = idList[0]
+    # message['MessageFrame']['value'] = {}
+    # xmlFile.write ("<MessageFrame>\n"  + \
+    #                1*tab+"<messageId>"+str(idList[0])+"</messageId>\n"   + \
+    #                1*tab+"<value>\n")
 
 ###
 #   RSM: Common Container for RSZW/LC...
 ###
 
-    xmlFile.write (2*tab+"<RoadsideSafetyMessage>\n"  + \
-                   3*tab+"<version>1</version>\n\n"   + \
-                   3*tab+"<commonContainer>\n")
+    # message['MessageFrame']['value']['RoadsideSafetyMessage'] = {}
+    # message['MessageFrame']['value']['RoadsideSafetyMessage']['version'] = 1
+    # message['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer'] = {}
+    # commonContainer = message['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer']
+    commonContainer = {}
+    # xmlFile.write (2*tab+"<RoadsideSafetyMessage>\n"  + \
+    #                3*tab+"<version>1</version>\n\n"   + \
+    #                3*tab+"<commonContainer>\n")
 
 ###
 #   Event Info...   Repeat for all message segments
@@ -118,57 +129,79 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 #       eventRecurrence
 ###
 
-    xmlFile.write ("<!--\n\t\t ...Event ID...(no Message ID)\n-->\n")                       ###comment in XML file
-    xmlFile.write (4*tab+"<eventInfo>\n" + \
-                   5*tab+"<eventID>"+str(idList[1])+"</eventID>\n")
+    # commonContainer['#comment'] = '\n\t\t ...Event ID...(no Message ID)\n'
+    # xmlFile.write ("<!--\n\t\t ...Event ID...(no Message ID)\n-->\n")                       ###comment in XML file
+    commonContainer['eventInfo'] = {}
+    commonContainer['eventInfo']['eventID'] = idList[1]
+    # xmlFile.write (4*tab+"<eventInfo>\n" + \
+    #                5*tab+"<eventID>"+str(idList[1])+"</eventID>\n")
 
 ###
 #   Message segmentation section...   Repeated for all segments
 #   Added - June, 2018
 ###
-
-    xmlFile.write ("<!--\n\t\t ...Message segmentation... \n-->\n")                         ###comment in XML file
-    xmlFile.write (5*tab+"<msgSegmentInfo>\n" + \
-                   6*tab+"<totalMsgSegments>"+str(msgSegList[0][0])+"</totalMsgSegments>\n" + \
-                   6*tab+"<thisSegmentNum>"+str(currSeg)+"</thisSegmentNum>\n" + \
-                   5*tab+"</msgSegmentInfo>\n")
+    # commonContainer['eventInfo']['#comment'] = '\n...Message segmentation...\n'
+    # xmlFile.write ("<!--\n\t\t ...Message segmentation... \n-->\n")                         ###comment in XML file
+    commonContainer['eventInfo']['msgSegmentInfo'] = {}
+    commonContainer['eventInfo']['msgSegmentInfo']['totalMsgSegments'] = msgSegList[0][0]
+    commonContainer['eventInfo']['msgSegmentInfo']['thisSegmentNum'] = currSeg
+    # xmlFile.write (5*tab+"<msgSegmentInfo>\n" + \
+    #                6*tab+"<totalMsgSegments>"+str(msgSegList[0][0])+"</totalMsgSegments>\n" + \
+    #                6*tab+"<thisSegmentNum>"+str(currSeg)+"</thisSegmentNum>\n" + \
+    #                5*tab+"</msgSegmentInfo>\n")
     
 ###
 #   Event start/end date & time... REPEAT for all message segments ...
 ###
 
-    xmlFile.write ("<!--\n\t\t ...Event start Date & Time...\n-->\n")                       ###comment in XML file
+    # commonContainer['eventInfo']['#comment'] = '\n...Event start Date and Time...\n'
+    # xmlFile.write ("<!--\n\t\t ...Event start Date & Time...\n-->\n")                       ###comment in XML file
 
 ###
 #   WZ start date and time are required. If not specified, use current date and 00h:00m
 #   WZ end date and time are optional, if not present, skip it
 ###
 
-    xmlFile.write (5*tab+"<startDateTime>\n" + \
-                   6*tab+"<year>"+str(eDateTime[0])+"</year>\n" + \
-                   6*tab+"<month>"+str(eDateTime[1])+"</month>\n" + \
-                   6*tab+"<day>"+str(eDateTime[2])+"</day>\n" + \
-                   6*tab+"<hour>"+str(eDateTime[3])+"</hour>\n" + \
-                   6*tab+"<minute>"+str(eDateTime[4])+"</minute>\n" + \
-                   6*tab+"<offset>"+str(timeOffset)+"</offset>\n" + \
-                   5*tab+"</startDateTime>\n")
+    commonContainer['eventInfo']['startDateTime'] = {}
+    commonContainer['eventInfo']['startDateTime']['year'] = eDateTime[0]
+    commonContainer['eventInfo']['startDateTime']['month'] = eDateTime[1]
+    commonContainer['eventInfo']['startDateTime']['day'] = eDateTime[2]
+    commonContainer['eventInfo']['startDateTime']['hour'] = eDateTime[3]
+    commonContainer['eventInfo']['startDateTime']['minute'] = eDateTime[4]
+    commonContainer['eventInfo']['startDateTime']['offset'] = timeOffset
+    # xmlFile.write (5*tab+"<startDateTime>\n" + \
+    #                6*tab+"<year>"+str(eDateTime[0])+"</year>\n" + \
+    #                6*tab+"<month>"+str(eDateTime[1])+"</month>\n" + \
+    #                6*tab+"<day>"+str(eDateTime[2])+"</day>\n" + \
+    #                6*tab+"<hour>"+str(eDateTime[3])+"</hour>\n" + \
+    #                6*tab+"<minute>"+str(eDateTime[4])+"</minute>\n" + \
+    #                6*tab+"<offset>"+str(timeOffset)+"</offset>\n" + \
+    #                5*tab+"</startDateTime>\n")
     
 ###
 #       Event duration - End date & time can be optional...
 ###
 
-    xmlFile.write ("<!--\n\t\t ...Event end Date and Time...\n-->\n")                       ###comment in XML file
+    # commonContainer['eventInfo']['#comment'] = '\n...Event end Date and Time...\n'
+    # xmlFile.write ("<!--\n\t\t ...Event end Date and Time...\n-->\n")                       ###comment in XML file
            
-    if str(endDateTime[0]) != "":            
-        xmlFile.write (5*tab+"<endDateTime>\n" + \
-                       6*tab+"<year>"+str(endDateTime[0])+"</year>\n" + \
-                       6*tab+"<month>"+str(endDateTime[1])+"</month>\n" + \
-                       6*tab+"<day>"+str(endDateTime[2])+"</day>\n" + \
-                       6*tab+"<hour>"+str(endDateTime[3])+"</hour>\n" + \
-                       6*tab+"<minute>"+str(endDateTime[4])+"</minute>\n" + \
-                       5*tab+"</endDateTime>\n")
-    else:
-       xmlFile.write ("<!--\n\t\t ...Event End Date and Time NOT Specified...\n-->\n")    
+    if str(endDateTime[0]) != "":
+        commonContainer['eventInfo']['endDateTime'] = {}
+        commonContainer['eventInfo']['endDateTime']['year'] = endDateTime[0]
+        commonContainer['eventInfo']['endDateTime']['month'] = endDateTime[1]
+        commonContainer['eventInfo']['endDateTime']['day'] = endDateTime[2]
+        commonContainer['eventInfo']['endDateTime']['hour'] = endDateTime[3]
+        commonContainer['eventInfo']['endDateTime']['minute'] = endDateTime[4]
+        # xmlFile.write (5*tab+"<endDateTime>\n" + \
+        #                6*tab+"<year>"+str(endDateTime[0])+"</year>\n" + \
+        #                6*tab+"<month>"+str(endDateTime[1])+"</month>\n" + \
+        #                6*tab+"<day>"+str(endDateTime[2])+"</day>\n" + \
+        #                6*tab+"<hour>"+str(endDateTime[3])+"</hour>\n" + \
+        #                6*tab+"<minute>"+str(endDateTime[4])+"</minute>\n" + \
+        #                5*tab+"</endDateTime>\n")
+    # else:
+        # commonContainer['eventInfo']['#comment'] = '\n...Event End Date and Time NOT Specified...\n'
+    #    xmlFile.write ("<!--\n\t\t ...Event End Date and Time NOT Specified...\n-->\n")    
 
 ###
 #       Whole bloody section on event recurrences is required here...
@@ -182,15 +215,18 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 #       Cause and optional subcause codes...
 ###
 
-    xmlFile.write ("<!--\n\t\t ...Cause/Sub cause codes...\n-->\n")                          ###comment in XML file
-    xmlFile.write (5*tab+"<causeCode>"+str(c_sc_codes[0])+"</causeCode>\n" + \
-                   5*tab+"<subCauseCode>"+str(c_sc_codes[1])+"</subCauseCode>\n")
+    # xmlFile.write ("<!--\n\t\t ...Cause/Sub cause codes...\n-->\n")       
+    # commonContainer['eventInfo']['#comment'] = '\n...Cause/Sub cause codes...\n'                   ###comment in XML file
+    commonContainer['eventInfo']['causeCode'] = c_sc_codes[0]
+    commonContainer['eventInfo']['subCauseCode'] = c_sc_codes[1]
+    # xmlFile.write (5*tab+"<causeCode>"+str(c_sc_codes[0])+"</causeCode>\n" + \
+    #                5*tab+"<subCauseCode>"+str(c_sc_codes[1])+"</subCauseCode>\n")
     
 ###
 #   End of event Info...
 ###
 
-    xmlFile.write (4*tab+"</eventInfo>\n")
+    # xmlFile.write (4*tab+"</eventInfo>\n")
 
 ###
 #   Start of regionInfo
@@ -201,8 +237,11 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 #       approachRegion
 #
 ###
-    xmlFile.write ("<!--\n\t\t ...Region Info Section...\n-->\n")                           ###comment in XML file
-    xmlFile.write (4*tab+"<regionInfo>\n")
+
+    # commonContainer['#comment'] = '\n...Region Info Section...\n'
+    # xmlFile.write ("<!--\n\t\t ...Region Info Section...\n-->\n")                           ###comment in XML file
+    commonContainer['regionInfo'] = {}
+    # xmlFile.write (4*tab+"<regionInfo>\n")
 
 ###
 #   Applicable Heading and Tolerance... REPEAT for message segments ...
@@ -212,11 +251,15 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 
     appHeading = round(float(appHeading))    
 
-    xmlFile.write ("<!--\n\t\t ...Applicable Heading / Tolerance...\n-->\n")        ###comment in XML file
-    xmlFile.write (5*tab+"<applicableHeading>\n" + \
-                   6*tab+"<heading>"+str(appHeading)+"</heading>\n" + \
-                   6*tab+"<tolerance>"+str(hTolerance)+"</tolerance>\n" + \
-                   5*tab+"</applicableHeading>\n")
+    # commonContainer['regionInfo']['#comment'] = '\n...Applicable Heading / Tolerance...\n'
+    # xmlFile.write ("<!--\n\t\t ...Applicable Heading / Tolerance...\n-->\n")        ###comment in XML file
+    commonContainer['regionInfo']['applicableHeading'] = {}
+    commonContainer['regionInfo']['applicableHeading']['heading'] = appHeading
+    commonContainer['regionInfo']['applicableHeading']['tolerance'] = hTolerance
+    # xmlFile.write (5*tab+"<applicableHeading>\n" + \
+    #                6*tab+"<heading>"+str(appHeading)+"</heading>\n" + \
+    #                6*tab+"<tolerance>"+str(hTolerance)+"</tolerance>\n" + \
+    #                5*tab+"</applicableHeading>\n")
     
 ###
 #   Reference Point...    REPEAT for all message segments   ...
@@ -235,18 +278,27 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
     lon  = int(float(refPoint[1]) * 10000000)
     elev = round(float(refPoint[2]))                                           		    ###in meters no fraction
 
-    xmlFile.write ("<!--\n\t\t ...Reference Point - Lat/Long in Micro Degrees...\n-->\n")   ###comment in XML file
-    xmlFile.write (5*tab+"<referencePoint>\n" + \
-                   6*tab+"<lat>"+str(lat)+"</lat>\n" + \
-                   6*tab+"<long>"+str(lon)+"</long>\n" + \
-                   6*tab+"<elevation>"+str(elev)+"</elevation>\n" + \
-                   5*tab+"</referencePoint>\n")    
+    # commonContainer['regionInfo']['#comment'] = '\n...Reference Point - Lat/Long in Micro Degrees...\n'
+    # xmlFile.write ("<!--\n\t\t ...Reference Point - Lat/Long in Micro Degrees...\n-->\n")   ###comment in XML file
+    commonContainer['regionInfo']['referencePoint'] = {}
+    commonContainer['regionInfo']['referencePoint']['lat'] = lat
+    commonContainer['regionInfo']['referencePoint']['long'] = lon
+    commonContainer['regionInfo']['referencePoint']['elevation'] = elev
+    # xmlFile.write (5*tab+"<referencePoint>\n" + \
+    #                6*tab+"<lat>"+str(lat)+"</lat>\n" + \
+    #                6*tab+"<long>"+str(lon)+"</long>\n" + \
+    #                6*tab+"<elevation>"+str(elev)+"</elevation>\n" + \
+    #                5*tab+"</referencePoint>\n")
 ###
 #   Reference Point Type...
 ###
-    xmlFile.write ("<!--\n\t\t ...Reference Point Type...\n-->\n")                          ###comment in XML file
-    xmlFile.write (5*tab+"<referencePointType><startOfEvent/></referencePointType>\n" + \
-                   5*tab+"<descriptiveName>"+descName+"</descriptiveName>\n")
+
+    # commonContainer['regionInfo']['#comment'] = '\n...Reference Point Type...\n'
+    # xmlFile.write ("<!--\n\t\t ...Reference Point Type...\n-->\n")                          ###comment in XML file
+    commonContainer['regionInfo']['referencePointType'] = {"startOfEvent": None}
+    commonContainer['regionInfo']['descriptiveName'] = descName
+    # xmlFile.write (5*tab+"<referencePointType><startOfEvent/></referencePointType>\n" + \
+    #                5*tab+"<descriptiveName>"+descName+"</descriptiveName>\n")
 
 
 ###
@@ -267,12 +319,19 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 ###                       
 
     if currSeg == 1:
-        xmlFile.write ("\n<!--\n\t\t  ...Speed Limit at the Ref. Point...\n-->\n")      ###comment in XML file
-        xmlFile.write (5*tab+"<speedLimit>\n" + \
-                       6*tab+"<type>"+speedLimit[0]+"</type>\n" + \
-                       6*tab+"<speed>"+str(speedLimit[2])+"</speed>\n" + \
-                       6*tab+"<speedUnits>"+speedLimit[4]+"</speedUnits>\n" + \
-                       5*tab+"</speedLimit>\n")
+        # commonContainer['regionInfo']['#comment'] = '\n...Speed Limit at the Ref. Point...\n'
+        # xmlFile.write ("\n<!--\n\t\t  ...Speed Limit at the Ref. Point...\n-->\n")      ###comment in XML file
+        commonContainer['regionInfo']['speedLimit'] = {}
+        commonContainer['regionInfo']['speedLimit']['type'] = {}
+        commonContainer['regionInfo']['speedLimit']['type'][speedLimit[0].replace('<', '').replace('/>', '')] = None
+        commonContainer['regionInfo']['speedLimit']['speed'] = speedLimit[2]
+        commonContainer['regionInfo']['speedLimit']['speedUnits'] = {}
+        commonContainer['regionInfo']['speedLimit']['speedUnits'][speedLimit[4].replace('<', '').replace('/>', '')] = None
+        # xmlFile.write (5*tab+"<speedLimit>\n" + \
+        #                6*tab+"<type>"+speedLimit[0]+"</type>\n" + \
+        #                6*tab+"<speed>"+str(speedLimit[2])+"</speed>\n" + \
+        #                6*tab+"<speedUnits>"+speedLimit[4]+"</speedUnits>\n" + \
+        #                5*tab+"</speedLimit>\n")
     pass
 
 ###
@@ -280,8 +339,10 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 ###
 
     if currSeg == 1:
-        xmlFile.write ("\n<!--\n\t\t...Event Length...\n-->\n")                         ###comment in XML file                    
-        xmlFile.write (5*tab+"<eventLength>"+str(eL)+"</eventLength>\n")
+        # commonContainer['regionInfo']['#comment'] = '\n\t\t...Event Length...\n'
+        # xmlFile.write ("\n<!--\n\t\t...Event Length...\n-->\n")                         ###comment in XML file
+        commonContainer['regionInfo']['eventLength'] = eL
+        # xmlFile.write (5*tab+"<eventLength>"+str(eL)+"</eventLength>\n")
     pass
 
 ###
@@ -290,7 +351,7 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 #   Where is laneWidth???
 ###
 
-  ###   xmlFile.write ("<!--\n\t\t...Road Width...\n-->\n")                             ###comment in XML file                    
+  ###   xmlFile.write ("<!--\n\t\t...Road Width...\n-->\n")                             ###comment in XML file
   ###   xmlFile.write (4*tab+"<roadWidth>"+str(int(rW))+"</roadWidth>\n\n")
         
 ###
@@ -301,15 +362,22 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 
     alScale = 1                                             #default approach lane scale factor                                                                  
     if currSeg == 1:
-        xmlFile.write ("\n<!--\n\t\t...Start of Approach Region...\n-->\n")             ###comment in XML file 
-        xmlFile.write ("<!--    ...APPROACH LANES: Map Waypoints...\n" + \
-                       6*tab+"Total nodes per lane - "+str(len(arrayMapPt))+"\n" + \
-                       "-->\n")
+        # commonContainer['regionInfo']['#comment'] = '\n\t\t...Start of Approach Region...\n'
+        # commonContainer['regionInfo']['#comment'] = ('    ...APPROACH LANES: Map Waypoints...\n' + \
+                    #    6*tab+'Total nodes per lane - '+str(len(arrayMapPt))+'\n')
+        # xmlFile.write ("\n<!--\n\t\t...Start of Approach Region...\n-->\n")             ###comment in XML file
+        # xmlFile.write ("<!--    ...APPROACH LANES: Map Waypoints...\n" + \
+        #                6*tab+"Total nodes per lane - "+str(len(arrayMapPt))+"\n" + \
+        #                "-->\n")
 
-        xmlFile.write (5*tab+"<approachRegion>\n" + \
-                       6*tab+"<roadwayGeometry>\n" + \
-                       7*tab+"<scale>"+str(alScale)+"</scale>\n" + \
-                       7*tab+"<rsmLanes>\n")
+        commonContainer['regionInfo']['approachRegion'] = {}
+        commonContainer['regionInfo']['approachRegion']['roadwayGeometry'] = {}
+        commonContainer['regionInfo']['approachRegion']['roadwayGeometry']['scale'] = alScale
+        commonContainer['regionInfo']['approachRegion']['roadwayGeometry']['rsmLanes'] = {}
+        # xmlFile.write (5*tab+"<approachRegion>\n" + \
+        #                6*tab+"<roadwayGeometry>\n" + \
+        #                7*tab+"<scale>"+str(alScale)+"</scale>\n" + \
+        #                7*tab+"<rsmLanes>\n")
 
         #print ("TL and arrayMapPt = ", tL, len(arrayMapPt))
 
@@ -321,6 +389,7 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 #
 ###
 
+        commonContainer['regionInfo']['approachRegion']['roadwayGeometry']['rsmLanes']['RSMLane'] = []
         connToList = [(1,1),(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8)]      #connectsTo list for approach lanes leading to WZ
 
         tL = lS[0][0]                                                       #number of lanes
@@ -329,7 +398,8 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
             preName = "Lane "
             if ln == 0:     preName = "Left Lane: Lane "
             if ln == tL-1:  preName = "Right Lane: Lane "
-            xmlFile.write ("<!--\n\t\t    Approach Lane #"+str(ln+1)+"    \n-->\n")
+            # commonContainer['regionInfo']['approachRegion']['roadwayGeometry']['rsmLanes']['#comment'] = '\n\t\t    Approach Lane #"+str(ln+1)+"    \n'
+            # xmlFile.write ("<!--\n\t\t    Approach Lane #"+str(ln+1)+"    \n-->\n")
 
 ###
 #
@@ -351,19 +421,26 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 ###
 #       Following is needed for all cases... Either connectsTo or NOT...
 ###
-
-            xmlFile.write (8*tab+"<RSMLane>\n" + \
-                           9*tab+"<laneID>"+str(ln+1)+"</laneID>\n" + \
-                           9*tab+"<lanePosition>"+str(ln+1)+"</lanePosition>\n" + \
-                           9*tab+"<laneName>Lane #" + str(ln+1)+"</laneName>\n" + \
-                           9*tab+"<laneGeometry>\n" + \
-                           10*tab+"<nodeSet>\n")
+            RSMLane = {}
+            RSMLane['laneID'] = ln+1
+            RSMLane['lanePosition'] = ln+1
+            RSMLane['laneName'] = "Lane #" + str(ln+1)
+            RSMLane['laneGeometry'] = {}
+            RSMLane['laneGeometry']['nodeSet'] = {}
+            RSMLane['laneGeometry']['nodeSet']['NodeLLE'] = []
+            # xmlFile.write (8*tab+"<RSMLane>\n" + \
+            #                9*tab+"<laneID>"+str(ln+1)+"</laneID>\n" + \
+            #                9*tab+"<lanePosition>"+str(ln+1)+"</lanePosition>\n" + \
+            #                9*tab+"<laneName>Lane #" + str(ln+1)+"</laneName>\n" + \
+            #                9*tab+"<laneGeometry>\n" + \
+            #                10*tab+"<nodeSet>\n")
 ###
 #       Repeat the following for all nodes in approach for lane ln+1
 ###
 
             kt = 0
             while kt < len(arrayMapPt):                                     #lat/lon/alt for each data point
+                NodeLLE = {}
                 #print ("kt, ln:", kt, ln)
 
 ###
@@ -379,14 +456,20 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
                 lon = int((arrayMapPt[kt][ln*4+1]) * 10000000)
                 elev = round(arrayMapPt[kt][ln*4+2])                        #in full meters only
 
-                xmlFile.write (11*tab+"<NodeLLE>" + "\t\t\t\t\t<!--  Approach Lane#/Node# - "+str(ln+1)+"/"+str(kt+1)+"  -->\n" + \
-                               12*tab+"<nodePoint>\n" + \
-                               13*tab+"<node-3Dabsolute>\n" + \
-                               14*tab+"<lat>"+str(lat)+"</lat>\n" + \
-                               14*tab+"<long>"+str(lon)+"</long>\n" + \
-                               14*tab+"<elevation>"+str(elev)+"</elevation>\n" + \
-                               13*tab+"</node-3Dabsolute>\n" + \
-                               12*tab+"</nodePoint>\n")
+                NodeLLE['nodePoint'] = {}
+                NodeLLE['nodePoint']['node-3Dabsolute'] = {}
+                NodeLLE['nodePoint']['node-3Dabsolute']['lat'] = lat
+                NodeLLE['nodePoint']['node-3Dabsolute']['long'] = lon
+                NodeLLE['nodePoint']['node-3Dabsolute']['elevation'] = elev
+                # NodeLLE['nodePoint']['#comment'] = '\t\t\t\t\t  Approach Lane#/Node# - '+str(ln+1)+'/'+str(kt+1)
+                # xmlFile.write (11*tab+"<NodeLLE>" + "\t\t\t\t\t<!--  Approach Lane#/Node# - "+str(ln+1)+"/"+str(kt+1)+"  -->\n" + \
+                #                12*tab+"<nodePoint>\n" + \
+                #                13*tab+"<node-3Dabsolute>\n" + \
+                #                14*tab+"<lat>"+str(lat)+"</lat>\n" + \
+                #                14*tab+"<long>"+str(lon)+"</long>\n" + \
+                #                14*tab+"<elevation>"+str(elev)+"</elevation>\n" + \
+                #                13*tab+"</node-3Dabsolute>\n" + \
+                #                12*tab+"</nodePoint>\n")
 
 ###
 #           Before closing the "NodeLLE, see if there are any node attributes that should be
@@ -397,7 +480,8 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 #           would apply to the WZ lanes...
 ###
 
-                xmlFile.write (11*tab+"</NodeLLE>\n")
+                # xmlFile.write (11*tab+"</NodeLLE>\n")
+                RSMLane['laneGeometry']['nodeSet']['NodeLLE'].append(NodeLLE)
                 kt = kt + 1                                                 #incr row (next node point for same lane
             pass                                                            #end of while
 
@@ -405,8 +489,8 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 #       End of nodeSet and laneGeometry...
 ###
 
-            xmlFile.write (10*tab+"</nodeSet>\n" + \
-                           9*tab+"</laneGeometry>\n")
+            # xmlFile.write (10*tab+"</nodeSet>\n" + \
+            #                9*tab+"</laneGeometry>\n")
        
 ###
 #       Use the following ONLY if there is ConnectingLane using "connectsTo"...
@@ -418,32 +502,35 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 #
 ###
             if (connToList[ln][0] != connToList[ln][1]):                    #connects to different lane...
-                xmlFile.write (9*tab+"<connectsTo>\n" + \
-                               10*tab+"<LaneID>"+str(connToList[ln][0])+"</LaneID>\n" + \
-                               10*tab+"<LaneID>"+str(connToList[ln][1])+"</LaneID>\n" + \
-                               9*tab+"</connectsTo>\n")
+                RSMLane['connectsTo'] = {}
+                RSMLane['connectsTo']['laneID'] = [connToList[ln][0], connToList[ln][1]]
+                # xmlFile.write (9*tab+"<connectsTo>\n" + \
+                #                10*tab+"<LaneID>"+str(connToList[ln][0])+"</LaneID>\n" + \
+                #                10*tab+"<LaneID>"+str(connToList[ln][1])+"</LaneID>\n" + \
+                #                9*tab+"</connectsTo>\n")
             pass    
 
 ###
 #       End of RSMLane    
 ###
 
-            xmlFile.write (8*tab+"</RSMLane>\n")
+            # xmlFile.write (8*tab+"</RSMLane>\n")
 
+            commonContainer['regionInfo']['approachRegion']['roadwayGeometry']['rsmLanes']['RSMLane'].append(RSMLane)
             ln = ln + 1                                                     #next lane
         pass                                                                #end of while
 
-        xmlFile.write (7*tab+"</rsmLanes>\n" + \
-                       6*tab+"</roadwayGeometry>\n" + \
-                       5*tab+"</approachRegion>\n" + \
-                       4*tab+"</regionInfo>\n")                             #end of approachLanes and regionInfo
+        # xmlFile.write (7*tab+"</rsmLanes>\n" + \
+        #                6*tab+"</roadwayGeometry>\n" + \
+        #                5*tab+"</approachRegion>\n" + \
+        #                4*tab+"</regionInfo>\n")                             #end of approachLanes and regionInfo
     pass
 
 ###
 #   Close regionInfo tag for message segment > 1
 ###
 
-    if currSeg > 1:  xmlFile.write (4*tab+"</regionInfo>\n")
+    # if currSeg > 1:  xmlFile.write (4*tab+"</regionInfo>\n")
     
 ###
 ##
@@ -451,8 +538,10 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 ##
 ###
 
-    xmlFile.write (3*tab+"</commonContainer>\n")                            #end of common container...    
-    xmlFile.write ("\n<!--\n\t\t...END of COMMON CONTAINER...\t\t-->\n")    ###comment in XML file                      
+    # xmlFile.write (3*tab+"</commonContainer>\n")                            #end of common container...    
+    # commonContainer['#comment'] = '\n\t\t...END of COMMON CONTAINER...'
+    # xmlFile.write ("\n<!--\n\t\t...END of COMMON CONTAINER...\t\t-->\n")    ###comment in XML file                      
+    return commonContainer
 
 
 ###
@@ -505,8 +594,10 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 #   Start WZ lane map waypoints...
 ###
 
-    xmlFile.write ("\n<!--   ...Work Zone Lanes: Map way points...   -->\n\n")
-    xmlFile.write (3*tab+"<rszContainer>\n")
+    rszContainer = {}
+    # rszContainer['#comment'] = '   ...Work Zone Lanes: Map way points...   '
+    # xmlFile.write ("\n<!--   ...Work Zone Lanes: Map way points...   -->\n\n")
+    # xmlFile.write (3*tab+"<rszContainer>\n")
 
 ###
 #   Added on Jan. 25, 2018
@@ -593,24 +684,37 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 #   Add speedLimit for the entire WZ under rszContainer. speedLimit can be updated at node level
 #   when appropriate - e.g. workers present, otherwise the limit is applied for the entire WZ.
 ###
-    
-    xmlFile.write (4*tab+"<speedLimit>\n" + \
-                   5*tab+"<type>"+speedLimit[0]+"</type>\n" + \
-                   5*tab+"<speed>"+str(speedLimit[2])+"</speed>\n" + \
-                   5*tab+"<speedUnits>"+speedLimit[4]+"</speedUnits>\n" + \
-                   4*tab+"</speedLimit>\n\n")
+
+    rszContainer['speedLimit'] = {}
+    rszContainer['speedLimit']['type'] = {}
+    rszContainer['speedLimit']['type'][speedLimit[0].replace('<', '').replace('/>', '')] = None
+    rszContainer['speedLimit']['speed'] = speedLimit[2]
+    rszContainer['speedLimit']['speedUnits'] = {}
+    rszContainer['speedLimit']['speedUnits'][speedLimit[4].replace('<', '').replace('/>', '')] = None
+    # xmlFile.write (4*tab+"<speedLimit>\n" + \
+    #                5*tab+"<type>"+speedLimit[0]+"</type>\n" + \
+    #                5*tab+"<speed>"+str(speedLimit[2])+"</speed>\n" + \
+    #                5*tab+"<speedUnits>"+speedLimit[4]+"</speedUnits>\n" + \
+    #                4*tab+"</speedLimit>\n\n")
 
 ###
 #   ... Start of WZ Lane Geometry ...
 ###       
 
-    xmlFile.write ("<!--\t ...S T A R T   of   L A N E   G E O M E T R Y...\n" + \
-                   8*tab+"Total node points per lane - "+str(len(arrayMapPt))+"\n" + \
-                   "-->\n") 
-    xmlFile.write (4*tab+"<rszRegion>\n" + \
-                   5*tab+"<roadwayGeometry>\n" +  \
-                   6*tab+"<scale>"+str(wzLaneScale)+"</scale>\n")
-    xmlFile.write (6*tab+"<rsmLanes>\n")
+    # rszContainer['#comment'] = '<!--\t ...S T A R T   of   L A N E   G E O M E T R Y...\n' + \
+                #    8*tab+'Total node points per lane - '+str(len(arrayMapPt))+'\n'
+    # xmlFile.write ("<!--\t ...S T A R T   of   L A N E   G E O M E T R Y...\n" + \
+    #                8*tab+"Total node points per lane - "+str(len(arrayMapPt))+"\n" + \
+    #                "-->\n") 
+    rszContainer['rszRegion'] = {}
+    rszContainer['rszRegion']['roadwayGeometry'] = {}
+    rszContainer['rszRegion']['roadwayGeometry']['scale'] = wzLaneScale
+    rszContainer['rszRegion']['roadwayGeometry']['rsmLanes'] = {}
+    rszContainer['rszRegion']['roadwayGeometry']['rsmLanes']['RSMLane'] = []
+    # xmlFile.write (4*tab+"<rszRegion>\n" + \
+    #                5*tab+"<roadwayGeometry>\n" +  \
+    #                6*tab+"<scale>"+str(wzLaneScale)+"</scale>\n")
+    # xmlFile.write (6*tab+"<rsmLanes>\n")
 
     ln = 0
     while ln < totLane:
@@ -620,14 +724,23 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
         if ln == totLane-1: preName = "Right Lane: Lane #"
         
         ##print ("Working on Lane: ",ln+1, "tot lane = ",totLane)
-        xmlFile.write ("<!--\n\t    ...Work Zone Lane #"+str(ln+1)+"...\n-->\n")
-        xmlFile.write (7*tab+"<RSMLane>\n" + \
-                       8*tab+"<laneID>"+str(ln+1)+"</laneID>\n" + \
-                       8*tab+"<lanePosition>"+str(ln+1)+"</lanePosition>\n" + \
-                       8*tab+"<laneName>"+preName+str(ln+1)+"</laneName>\n" + \
-                       8*tab+"<laneWidth>"+str(laneWidth)+"</laneWidth>\n" + \
-                       8*tab+"<laneGeometry>\n" + \
-                       9*tab+"<nodeSet>\n")
+        # rszContainer['#comment'] = '\n\t    ...Work Zone Lane #'+str(ln+1)+'...\n'
+        # xmlFile.write ("<!--\n\t    ...Work Zone Lane #"+str(ln+1)+"...\n-->\n")
+        RSMLane = {}
+        RSMLane['laneID'] = ln+1
+        RSMLane['lanePosition'] = ln+1
+        RSMLane['laneName'] = preName+str(ln+1)
+        RSMLane['laneWidth'] = laneWidth
+        RSMLane['laneGeometry'] = {}
+        RSMLane['laneGeometry']['nodeSet'] = {}
+        RSMLane['laneGeometry']['nodeSet']['NodeLLE'] = []
+        # xmlFile.write (7*tab+"<RSMLane>\n" + \
+        #                8*tab+"<laneID>"+str(ln+1)+"</laneID>\n" + \
+        #                8*tab+"<lanePosition>"+str(ln+1)+"</lanePosition>\n" + \
+        #                8*tab+"<laneName>"+preName+str(ln+1)+"</laneName>\n" + \
+        #                8*tab+"<laneWidth>"+str(laneWidth)+"</laneWidth>\n" + \
+        #                8*tab+"<laneGeometry>\n" + \
+        #                9*tab+"<nodeSet>\n")
 
 ###
 #       Repeat the following for all nodes in WZ for lane ln+1
@@ -704,15 +817,21 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
                 lat = int((arrayMapPt[kt][ln*4+0]) * 10000000)
                 lon = int((arrayMapPt[kt][ln*4+1]) * 10000000)
                 elev = round(arrayMapPt[kt][ln*4+2])                    #in full meters
-
-                xmlFile.write (10*tab+"<NodeLLE>" + "\t\t\t\t\t<!--  WZ Lane#/Node# - "+str(ln+1)+"/"+str(kt+1)+lcMsg+wpMsg+"  -->\n" + \
-                               11*tab+"<nodePoint>\n" + \
-                               12*tab+"<node-3Dabsolute>\n" + \
-                               13*tab+"<lat>"+str(lat)+"</lat>\n" + \
-                               13*tab+"<long>"+str(lon)+"</long>\n" + \
-                               13*tab+"<elevation>"+str(elev)+"</elevation>\n" + \
-                               12*tab+"</node-3Dabsolute>\n" + \
-                               11*tab+"</nodePoint>\n")
+                NodeLLE = {}
+                NodeLLE['nodePoint'] = {}
+                NodeLLE['nodePoint']['node-3Dabsolute'] = {}
+                NodeLLE['nodePoint']['node-3Dabsolute']['lat'] = lat
+                NodeLLE['nodePoint']['node-3Dabsolute']['long'] = lon
+                NodeLLE['nodePoint']['node-3Dabsolute']['elevation'] = elev
+                # rszContainer['#comment'] = '\t\t\t\t\t<!--  WZ Lane#/Node# - '+str(ln+1)+'/'+str(kt+1)+lcMsg+wpMsg
+                # xmlFile.write (10*tab+"<NodeLLE>" + "\t\t\t\t\t<!--  WZ Lane#/Node# - "+str(ln+1)+"/"+str(kt+1)+lcMsg+wpMsg+"  -->\n" + \
+                #                11*tab+"<nodePoint>\n" + \
+                #                12*tab+"<node-3Dabsolute>\n" + \
+                #                13*tab+"<lat>"+str(lat)+"</lat>\n" + \
+                #                13*tab+"<long>"+str(lon)+"</long>\n" + \
+                #                13*tab+"<elevation>"+str(elev)+"</elevation>\n" + \
+                #                12*tab+"</node-3Dabsolute>\n" + \
+                #                11*tab+"</nodePoint>\n")
                
 ###
 #               Add Attributes here, IF....
@@ -727,7 +846,8 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 ###
 
                 if currLaneStat != prevLaneStat or currWPStat != prevWPStat:
-                    xmlFile.write (11*tab+"<nodeAttributes>\n")               
+                    NodeLLE['nodeAttributes'] = {}
+                    # xmlFile.write (11*tab+"<nodeAttributes>\n")               
   
 ###
 #                   Provide node attributes if lc/lo status change or WP status change for the node...
@@ -745,24 +865,33 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
                     if currWPStat != prevWPStat:                        #WP status change
                         if currWPStat == 1:                             #start of wp
                             sLoc = 3
-                            pP = "<peoplePresent><true/></peoplePresent>"
+                            pP = {"true": None}
+                            # pP = "<peoplePresent><true/></peoplePresent>"
                         pass
             
                         if currWPStat == 0:                             #end of WP
                             sLoc = 2
-                            pP = "<peoplePresent><false/></peoplePresent>"
+                            pP = {"false": None}
+                            # pP = "<peoplePresent><false/></peoplePresent>"
                         pass                
 ###
 #                       update speed limit attributes followed by workers present as defined in ASN.1...
 ###
 
                         ###xmlFile.write (12*tab+""+pP+"\n")            #must come after node's speed attribute
-                        xmlFile.write (12*tab+"<speedLimit>\n" + \
-                                       13*tab+"<type>"+speedLimit[0]+"</type>\n" + \
-                                       14*tab+"<speed>"+str(speedLimit[sLoc])+"</speed>\n" + \
-                                       14*tab+"<speedUnits>"+speedLimit[4]+"</speedUnits>\n" + \
-                                       12*tab+"</speedLimit>\n")
-                        xmlFile.write (12*tab+""+pP+"\n")               #must come after node's speed attribute
+                        NodeLLE['nodeAttributes']['speedLimit'] = {}
+                        NodeLLE['nodeAttributes']['speedLimit']['type'] = {}
+                        NodeLLE['nodeAttributes']['speedLimit']['type'][speedLimit[0].replace('<', '').replace('/>', '')] = None
+                        NodeLLE['nodeAttributes']['speedLimit']['speed'] = speedLimit[sLoc]
+                        NodeLLE['nodeAttributes']['speedLimit']['speedUnits'] = {}
+                        NodeLLE['nodeAttributes']['speedLimit']['speedUnits'][speedLimit[4].replace('<', '').replace('/>', '')] = None
+                        NodeLLE['nodeAttributes']['peoplePresent'] = pP
+                        # xmlFile.write (12*tab+"<speedLimit>\n" + \
+                        #                13*tab+"<type>"+speedLimit[0]+"</type>\n" + \
+                        #                14*tab+"<speed>"+str(speedLimit[sLoc])+"</speed>\n" + \
+                        #                14*tab+"<speedUnits>"+speedLimit[4]+"</speedUnits>\n" + \
+                        #                12*tab+"</speedLimit>\n")
+                        # xmlFile.write (12*tab+""+pP+"\n")               #must come after node's speed attribute
 
 
                         prevWPStat = currWPStat                         #set WP status
@@ -802,37 +931,40 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 #                           set node attribute for "laneClosed" 
 ### 
                             
-                            lClosed = "<laneClosed><true/></laneClosed>"
+                            lClosed = {"true": None} #"<laneClosed><true/></laneClosed>"
                             if ln < 2:                                  #lane 1 or 2 closed...
-                                tLeft  = "<taperLeft><false/></taperLeft>"                           
-                                tRight = "<taperRight><true/></taperRight>"
+                                tLeft  = {"false": None} #"<taperLeft><false/></taperLeft>"                           
+                                tRight = {"true": None} #"<taperRight><true/></taperRight>"
                             pass
                 
                             if ln > 1:                                  #lane 3 or 4 closed...
-                                tLeft  = "<taperLeft><true/></taperLeft>"                           
-                                tRight = "<taperRight><false/></taperRight>"                                             
+                                tLeft  = {"true": None} #"<taperLeft><true/></taperLeft>"                           
+                                tRight = {"false": None} #"<taperRight><false/></taperRight>"                                             
                             pass
                         pass
 
                         if currLaneStat == 0:                           #lane is opened at this node
-                            lClosed = "<laneClosed><false/></laneClosed>"
+                            lClosed = {"false": None} #"<laneClosed><false/></laneClosed>"
                             if ln < 2:                                  #lane 1 or 2 opened...
-                                tLeft  = "<taperLeft><true/></taperLeft>"                           
-                                tRight = "<taperRight><false/></taperRight>"
+                                tLeft  = {"true": None} #"<taperLeft><true/></taperLeft>"                           
+                                tRight = {"false": None} #"<taperRight><false/></taperRight>"
                             pass    
                     
                             if ln > 1:                                  #lane 3 or 4 opened...
-                                tLeft  = "<taperLeft><false/></taperLeft>"                           
-                                tRight = "<taperRight><true/></taperRight>"                                             
+                                tLeft  = {"false": None} #"<taperLeft><false/></taperLeft>"                           
+                                tRight = {"true": None} #"<taperRight><true/></taperRight>"                                             
                             pass
                         pass
 
 ###
 #                       Write Lane taper attributes...
 ###
-                        xmlFile.write (12*tab+""+tLeft+"\n" + \
-                                       12*tab+""+tRight+"\n" + \
-                                       12*tab+""+lClosed+"\n")
+                        NodeLLE['nodeAttributes']['taperLeft'] = tLeft
+                        NodeLLE['nodeAttributes']['taperRight'] = tRight
+                        NodeLLE['nodeAttributes']['laneClosed'] = lClosed
+                        # xmlFile.write (12*tab+""+tLeft+"\n" + \
+                        #                12*tab+""+tRight+"\n" + \
+                        #                12*tab+""+lClosed+"\n")
 
                         prevLaneStat = currLaneStat                     #set prev status same as current
                 
@@ -840,17 +972,18 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 ###
 #                   End of nodeAttributes...
 ###
-                    xmlFile.write (11*tab+"</nodeAttributes>\n")
+                    # xmlFile.write (11*tab+"</nodeAttributes>\n")
                 pass                                                    #end of node attributes
 
-                xmlFile.write (10*tab+"</NodeLLE>\n")                   #end of NodeLLE
+                RSMLane['laneGeometry']['nodeSet']['NodeLLE'].append(NodeLLE)
+                # xmlFile.write (10*tab+"</NodeLLE>\n")                   #end of NodeLLE
                 
             pass                                                        #end of lcStat check
 
             kt = kt + 1                                                 #incr for next node point for same lane
         pass                                                            #end of while - all nodes for the lane
-        xmlFile.write (9*tab+"</nodeSet>\n")                            #end of nodeset for the lane
-        xmlFile.write (8*tab+"</laneGeometry>\n")                       #end of laneGeoetry
+        # xmlFile.write (9*tab+"</nodeSet>\n")                            #end of nodeset for the lane
+        # xmlFile.write (8*tab+"</laneGeometry>\n")                       #end of laneGeoetry
 
 ###
 #       For Closed Lane only, add "connectsTo" attribute for lane... 
@@ -861,38 +994,40 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 ###
 #           Write connectsTo tag...
 ###
-
-            xmlFile.write (8*tab+"<connectsTo>\n" + \
-                           9*tab+"<LaneID>"+str(ln+1)+"</LaneID>\n" + \
-                           9*tab+"<LaneID>"+str(toLane+1)+"</LaneID>\n" + \
-                           8*tab+"</connectsTo>\n")
+            RSMLane['connectsTo'] = {}
+            RSMLane['connectsTo']['laneID'] = [ln+1, toLane+1]
+            # xmlFile.write (8*tab+"<connectsTo>\n" + \
+            #                9*tab+"<LaneID>"+str(ln+1)+"</LaneID>\n" + \
+            #                9*tab+"<LaneID>"+str(toLane+1)+"</LaneID>\n" + \
+            #                8*tab+"</connectsTo>\n")
         pass
         
-        xmlFile.write (7*tab+"</RSMLane>\n")                            #end of current lane
+        rszContainer['rszRegion']['roadwayGeometry']['rsmLanes']['RSMLane'].append(RSMLane)
+        # xmlFile.write (7*tab+"</RSMLane>\n")                            #end of current lane
                        
         ln = ln + 1                                                     #next lane
         #print ("after ln incr:", ln)
     pass                                                                #end of while
 
-    xmlFile.write (6*tab+"</rsmLanes>\n" + \
-                   5*tab+"</roadwayGeometry>\n" + \
-                   4*tab+"</rszRegion>\n" + \
-                   3*tab+"</rszContainer>\n")                           #end of RSZ container
+    # xmlFile.write (6*tab+"</rsmLanes>\n" + \
+    #                5*tab+"</roadwayGeometry>\n" + \
+    #                4*tab+"</rszRegion>\n" + \
+    #                3*tab+"</rszContainer>\n")                           #end of RSZ container
 
 ###
 #   END OF RSM!!!
 ###                                               
 
-    xmlFile.write (2*tab+"</RoadsideSafetyMessage>\n")                  #end or RSM...
+    # xmlFile.write (2*tab+"</RoadsideSafetyMessage>\n")                  #end or RSM...
     
 
 ###
 #   RSM: End of MessageFrame...  
 ###
 
-    xmlFile.write (1*tab+"</value>\n" + \
-                   "</MessageFrame>")
+    # xmlFile.write (1*tab+"</value>\n" + \
+    #                "</MessageFrame>")
 
 
-    return                                                              #End of func!
+    return rszContainer                                                   #End of func!
                        

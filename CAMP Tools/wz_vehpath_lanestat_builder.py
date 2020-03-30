@@ -33,9 +33,9 @@ import  csv                                                 #csv file processor
 #def buildVehPathData_LaneStat (vehPathDataFile,totalLanes,pathPt,laneStat,wpStat,refPoint,refPtIdx,appHeading,wzLen,sampleFreq):
 def buildVehPathData_LaneStat (vehPathDataFile,totalLanes,pathPt,laneStat,wpStat,refPoint,atRefPoint,sampleFreq):
 
-
     newFormat   = True                                      #set new data format to true...
-    gotRefPt    = False                                     #default 
+
+    gotRefPt    = False                                     #default
     laneStatIdx = 0                                         #laneStat + lcOffset array index
     wpStatIdx   = 0                                         #wpStat array index
     rowKt       = 0                                         #input record processing counter
