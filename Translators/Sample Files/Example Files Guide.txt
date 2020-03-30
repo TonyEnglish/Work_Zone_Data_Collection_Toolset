@@ -1,0 +1,8 @@
+Example Files Guide
+
+CAMP_RSM_example.xml is an xml RSM file generated from the CAMP tool
+CAMP_RSM_example_2_with_comments.xml is an xml RSM file generated from the CAMP tool, with comments labeling some of the data fields
+CAMP_WZDx_translated_example.geojson is a geojson WZDx file translated from CAMP_RSM_example.xml
+WZDX_linestring_example.geojson is a geojson WZDx sample file from https://github.com/usdot-jpo-ode/jpo-wzdx
+
+CAMP_RSM_example.xml -> RSM to WZDx Translator -> CAMP_WZDx_translated_example.geojson
