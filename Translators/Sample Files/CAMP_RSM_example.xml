@@ -6,7 +6,7 @@
       <version>1</version>
       <commonContainer>
         <eventInfo>
-          <eventID>00007964</eventID>
+          <eventID>000035c2</eventID>
           <msgSegmentInfo>
             <totalMsgSegments>1</totalMsgSegments>
             <thisSegmentNum>1</thisSegmentNum>
@@ -26,6 +26,49 @@
             <hour>23</hour>
             <minute>59</minute>
           </endDateTime>
+          <eventRecurrence>
+            <EventRecurrence>
+              <startTime>
+                <hour>0</hour>
+                <minute>0</minute>
+              </startTime>
+              <endTime>
+                <hour>23</hour>
+                <minute>59</minute>
+              </endTime>
+              <startDate>
+                <year>2019</year>
+                <month>11</month>
+                <day>8</day>
+              </startDate>
+              <endDate>
+                <year>2019</year>
+                <month>11</month>
+                <day>10</day>
+              </endDate>
+              <monday>
+                <true/>
+              </monday>
+              <tuesday>
+                <true/>
+              </tuesday>
+              <wednesday>
+                <false/>
+              </wednesday>
+              <thursday>
+                <true/>
+              </thursday>
+              <friday>
+                <true/>
+              </friday>
+              <saturday>
+                <true/>
+              </saturday>
+              <sunday>
+                <true/>
+              </sunday>
+            </EventRecurrence>
+          </eventRecurrence>
           <causeCode>3</causeCode>
           <subCauseCode>0</subCauseCode>
         </eventInfo>
@@ -61,6 +104,7 @@
                   <laneID>1</laneID>
                   <lanePosition>1</lanePosition>
                   <laneName>Lane #1</laneName>
+                  <laneWidth>360</laneWidth>
                   <laneGeometry>
                     <nodeSet>
                       <NodeLLE>
@@ -88,6 +132,7 @@
                   <laneID>2</laneID>
                   <lanePosition>2</lanePosition>
                   <laneName>Lane #2</laneName>
+                  <laneWidth>360</laneWidth>
                   <laneGeometry>
                     <nodeSet>
                       <NodeLLE>
@@ -115,6 +160,7 @@
                   <laneID>3</laneID>
                   <lanePosition>3</lanePosition>
                   <laneName>Lane #3</laneName>
+                  <laneWidth>360</laneWidth>
                   <laneGeometry>
                     <nodeSet>
                       <NodeLLE>

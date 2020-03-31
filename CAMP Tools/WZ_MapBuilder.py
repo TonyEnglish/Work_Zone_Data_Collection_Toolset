@@ -536,8 +536,8 @@ def build_XML_file():
 #   Build xml for common container...
 ###
 
-        commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
-                      speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
+        commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,wzDaysOfWeek,c_sc_codes,newRefPt,appHeading,hTolerance, \
+                      speedLimit,laneWidth,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
 
         #if currSeg == 1:
             #logFile.write("\n ---Constructed Approach Lane Node Points/Lane: "+str(len(appMapPt))+"\t(Must between 2 and 63)")
