@@ -27,6 +27,7 @@
 ###
 
 import  os.path
+import sys
 
 ###
 #     Open and read csv file...    
@@ -38,6 +39,7 @@ import  time                                            #do I need time???
 import  math                                            #math library for math functions
 import  random                                          #random number generator
 import  xmltodict                                       #dict to xml converter
+import  json                                            #json manipulation
 
 from    wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
 
@@ -54,6 +56,8 @@ from    wz_map_constructor  import getDist              #get distance in meters 
 
 from wz_xml_builder         import build_xml_CC         #common container
 from wz_xml_builder         import build_xml_WZC        #WZ container
+from rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
+
 
 ###
 #   .js file cotaining several arrays and data elements to be used by javaScript processing s/w for overlaying constructed
@@ -493,6 +497,9 @@ def build_XML_file():
         ##xml_outFile = "./WZ_XML_File/RSZW_MAP_xmlFile-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
         xml_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
         xmlFile = open(xml_outFile, "w")
+        
+        wzdx_outFile = "./WZ_MapMsg/WZDx_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".geojson"
+        wzdxFile = open(wzdx_outFile, "w")
     
 ###
 #   Write initial xml lines in the output xml file...
@@ -558,22 +565,27 @@ def build_XML_file():
 ###
         rszContainer = build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
 
-        message = {}
-        message['MessageFrame'] = {}
-        message['MessageFrame']['messageId'] = idList[0]
-        message['MessageFrame']['value'] = {}
-        message['MessageFrame']['value']['RoadsideSafetyMessage'] = {}
-        message['MessageFrame']['value']['RoadsideSafetyMessage']['version'] = 1
-        message['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer'] = commonContainer
-        message['MessageFrame']['value']['RoadsideSafetyMessage']['rszContainer'] = rszContainer
-        rsm_xml = xmltodict.unparse(message, short_empty_elements=True, pretty=True, indent="  ")
+        rsm = {}
+        rsm['MessageFrame'] = {}
+        rsm['MessageFrame']['messageId'] = idList[0]
+        rsm['MessageFrame']['value'] = {}
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage'] = {}
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage']['version'] = 1
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer'] = commonContainer
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage']['rszContainer'] = rszContainer
+
+        rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent="  ")
         xmlFile.write(rsm_xml)
+
+        wzdx = wzdx_creator(rsm)
+        wzdxFile.write(json.dumps(wzdx, indent=2))
     
 ###
 #   Done, finito, close files
 ###   
 
         xmlFile.close()
+        wzdxFile.close()
 
         currSeg = currSeg+1
     pass
