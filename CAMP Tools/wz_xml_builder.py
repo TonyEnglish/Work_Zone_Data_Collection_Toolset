@@ -217,9 +217,11 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,wzDaysOfWeek,c
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startTime'] = {}
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startTime']['hour'] = eDateTime[3]
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startTime']['minute'] = eDateTime[4]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startTime']['second'] = 0
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime'] = {}
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime']['hour'] = endDateTime[3]
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime']['minute'] = endDateTime[4]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime']['second'] = 0
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate'] = {}
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['year'] = eDateTime[0]
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['month'] = eDateTime[1]
@@ -527,7 +529,7 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,wzDaysOfWeek,c
 ###
             if (connToList[ln][0] != connToList[ln][1]):                    #connects to different lane...
                 RSMLane['connectsTo'] = {}
-                RSMLane['connectsTo']['laneID'] = [connToList[ln][0], connToList[ln][1]]
+                RSMLane['connectsTo']['LaneID'] = [connToList[ln][0], connToList[ln][1]]
                 # xmlFile.write (9*tab+"<connectsTo>\n" + \
                 #                10*tab+"<LaneID>"+str(connToList[ln][0])+"</LaneID>\n" + \
                 #                10*tab+"<LaneID>"+str(connToList[ln][1])+"</LaneID>\n" + \
@@ -1019,7 +1021,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 #           Write connectsTo tag...
 ###
             RSMLane['connectsTo'] = {}
-            RSMLane['connectsTo']['laneID'] = [ln+1, toLane+1]
+            RSMLane['connectsTo']['LaneID'] = [ln+1, toLane+1]
             # xmlFile.write (8*tab+"<connectsTo>\n" + \
             #                9*tab+"<LaneID>"+str(ln+1)+"</LaneID>\n" + \
             #                9*tab+"<LaneID>"+str(toLane+1)+"</LaneID>\n" + \

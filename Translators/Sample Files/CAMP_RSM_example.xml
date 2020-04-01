@@ -6,7 +6,7 @@
       <version>1</version>
       <commonContainer>
         <eventInfo>
-          <eventID>000035c2</eventID>
+          <eventID>00003fca</eventID>
           <msgSegmentInfo>
             <totalMsgSegments>1</totalMsgSegments>
             <thisSegmentNum>1</thisSegmentNum>
@@ -31,10 +31,12 @@
               <startTime>
                 <hour>0</hour>
                 <minute>0</minute>
+                <second>0</second>
               </startTime>
               <endTime>
                 <hour>23</hour>
                 <minute>59</minute>
+                <second>0</second>
               </endTime>
               <startDate>
                 <year>2019</year>
@@ -555,8 +557,8 @@
                   </nodeSet>
                 </laneGeometry>
                 <connectsTo>
-                  <laneID>3</laneID>
-                  <laneID>2</laneID>
+                  <LaneID>3</LaneID>
+                  <LaneID>2</LaneID>
                 </connectsTo>
               </RSMLane>
             </rsmLanes>
