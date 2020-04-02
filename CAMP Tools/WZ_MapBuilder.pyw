@@ -37,6 +37,8 @@ import  datetime                                        #Date and Time methods..
 import  time                                            #do I need time???
 import  math                                            #math library for math functions
 import  random                                          #random number generator
+import  xmltodict                                       #dict to xml converter
+import  json                                            #json manipulation
 
 from    wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
 
@@ -53,6 +55,7 @@ from    wz_map_constructor  import getDist              #get distance in meters 
 
 from wz_xml_builder         import build_xml_CC         #common container
 from wz_xml_builder         import build_xml_WZC        #WZ container
+from rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
 
 ###
 #   .js file cotaining several arrays and data elements to be used by javaScript processing s/w for overlaying constructed
@@ -483,6 +486,11 @@ def build_XML_file():
     currSeg = 1                                             #current message segment
     totSeg  = msgSegList[0][0]                              #total message segments
 
+    print('wzdx file created')
+    wzdx_outFile = "./WZ_MapMsg/WZDx_File-" + ctrDT + ".geojson"
+    wzdxFile = open(wzdx_outFile, "w")
+    rsmSegments = []
+
     while currSeg <= totSeg:                                #repeat for all segments
 
 ###
@@ -498,14 +506,14 @@ def build_XML_file():
 #   Introductory lines...
 ###
       
-        xmlFile.write ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + \
-                       "<!-- \n" + \
-                       "\t CAMP xml file for RSZW/LC Mapping Project\n" + \
-                       "\t Message segment file "+ str(currSeg)+" of "+str(totSeg)+"...\n\n" + \
-                       "\t Version 1.5 - June, 2018\n" + \
-                       "\t for RSMv5.1 ASN\n" + \
-                       "\t File Name: "+xml_outFile+"\n" + \
-                       "\t Created: "+cDT+"\n\n-->\n")
+        # xmlFile.write ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + \
+        #                "<!-- \n" + \
+        #                "\t CAMP xml file for RSZW/LC Mapping Project\n" + \
+        #                "\t Message segment file "+ str(currSeg)+" of "+str(totSeg)+"...\n\n" + \
+        #                "\t Version 1.5 - June, 2018\n" + \
+        #                "\t for RSMv5.1 ASN\n" + \
+        #                "\t File Name: "+xml_outFile+"\n" + \
+        #                "\t Created: "+cDT+"\n\n-->\n")
 
 ###
 #   Build common container...
@@ -536,8 +544,10 @@ def build_XML_file():
 ###
 
    
-        build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
-                      speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
+        # build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
+        #               speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
+        commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,wzDaysOfWeek,c_sc_codes,newRefPt,appHeading,hTolerance, \
+                      speedLimit,laneWidth,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
 
         #if currSeg == 1:
             #logFile.write("\n ---Constructed Approach Lane Node Points/Lane: "+str(len(appMapPt))+"\t(Must between 2 and 63)")
@@ -557,8 +567,22 @@ def build_XML_file():
 #   Build WZ container
 ###
 
-        build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
-    
+        # build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
+        rszContainer = build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
+
+        rsm = {}
+        rsm['MessageFrame'] = {}
+        rsm['MessageFrame']['messageId'] = idList[0]
+        rsm['MessageFrame']['value'] = {}
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage'] = {}
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage']['version'] = 1
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer'] = commonContainer
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage']['rszContainer'] = rszContainer
+
+        rsmSegments.append(rsm)
+
+        rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent="  ")
+        xmlFile.write(rsm_xml)
 ###
 #   Done, finito, close files
 ###   
@@ -567,6 +591,10 @@ def build_XML_file():
 
         currSeg = currSeg+1
     pass
+
+    wzdx = wzdx_creator(rsmSegments)
+    wzdxFile.write(json.dumps(wzdx, indent=2))
+    wzdxFile.close()
 
 ###
 #   May want to print WZ length per segment and total WZ length...

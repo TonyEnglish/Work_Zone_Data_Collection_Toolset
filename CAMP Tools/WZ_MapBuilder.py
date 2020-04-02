@@ -96,7 +96,7 @@ from tkinter                import filedialog
 #   Following added to read and parse WZ config file
 ###
 
-import  configparser                                    #config file parser
+import  configparser                                    #config file parser 
 
 
 ### ------------------------------------------------------------------------------------------------------------------
@@ -487,7 +487,10 @@ def build_XML_file():
 
     currSeg = 1                                             #current message segment
     totSeg  = msgSegList[0][0]                              #total message segments
-
+    rsmSegments = []
+        
+    wzdx_outFile = "./WZ_MapMsg/WZDx_File-" + ctrDT + ".geojson"
+    wzdxFile = open(wzdx_outFile, "w")
     while currSeg <= totSeg:                                #repeat for all segments
 
 ###
@@ -497,9 +500,6 @@ def build_XML_file():
         ##xml_outFile = "./WZ_XML_File/RSZW_MAP_xmlFile-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
         xml_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
         xmlFile = open(xml_outFile, "w")
-        
-        wzdx_outFile = "./WZ_MapMsg/WZDx_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".geojson"
-        wzdxFile = open(wzdx_outFile, "w")
     
 ###
 #   Write initial xml lines in the output xml file...
@@ -542,7 +542,8 @@ def build_XML_file():
 ###
 #   Build xml for common container...
 ###
-
+        # build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
+        #               speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
         commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,wzDaysOfWeek,c_sc_codes,newRefPt,appHeading,hTolerance, \
                       speedLimit,laneWidth,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
 
@@ -563,6 +564,7 @@ def build_XML_file():
 ###
 #   Build WZ container
 ###
+        # build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
         rszContainer = build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
 
         rsm = {}
@@ -574,21 +576,24 @@ def build_XML_file():
         rsm['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer'] = commonContainer
         rsm['MessageFrame']['value']['RoadsideSafetyMessage']['rszContainer'] = rszContainer
 
+        rsmSegments.append(rsm)
+
         rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent="  ")
         xmlFile.write(rsm_xml)
 
-        wzdx = wzdx_creator(rsm)
-        wzdxFile.write(json.dumps(wzdx, indent=2))
     
 ###
 #   Done, finito, close files
 ###   
 
         xmlFile.close()
-        wzdxFile.close()
 
         currSeg = currSeg+1
     pass
+
+    wzdx = wzdx_creator(rsmSegments)
+    wzdxFile.write(json.dumps(wzdx, indent=2))
+    wzdxFile.close()
 
 ###
 #   May want to print WZ length per segment and total WZ length...
