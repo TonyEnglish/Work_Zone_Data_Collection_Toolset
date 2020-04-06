@@ -14,6 +14,11 @@ The CAMP tool is an open source work zone capturing tool. Using a gps and a comp
 
 A proof of concept RSM to WZDx translator has been developed. 
 
+# Requirements
+
+Python
+Java
+
 # Updates
 3/30/2020
 - Added POC RSM to WZDx translator
