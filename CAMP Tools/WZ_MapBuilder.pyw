@@ -27,6 +27,7 @@
 ###
 
 import  os.path
+import  subprocess
 
 ###
 #     Open and read csv file...    
@@ -499,6 +500,7 @@ def build_XML_file():
        
         ##xml_outFile = "./WZ_XML_File/RSZW_MAP_xmlFile-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
         xml_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
+        uper_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".uper"
         xmlFile = open(xml_outFile, "w")
     
 ###
@@ -588,6 +590,9 @@ def build_XML_file():
 ###   
 
         xmlFile.close()
+        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper.jar', str(xml_outFile), str(uper_outFile)])
+        #Throw error if doesnt fully execute
+        #check if uper file has nonzer size?
 
         currSeg = currSeg+1
     pass
