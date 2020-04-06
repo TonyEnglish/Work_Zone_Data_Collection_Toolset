@@ -491,6 +491,7 @@ def build_XML_file():
     wzdx_outFile = "./WZ_MapMsg/WZDx_File-" + ctrDT + ".geojson"
     wzdxFile = open(wzdx_outFile, "w")
     rsmSegments = []
+    uper_failed = False
 
     while currSeg <= totSeg:                                #repeat for all segments
 
@@ -590,12 +591,19 @@ def build_XML_file():
 ###   
 
         xmlFile.close()
-        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper.jar', str(xml_outFile), str(uper_outFile)])
+        CREATE_NO_WINDOW = 0x08000000
+        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper.jar', str(xml_outFile), str(uper_outFile)], creationflags=CREATE_NO_WINDOW)
+        if os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
+            #Error, uper conversion not successful
+            uper_failed = True
         #Throw error if doesnt fully execute
-        #check if uper file has nonzer size?
+        #check if uper file has nonzero size?
+        #Suppress output
 
         currSeg = currSeg+1
     pass
+    if uper_failed:
+        messagebox.showinfo("WZ Map Builder", "UPER RSM Conversion failed\nEnsure Java is installed and added to your system PATH")
 
     wzdx = wzdx_creator(rsmSegments)
     wzdxFile.write(json.dumps(wzdx, indent=2))

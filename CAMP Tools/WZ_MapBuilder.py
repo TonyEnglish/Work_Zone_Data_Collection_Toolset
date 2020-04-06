@@ -99,7 +99,8 @@ from tkinter                import filedialog
 
 import  configparser                                    #config file parser 
 
-
+global uper_failed
+uper_failed = False
 ### ------------------------------------------------------------------------------------------------------------------
 #
 #   Local methods/functions...
@@ -139,6 +140,7 @@ def displayStatusMsg(xPos, yPos, msgStr):
 ##
 
 def buildWZMap():
+    global uper_failed
     
     if len(wzConfig_file.get()): 
         startMainProcess()
@@ -146,6 +148,8 @@ def buildWZMap():
         if msgSegList[0][0] == -1:                          #Segmentation failed...
             messagebox.showinfo("WZ Map Builder", " ... ERROR -- in building message segmentation -- ERROR ...\n\n"+ \
                                                   "Review map_builder.log file in WP_MapMsg folder for detail...")
+        elif uper_failed:
+            messagebox.showinfo("WZ Map Builder", "UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH")
         else:
             messagebox.showinfo("WZ Map Builder", "WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...")
         pass
@@ -423,6 +427,7 @@ def build_JS_file():
 ###########   ------------------------------------------------------------------------------------   ########
 
 def build_XML_file():
+    global uper_failed
     
 ###
 #   Data elements for "common" container...
@@ -492,6 +497,9 @@ def build_XML_file():
         
     wzdx_outFile = "./WZ_MapMsg/WZDx_File-" + ctrDT + ".geojson"
     wzdxFile = open(wzdx_outFile, "w")
+    
+    devnull = open(os.devnull, 'w')
+
     while currSeg <= totSeg:                                #repeat for all segments
 
 ###
@@ -589,9 +597,13 @@ def build_XML_file():
 ###   
 
         xmlFile.close()
-        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper.jar', str(xml_outFile), str(uper_outFile)])
+        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper.jar', str(xml_outFile), str(uper_outFile)], stdout=devnull)
         #Throw error if doesnt fully execute
-        #check if uper file has nonzer size?
+        #check if uper file has nonzero size?
+        #Suppress output
+        if not os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
+            #Error, uper conversion not successful
+            uper_failed = True
 
         currSeg = currSeg+1
     pass
