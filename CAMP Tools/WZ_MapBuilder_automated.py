@@ -97,6 +97,8 @@ from wz_msg_segmentation    import buildMsgSegNodeList  #msg segmentation node l
 import  configparser                                    #config file parser 
 
 uper_failed = False
+error = False
+error_message = ''
 
 ### ------------------------------------------------------------------------------------------------------------------
 #
@@ -119,16 +121,21 @@ def inputFileDialog(filename):
 
 def buildWZMap(filename):
     global uper_failed
+    global error
+    global error_message
     
     startMainProcess()
 
     if msgSegList[0][0] == -1:                          #Segmentation failed...
-        messagebox.showinfo("WZ Map Builder", " ... ERROR -- in building message segmentation -- ERROR ...\n\n"+ \
-                                                "Review map_builder.log file in WP_MapMsg folder for detail...")
-    elif uper_failed:
-        messagebox.showinfo("WZ Map Builder", "UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH")
+        error = True
+        error_message = 'Failed to build message segmentation'
+        logFile.write('Error in building message segmentation')
+    elif uper_failed:   
+        error = True
+        error_message = 'Failed to run message builder UPER conversion'
+        logFile.write("UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH")
     else:
-        messagebox.showinfo("WZ Map Builder", "WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...")
+        logFile.write("WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...")
     pass
 
 ##
@@ -150,6 +157,8 @@ def buildWZMap(filename):
    
 def configRead(file):
     global wzConfig
+    global error
+    global error_message
     if os.path.exists(file):
         try:
             cfg = open(file)
@@ -158,9 +167,13 @@ def configRead(file):
             getConfigVars()
 		
         except Exception as e:
-            messagebox.showinfo("Read Config File", "Configuration file read failed: " + file + "\n" + str(e))
+            error = True
+            error_message = 'Configuration file read failed: ' + file + '\n' + str(e)
+            logFile.write("Configuration file read failed: " + file + "\n" + str(e))
     else:
-        messagebox.showinfo("Read Config", "Configuration file NOT FOUND: " + file + "\n" + str(e))
+        error = True
+        error_message = 'Configuration file NOT FOUND: ' + file + '\n' + str(e)
+        logFile.write("Configuration file NOT FOUND: " + file + "\n" + str(e))
 
 ###
 # ----------------- End of config_read --------------------
@@ -179,6 +192,8 @@ def getConfigVars():
 ###
 #   Following are global variables are later used by other functions/methods...
 ###
+    global error
+    global error_message
 
     global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
@@ -225,13 +240,17 @@ def getConfigVars():
     vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
            
     if os.path.exists(dirName) == False:
-        messagebox.showinfo("Veh Path Data Dir", "Vehicle Path Data file directory:\n\n"+dirName+"\n\nNOT found, correct directory name in WZ Configuration step...")
+        error = True
+        error_message = 'Vehicle Path Data file directory: '+dirName+' NOT found, correct directory name in WZ Configuration step'
+        logFile.write("Vehicle Path Data file directory:\n\n"+dirName+"\n\nNOT found, correct directory name in WZ Configuration step")
         btnStart["state"] = "disabled"                                  #enable button to view log file...
         btnStart["bg"] = "gray75"        
         sys.exit(0)
 
     if os.path.exists(vehPathDataFile) == False:
-        messagebox.showinfo("Veh Path Data file", "Vehicle Path Data file:\n\n"+fileName+"\n\nNOT found, correct file name in WZ Configuration step...")
+        error = True
+        error_message = 'Vehicle Path Data file: '+fileName+' NOT found, correct file name in WZ Configuration step...'
+        logFile.write('Vehicle Path Data file: '+fileName+' NOT found, correct file name in WZ Configuration step...')
         btnStart["state"] = "disabled"                                  #enable button to view log file...
         btnStart["bg"] = "gray75"        
         sys.exit(0)
@@ -879,4 +898,4 @@ def export_files(config_path):
     zipObj.close()
 
 
-#export_files('C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/wz_default_config.wzc')
+export_files('C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/wz_default_config.wzc')
