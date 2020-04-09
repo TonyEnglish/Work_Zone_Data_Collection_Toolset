@@ -111,11 +111,11 @@ uper_failed = False
 ###
 
 def inputFileDialog():
-    filename = filedialog.askopenfilename(initialdir=".", title="Select Input File", filetypes=[("Config File","*.wzc")])
+    filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.wzc")])
     if len(filename): 
         wzConfig_file.set(filename)
         configRead(filename)
-        set_config_description()
+        set_config_description(filename)
         btnBegin["state"]   = "normal"                    #enable the start button for map building...
         btnBegin["bg"]      = "green"        
     pass
@@ -335,19 +335,20 @@ def getConfigVars():
 #
 ###############################################################################################
 
-def set_config_description():
+def set_config_description(config_file):
     startDate_split = wzStartDate.split('-')
     start_date = startDate_split[1] + '/' + startDate_split[2] + '/' + startDate_split[0]
     endDate_split = wzEndDate.split('-')
     end_date = endDate_split[1] + '/' + endDate_split[2] + '/' + endDate_split[0]
-    config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nNumber of Lanes: ' + str(totalLanes) + '\nDate Range: ' + start_date + ' to ' + end_date
+    config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nNumber of Lanes: ' + str(totalLanes) + \
+        '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
     msg['text'] = config_description
 
 def launch_WZ_veh_path_data_acq():
 
-    WZ_dataacq = "WZ_VehPathDataAcq.pyw"
+    WZ_dataacq = "WZ_VehPathDataAcq_automated.pyw"
     if os.path.exists(WZ_dataacq):
-        os.system("WZ_VehPathDataAcq.pyw")
+        os.system(WZ_dataacq)
         
     else:
         messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
@@ -361,8 +362,9 @@ def launch_WZ_veh_path_data_acq():
 ###
 
 root = Tk()
-root.title('CAMP Work Zone Data Collection')
+root.title('Work Zone Data Collection')
 root.geometry("700x400")
+#root.configure(bg='white')
 
 ###
 #   WZ config parser object....
@@ -450,7 +452,7 @@ msgSegList      = []                    #WZ message node segmentation list
 
 wzConfig_file = StringVar()
 
-lbl_top = Label(text='CAMP V2I-SA\nWork Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
+lbl_top = Label(text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.pack()
 
 winSize = Label(root, height=15, width=100)
@@ -468,9 +470,6 @@ for config_file in os.listdir(configDirectory): #Find most recently edited confi
 msg = Label(text='No config file found, please select a config file below',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=("Calibri", 12))
 msg.place(x=210, y=80)
 
-
-
-
 ###
 #   Get WZ configuration input file...
 ###
@@ -481,12 +480,15 @@ diag_wzConfig_file.place(x=10,y=220)
 wzConfig_file_name  = Entry(relief=SUNKEN, textvariable=wzConfig_file, width=80)
 wzConfig_file_name.place(x=150,y=235)
 
-btnBegin = Button(text='Begin',bg="grey75",fg="white",state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=50,pady=10)
+#photoimage = PhotoImage(file="button_test.png").subsample(3, 3)
+btnBegin = Button(text='Begin Data\nCollection',border=0,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
 btnBegin.place(x=280,y=320)
 
 if most_recent_file['Name']:
-    configRead(configDirectory + '/' + most_recent_file['Name'])
-    set_config_description()
+    rel_path = configDirectory + '/' + most_recent_file['Name']
+    configRead(rel_path)
+    wzConfig_file.set(os.path.abspath(rel_path))
+    set_config_description(rel_path)
     btnBegin["state"]   = "normal"                    #enable the start button for map building...
     btnBegin["bg"]      = "green"        
 

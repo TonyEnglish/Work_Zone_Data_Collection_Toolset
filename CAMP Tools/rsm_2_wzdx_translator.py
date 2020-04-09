@@ -6,7 +6,7 @@ import uuid
 #with open('rsm.json', 'r') as f:
 
 
-def wzdx_creator(messages):
+def wzdx_creator(messages, dataLane):
     wzd = {}
     ids = False # Enables ids linking tables together within file
     wzd['road_event_feed_info'] = {}
@@ -19,7 +19,7 @@ def wzdx_creator(messages):
     nodes = []
     for message in messages:
         RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
-        node_list = extract_nodes(RSM, wzd, ids)
+        node_list = extract_nodes(RSM, wzd, ids, int(dataLane))
         for node in node_list:
             nodes.append(node)
     wzd['features'] = wzdx_collapser(nodes)
@@ -90,7 +90,7 @@ def form_len(string):
     num = int(string)
     return format(num, '02d')
 
-def extract_nodes(RSM, wzd, ids):
+def extract_nodes(RSM, wzd, ids, dataLane):
     lanes = RSM['rszContainer']['rszRegion']['roadwayGeometry']['rsmLanes']['RSMLane']
     num_lanes = len(lanes)
     nodes = lanes[0]['laneGeometry']['nodeSet']['NodeLLE']
@@ -152,7 +152,7 @@ def extract_nodes(RSM, wzd, ids):
 
             lane['lane_status'] = lane_status
             point = lanes[j]['laneGeometry']['nodeSet']['NodeLLE'][i]['nodePoint']
-            if lane['lane_number'] == 1:
+            if lane['lane_number'] == dataLane:
                 lane_coordinate = []
                 if point.get('node-3Dabsolute') is not None: #Store coordinates of node for use later
                     lane_coordinate.append(int(point['node-3Dabsolute']['long'])/10000000)

@@ -591,7 +591,7 @@ def build_XML_file():
         currSeg = currSeg+1
     pass
 
-    wzdx = wzdx_creator(rsmSegments)
+    wzdx = wzdx_creator(rsmSegments, dataLane)
     wzdxFile.write(json.dumps(wzdx, indent=2))
     wzdxFile.close()
 
