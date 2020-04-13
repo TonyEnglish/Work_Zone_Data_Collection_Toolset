@@ -57,7 +57,7 @@ from    wz_map_constructor  import getDist              #get distance in meters 
 
 from wz_xml_builder         import build_xml_CC         #common container
 from wz_xml_builder         import build_xml_WZC        #WZ container
-from rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
+from WZ_MapBuilder_automated import export_files
 
 
 ###
@@ -345,10 +345,10 @@ def set_config_description(config_file):
     msg['text'] = config_description
 
 def launch_WZ_veh_path_data_acq():
-
     WZ_dataacq = "WZ_VehPathDataAcq_automated.pyw"
     if os.path.exists(WZ_dataacq):
         os.system(WZ_dataacq)
+        export_files(wzConfig_file.get())
         
     else:
         messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")

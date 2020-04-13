@@ -199,6 +199,8 @@ def getNMEA_String():
             distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, refLatEnd*pi/180, refLonEnd*pi/180))
             if distance < 100: #Leaving Workzone
                 dataLog = False
+                appRunning = False
+
         else:
             distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, refLatStart*pi/180, refLonStart*pi/180))
             if distance < 100: #Entering Workzone
