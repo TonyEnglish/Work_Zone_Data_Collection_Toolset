@@ -27,6 +27,8 @@
 ###
 
 import  os.path
+import sys
+import subprocess
 
 ###
 #     Open and read csv file...    
@@ -38,6 +40,7 @@ import  time                                            #do I need time???
 import  math                                            #math library for math functions
 import  random                                          #random number generator
 import  xmltodict                                       #dict to xml converter
+import  json                                            #json manipulation
 
 from    wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
 
@@ -54,6 +57,8 @@ from    wz_map_constructor  import getDist              #get distance in meters 
 
 from wz_xml_builder         import build_xml_CC         #common container
 from wz_xml_builder         import build_xml_WZC        #WZ container
+from rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
+
 
 ###
 #   .js file cotaining several arrays and data elements to be used by javaScript processing s/w for overlaying constructed
@@ -92,9 +97,10 @@ from tkinter                import filedialog
 #   Following added to read and parse WZ config file
 ###
 
-import  configparser                                    #config file parser
+import  configparser                                    #config file parser 
 
-
+global uper_failed
+uper_failed = False
 ### ------------------------------------------------------------------------------------------------------------------
 #
 #   Local methods/functions...
@@ -134,6 +140,7 @@ def displayStatusMsg(xPos, yPos, msgStr):
 ##
 
 def buildWZMap():
+    global uper_failed
     
     if len(wzConfig_file.get()): 
         startMainProcess()
@@ -141,6 +148,8 @@ def buildWZMap():
         if msgSegList[0][0] == -1:                          #Segmentation failed...
             messagebox.showinfo("WZ Map Builder", " ... ERROR -- in building message segmentation -- ERROR ...\n\n"+ \
                                                   "Review map_builder.log file in WP_MapMsg folder for detail...")
+        elif uper_failed:
+            messagebox.showinfo("WZ Map Builder", "UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH")
         else:
             messagebox.showinfo("WZ Map Builder", "WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...")
         pass
@@ -418,6 +427,7 @@ def build_JS_file():
 ###########   ------------------------------------------------------------------------------------   ########
 
 def build_XML_file():
+    global uper_failed
     
 ###
 #   Data elements for "common" container...
@@ -483,6 +493,12 @@ def build_XML_file():
 
     currSeg = 1                                             #current message segment
     totSeg  = msgSegList[0][0]                              #total message segments
+    rsmSegments = []
+        
+    wzdx_outFile = "./WZ_MapMsg/WZDx_File-" + ctrDT + ".geojson"
+    wzdxFile = open(wzdx_outFile, "w")
+    
+    devnull = open(os.devnull, 'w')
 
     while currSeg <= totSeg:                                #repeat for all segments
 
@@ -492,6 +508,7 @@ def build_XML_file():
        
         ##xml_outFile = "./WZ_XML_File/RSZW_MAP_xmlFile-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
         xml_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
+        uper_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".uper"
         xmlFile = open(xml_outFile, "w")
     
 ###
@@ -535,9 +552,10 @@ def build_XML_file():
 ###
 #   Build xml for common container...
 ###
-
-        commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
-                      speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
+        # build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
+        #               speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
+        commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,wzDaysOfWeek,c_sc_codes,newRefPt,appHeading,hTolerance, \
+                      speedLimit,laneWidth,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
 
         #if currSeg == 1:
             #logFile.write("\n ---Constructed Approach Lane Node Points/Lane: "+str(len(appMapPt))+"\t(Must between 2 and 63)")
@@ -556,27 +574,43 @@ def build_XML_file():
 ###
 #   Build WZ container
 ###
+        # build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
         rszContainer = build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,wzMapPt,RN,msgSegList,currSeg)
 
-        message = {}
-        message['MessageFrame'] = {}
-        message['MessageFrame']['messageId'] = idList[0]
-        message['MessageFrame']['value'] = {}
-        message['MessageFrame']['value']['RoadsideSafetyMessage'] = {}
-        message['MessageFrame']['value']['RoadsideSafetyMessage']['version'] = 1
-        message['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer'] = commonContainer
-        message['MessageFrame']['value']['RoadsideSafetyMessage']['rszContainer'] = rszContainer
-        rsm_xml = xmltodict.unparse(message, short_empty_elements=True, pretty=True, indent="  ")
+        rsm = {}
+        rsm['MessageFrame'] = {}
+        rsm['MessageFrame']['messageId'] = idList[0]
+        rsm['MessageFrame']['value'] = {}
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage'] = {}
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage']['version'] = 1
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage']['commonContainer'] = commonContainer
+        rsm['MessageFrame']['value']['RoadsideSafetyMessage']['rszContainer'] = rszContainer
+
+        rsmSegments.append(rsm)
+
+        rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent="  ")
         xmlFile.write(rsm_xml)
+
     
 ###
 #   Done, finito, close files
 ###   
 
         xmlFile.close()
+        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper.jar', str(xml_outFile), str(uper_outFile)], stdout=devnull)
+        #Throw error if doesnt fully execute
+        #check if uper file has nonzero size?
+        #Suppress output
+        if not os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
+            #Error, uper conversion not successful
+            uper_failed = True
 
         currSeg = currSeg+1
     pass
+
+    wzdx = wzdx_creator(rsmSegments)
+    wzdxFile.write(json.dumps(wzdx, indent=2))
+    wzdxFile.close()
 
 ###
 #   May want to print WZ length per segment and total WZ length...

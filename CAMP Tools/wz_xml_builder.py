@@ -48,10 +48,10 @@
 #   Following function constructs the "Common Container" based on RSM.4.4 ASN.1 Definition 
 ###
 
-import xmltodict
+# import xmltodict
 
-def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,refPoint,appHeading,hTolerance, \
-                  speedLimit,rW,eL,lS,arrayMapPt,msgSegList,currSeg,descName):
+def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,wzDaysOfWeek,c_sc_codes,refPoint,appHeading,hTolerance, \
+                  speedLimit,laneWidth,rW,eL,lS,arrayMapPt,msgSegList,currSeg,descName):
 
 ###
 #       Following data are passed from the caller for constructing Common Container...
@@ -94,6 +94,7 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 
     tab = "\t"                                                                              #define tab char equal editor's tab value...
     tab = "  "                                                                              #define tab char equal to 2 spaces...
+    laneWidth = round(laneWidth*100)                                                        #define laneWidth in cm
  
     # message = {}
     # message['MessageFrame'] = {}
@@ -207,9 +208,33 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 #       Whole bloody section on event recurrences is required here...
 ###
 
+###
+#       Event Recurrence...
+###
 
-# - -  - - - EVENT RECURRENCES GOES HERE... May want to call a function here...
-
+    commonContainer['eventInfo']['eventRecurrence'] = {}
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence'] = {}
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startTime'] = {}
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startTime']['hour'] = eDateTime[3]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startTime']['minute'] = eDateTime[4]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startTime']['second'] = 0
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime'] = {}
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime']['hour'] = endDateTime[3]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime']['minute'] = endDateTime[4]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime']['second'] = 0
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate'] = {}
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['year'] = eDateTime[0]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['month'] = eDateTime[1]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['day'] = eDateTime[2]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate'] = {}
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate']['year'] = endDateTime[0]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate']['month'] = endDateTime[1]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate']['day'] = endDateTime[2]
+    days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+    days_of_week_convert = {'monday': 'Mon', 'tuesday': 'Tue', 'wednesday': 'Wen', 'thursday': 'Thu', 'friday': 'Fri', 'saturday': 'Sat', 'sunday': 'Sun'}
+    for day in days_of_week:
+        commonContainer['eventInfo']['eventRecurrence']['EventRecurrence'][day] = {str(days_of_week_convert[day] in wzDaysOfWeek).lower(): None}
+    #commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['exclusion'] = {'false': None}
 
 ###
 #       Cause and optional subcause codes...
@@ -425,6 +450,7 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
             RSMLane['laneID'] = ln+1
             RSMLane['lanePosition'] = ln+1
             RSMLane['laneName'] = "Lane #" + str(ln+1)
+            RSMLane['laneWidth'] = laneWidth
             RSMLane['laneGeometry'] = {}
             RSMLane['laneGeometry']['nodeSet'] = {}
             RSMLane['laneGeometry']['nodeSet']['NodeLLE'] = []
@@ -503,7 +529,7 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,c_sc_codes,ref
 ###
             if (connToList[ln][0] != connToList[ln][1]):                    #connects to different lane...
                 RSMLane['connectsTo'] = {}
-                RSMLane['connectsTo']['laneID'] = [connToList[ln][0], connToList[ln][1]]
+                RSMLane['connectsTo']['LaneID'] = [connToList[ln][0], connToList[ln][1]]
                 # xmlFile.write (9*tab+"<connectsTo>\n" + \
                 #                10*tab+"<LaneID>"+str(connToList[ln][0])+"</LaneID>\n" + \
                 #                10*tab+"<LaneID>"+str(connToList[ln][1])+"</LaneID>\n" + \
@@ -995,7 +1021,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 #           Write connectsTo tag...
 ###
             RSMLane['connectsTo'] = {}
-            RSMLane['connectsTo']['laneID'] = [ln+1, toLane+1]
+            RSMLane['connectsTo']['LaneID'] = [ln+1, toLane+1]
             # xmlFile.write (8*tab+"<connectsTo>\n" + \
             #                9*tab+"<LaneID>"+str(ln+1)+"</LaneID>\n" + \
             #                9*tab+"<LaneID>"+str(toLane+1)+"</LaneID>\n" + \

@@ -4,7 +4,7 @@ Infrastructure and V2X Mapping Needs Assessment and Development Support​
 
 Tasks 6-7
 
-![Tasks 6-7 Diagram](https://github.com/TonyEnglish/V2X-manual-data-collection/task_6_7_diagram_screenshot.jpg)
+![Tasks 6-7 Diagram](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/task_6_7_diagram_screenshot.jpg)
 
 # CAMP Tool
 
@@ -13,6 +13,11 @@ The CAMP tool is an open source work zone capturing tool. Using a gps and a comp
 # Translators
 
 A proof of concept RSM to WZDx translator has been developed. 
+
+# Requirements
+
+Python
+Java
 
 # Updates
 3/30/2020

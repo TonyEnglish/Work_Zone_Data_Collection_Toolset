@@ -1,0 +1,1521 @@
+{
+  "road_event_feed_info": {
+    "feed_update_date": "2020-04-02T14:02:49Z",
+    "version": "2.0"
+  },
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": false,
+        "vehicle_impact": "all_lanes_open",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.4176989,
+            31.0757686
+          ],
+          [
+            -97.414637,
+            31.0783354
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 45,
+        "workers_present": true,
+        "vehicle_impact": "all_lanes_open",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.414637,
+            31.0783354
+          ],
+          [
+            -97.4107966,
+            31.081563
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": true,
+        "vehicle_impact": "all_lanes_open",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.4107966,
+            31.081563
+          ],
+          [
+            -97.4090122,
+            31.0830529
+          ],
+          [
+            -97.408686,
+            31.0833129
+          ],
+          [
+            -97.4083715,
+            31.0835437
+          ],
+          [
+            -97.4080688,
+            31.083747
+          ],
+          [
+            -97.4077313,
+            31.0839533
+          ],
+          [
+            -97.4074055,
+            31.0841333
+          ],
+          [
+            -97.4070439,
+            31.0843147
+          ],
+          [
+            -97.4066719,
+            31.0844836
+          ],
+          [
+            -97.4062925,
+            31.0846391
+          ],
+          [
+            -97.4059344,
+            31.0847695
+          ],
+          [
+            -97.405379,
+            31.0849458
+          ],
+          [
+            -97.4027702,
+            31.0857551
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.4027702,
+            31.0857551
+          ],
+          [
+            -97.397718,
+            31.0873171
+          ],
+          [
+            -97.3968977,
+            31.0875693
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": false,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3968977,
+            31.0875693
+          ],
+          [
+            -97.3918453,
+            31.0891298
+          ],
+          [
+            -97.3893666,
+            31.0898904
+          ],
+          [
+            -97.3871742,
+            31.0905474
+          ],
+          [
+            -97.3862618,
+            31.0908159
+          ],
+          [
+            -97.3857084,
+            31.0910041
+          ],
+          [
+            -97.385169,
+            31.0912057
+          ],
+          [
+            -97.3835403,
+            31.0918283
+          ],
+          [
+            -97.3822284,
+            31.0922919
+          ],
+          [
+            -97.3817455,
+            31.0924608
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 45,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3817455,
+            31.0924608
+          ],
+          [
+            -97.3798936,
+            31.0931078
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3798936,
+            31.0931078
+          ],
+          [
+            -97.3786257,
+            31.0935365
+          ],
+          [
+            -97.377402,
+            31.093938
+          ],
+          [
+            -97.3768601,
+            31.0941028
+          ],
+          [
+            -97.3753645,
+            31.0945241
+          ],
+          [
+            -97.3753645,
+            31.0945241
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 45,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3753645,
+            31.0945241
+          ],
+          [
+            -97.3745855,
+            31.0947334
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3745855,
+            31.0947334
+          ],
+          [
+            -97.372588,
+            31.0952472
+          ],
+          [
+            -97.3712026,
+            31.095604
+          ],
+          [
+            -97.370045,
+            31.0959196
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": false,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.370045,
+            31.0959196
+          ],
+          [
+            -97.3688964,
+            31.096215
+          ],
+          [
+            -97.3680977,
+            31.0964254
+          ],
+          [
+            -97.3676167,
+            31.0965682
+          ],
+          [
+            -97.3671445,
+            31.0967254
+          ],
+          [
+            -97.366702,
+            31.0968865
+          ],
+          [
+            -97.3662645,
+            31.0970636
+          ],
+          [
+            -97.3658061,
+            31.097266
+          ],
+          [
+            -97.3654022,
+            31.097461
+          ],
+          [
+            -97.3650774,
+            31.0976348
+          ],
+          [
+            -97.3646445,
+            31.0978876
+          ],
+          [
+            -97.3635753,
+            31.0985403
+          ],
+          [
+            -97.3630771,
+            31.0988579
+          ],
+          [
+            -97.3626991,
+            31.0991144
+          ],
+          [
+            -97.3623753,
+            31.0993519
+          ],
+          [
+            -97.3621058,
+            31.0995682
+          ],
+          [
+            -97.3618468,
+            31.0997947
+          ],
+          [
+            -97.361641,
+            31.0999955
+          ],
+          [
+            -97.3613749,
+            31.100282
+          ],
+          [
+            -97.3611039,
+            31.1005951
+          ],
+          [
+            -97.3608154,
+            31.1009558
+          ],
+          [
+            -97.3605397,
+            31.1013244
+          ],
+          [
+            -97.3602954,
+            31.1016806
+          ],
+          [
+            -97.3600538,
+            31.1020651
+          ],
+          [
+            -97.3598293,
+            31.1024577
+          ],
+          [
+            -97.3596197,
+            31.1028559
+          ],
+          [
+            -97.3594599,
+            31.103188
+          ],
+          [
+            -97.3593589,
+            31.1034381
+          ],
+          [
+            -97.3592299,
+            31.1038114
+          ],
+          [
+            -97.3592299,
+            31.1038114
+          ],
+          [
+            -97.3589852,
+            31.1045724
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 45,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3589852,
+            31.1045724
+          ],
+          [
+            -97.3587772,
+            31.1051972
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3587772,
+            31.1051972
+          ],
+          [
+            -97.3584402,
+            31.1061304
+          ],
+          [
+            -97.3578003,
+            31.1078172
+          ],
+          [
+            -97.3568663,
+            31.1102507
+          ],
+          [
+            -97.3561202,
+            31.1122745
+          ],
+          [
+            -97.3552374,
+            31.1146104
+          ],
+          [
+            -97.3544601,
+            31.1167046
+          ],
+          [
+            -97.3535935,
+            31.1189555
+          ],
+          [
+            -97.3534473,
+            31.1193073
+          ],
+          [
+            -97.3532926,
+            31.1196286
+          ],
+          [
+            -97.353111,
+            31.1199648
+          ],
+          [
+            -97.3529268,
+            31.120272
+          ],
+          [
+            -97.3527134,
+            31.1205922
+          ],
+          [
+            -97.3524998,
+            31.1208829
+          ],
+          [
+            -97.3522725,
+            31.1211638
+          ],
+          [
+            -97.3520327,
+            31.1214341
+          ],
+          [
+            -97.3517633,
+            31.1217133
+          ],
+          [
+            -97.3515174,
+            31.1219448
+          ],
+          [
+            -97.3511854,
+            31.1222323
+          ],
+          [
+            -97.3508839,
+            31.1224735
+          ],
+          [
+            -97.3505716,
+            31.1227013
+          ],
+          [
+            -97.3502683,
+            31.1229029
+          ],
+          [
+            -97.3499293,
+            31.123106
+          ],
+          [
+            -97.3497915,
+            31.1231841
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": false,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3497915,
+            31.1231841
+          ],
+          [
+            -97.3494403,
+            31.1233714
+          ],
+          [
+            -97.3490793,
+            31.1235452
+          ],
+          [
+            -97.348709,
+            31.1237056
+          ],
+          [
+            -97.3483031,
+            31.1238627
+          ],
+          [
+            -97.3479617,
+            31.12398
+          ],
+          [
+            -97.3476362,
+            31.1240776
+          ],
+          [
+            -97.3473284,
+            31.1241541
+          ],
+          [
+            -97.3473284,
+            31.1241541
+          ],
+          [
+            -97.3467592,
+            31.1242723
+          ],
+          [
+            -97.3422907,
+            31.1251259
+          ],
+          [
+            -97.339755,
+            31.1256041
+          ],
+          [
+            -97.3392776,
+            31.1257099
+          ],
+          [
+            -97.338867,
+            31.1258117
+          ],
+          [
+            -97.3385828,
+            31.1258967
+          ],
+          [
+            -97.3382786,
+            31.1260049
+          ],
+          [
+            -97.3378466,
+            31.1261787
+          ],
+          [
+            -97.3374084,
+            31.1263677
+          ],
+          [
+            -97.3372102,
+            31.1264677
+          ],
+          [
+            -97.3368951,
+            31.1266389
+          ],
+          [
+            -97.336847,
+            31.1266665
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 45,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.336847,
+            31.1266665
+          ],
+          [
+            -97.3364698,
+            31.1268899
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3364698,
+            31.1268899
+          ],
+          [
+            -97.3362222,
+            31.1270526
+          ],
+          [
+            -97.335898,
+            31.1272898
+          ],
+          [
+            -97.3355863,
+            31.1275358
+          ],
+          [
+            -97.3353098,
+            31.1277742
+          ],
+          [
+            -97.335049,
+            31.1280215
+          ],
+          [
+            -97.3348024,
+            31.128276
+          ],
+          [
+            -97.3345693,
+            31.1285385
+          ],
+          [
+            -97.3343341,
+            31.1288284
+          ],
+          [
+            -97.3341287,
+            31.1291062
+          ],
+          [
+            -97.3339507,
+            31.1293705
+          ],
+          [
+            -97.3337606,
+            31.1296831
+          ],
+          [
+            -97.3336099,
+            31.1299599
+          ],
+          [
+            -97.3334508,
+            31.1302877
+          ],
+          [
+            -97.3332759,
+            31.1306934
+          ],
+          [
+            -97.3329431,
+            31.1315347
+          ],
+          [
+            -97.3315902,
+            31.1350162
+          ],
+          [
+            -97.3305179,
+            31.1377836
+          ],
+          [
+            -97.3301238,
+            31.13879
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": false,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3301238,
+            31.13879
+          ],
+          [
+            -97.328813,
+            31.1421672
+          ],
+          [
+            -97.328813,
+            31.1421672
+          ],
+          [
+            -97.3276734,
+            31.1450814
+          ],
+          [
+            -97.3275237,
+            31.1454917
+          ],
+          [
+            -97.3272487,
+            31.1463408
+          ],
+          [
+            -97.3270296,
+            31.14691
+          ],
+          [
+            -97.3265864,
+            31.1480497
+          ],
+          [
+            -97.3259744,
+            31.1496935
+          ],
+          [
+            -97.3249281,
+            31.1525654
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 45,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3249281,
+            31.1525654
+          ],
+          [
+            -97.3243259,
+            31.1542289
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_name": "unknown",
+        "direction": "eastbound",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "total_num_lanes": 3,
+        "reduced_speed_limit": 60,
+        "workers_present": true,
+        "vehicle_impact": "some_lanes_closed",
+        "start_date": "2019-11-08T00:00:00Z",
+        "end_date": "2019-11-10T23:59:00Z",
+        "types_of_work": [
+          {
+            "type_name": "roadside-work",
+            "is_architectual_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_type": "middle-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 3,
+            "lane_edge_reference": "left",
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.3243259,
+            31.1542289
+          ],
+          [
+            -97.3236256,
+            31.1560472
+          ],
+          [
+            -97.3220062,
+            31.1602138
+          ],
+          [
+            -97.3217167,
+            31.1609274
+          ],
+          [
+            -97.3211556,
+            31.1622862
+          ],
+          [
+            -97.3203458,
+            31.1642964
+          ],
+          [
+            -97.3198715,
+            31.1654926
+          ]
+        ]
+      }
+    }
+  ]
+}

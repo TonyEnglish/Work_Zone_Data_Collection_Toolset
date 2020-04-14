@@ -6,21 +6,50 @@ import uuid
 #with open('rsm.json', 'r') as f:
 
 
-def wzdx_creator(message):
-    RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
-    ids = False # Enables ids linking tables together within file
+def wzdx_creator(messages, dataLane):
     wzd = {}
+    ids = False # Enables ids linking tables together within file
     wzd['road_event_feed_info'] = {}
-    if ids:
-        wzd['road_event_feed_info']['feed_info_id'] = str(uuid.uuid4())
+    # if ids:
+    #     wzd['road_event_feed_info']['feed_info_id'] = str(uuid.uuid4())
     wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     #wzd['road_event_feed_info']['metadata'] = 'https://fake-site.ltd/dummy-metadata.txt'
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
-    wzd['features'] = wzdx_collapser(extract_nodes(RSM, wzd, ids), RSM)
+    nodes = []
+    for message in messages:
+        RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
+        node_list = extract_nodes(RSM, wzd, ids, int(dataLane))
+        for node in node_list:
+            nodes.append(node)
+    wzd['features'] = wzdx_collapser(nodes)
+    wzd = add_ids(wzd, False)
     return wzd
 
-def wzdx_collapser(features, RSM): #Collapse identical nodes together to reduce overall number of nodes
+def add_ids(message, add_ids):
+    if add_ids:
+        feed_info_id = str(uuid.uuid4())
+        message['road_event_feed_info']['feed_info_id'] = feed_info_id
+        for feature in message['features']:
+            road_event_id = str(uuid.uuid4())
+            feature['properties']['road_event_id'] = road_event_id
+            feature['properties']['feed_info_id'] = feed_info_id
+            for lane in feature['properties']['lanes']:
+                lane_id = str(uuid.uuid4())
+                lane['lane_id'] = lane_id
+                lane['road_event_id'] = road_event_id
+                for lane_restriction in lane.get('lane_restrictions', []):
+                    lane_restriction_id = str(uuid.uuid4())
+                    lane_restriction['lane_restriction_id'] = lane_restriction_id
+                    lane_restriction['lane_id'] = lane_id
+            for types_of_work in feature['properties']['types_of_work']:
+                types_of_work_id = str(uuid.uuid4())
+                types_of_work['types_of_work_id'] = types_of_work_id
+                types_of_work['road_event_id'] = road_event_id
+
+    return message
+
+def wzdx_collapser(features): #Collapse identical nodes together to reduce overall number of nodes
     #return features
     new_nodes = []
     new_nodes.append(features[0])
@@ -29,9 +58,9 @@ def wzdx_collapser(features, RSM): #Collapse identical nodes together to reduce 
         new_nodes[-1]['geometry']['coordinates'].append(features[i]['geometry']['coordinates'][0]) #Add coordinates of next node to end of previous node
         if features[i]['properties'] != features[i-1]['properties'] and i != len(features)-1: #Only add unique nodes to output list
             new_nodes.append(features[i])
-            print('new')
-        else:
-            print('old')
+        #     print('new')
+        # else:
+        #     print('old')
 
     long_dif = new_nodes[-1]['geometry']['coordinates'][-1][0] - new_nodes[0]['geometry']['coordinates'][0][0]
     lat_dif = new_nodes[-1]['geometry']['coordinates'][-1][1] - new_nodes[0]['geometry']['coordinates'][0][1]
@@ -61,7 +90,7 @@ def form_len(string):
     num = int(string)
     return format(num, '02d')
 
-def extract_nodes(RSM, wzd, ids):
+def extract_nodes(RSM, wzd, ids, dataLane):
     lanes = RSM['rszContainer']['rszRegion']['roadwayGeometry']['rsmLanes']['RSMLane']
     num_lanes = len(lanes)
     nodes = lanes[0]['laneGeometry']['nodeSet']['NodeLLE']
@@ -73,8 +102,8 @@ def extract_nodes(RSM, wzd, ids):
     for i in range(len(nodes)):
         lanes_obj = {}
         lanes_wzdx = []
-        reduced_speed_limit = RSM['commonContainer']['regionInfo']['speedLimit']['speed'] #Assume in mph and max speed limit
-        if RSM['commonContainer']['regionInfo']['speedLimit']['speedUnits'].get('kph', {}) == None: #If kph, convert to mph
+        reduced_speed_limit = int(RSM['rszContainer'].get('speedLimit').get('speed', 0))
+        if RSM['rszContainer']['speedLimit'].get('kph', {}) == None: #If kph, convert to mph
             reduced_speed_limit = round(reduced_speed_limit*0.6214)
         people_present = False #initialization
         geometry = {}
@@ -82,10 +111,10 @@ def extract_nodes(RSM, wzd, ids):
         road_event_id = str(uuid.uuid4())
         for j in range(len(lanes)):
             lane = {}
-            if ids:
-                lane['lane_id'] = str(uuid.uuid4())
+            # if ids:
+            #     lane['lane_id'] = str(uuid.uuid4())
 
-                lane['road_event_id'] = road_event_id
+            #     lane['road_event_id'] = road_event_id
 
             lane['lane_number'] = int(lanes[j]['lanePosition'])
 
@@ -123,7 +152,7 @@ def extract_nodes(RSM, wzd, ids):
 
             lane['lane_status'] = lane_status
             point = lanes[j]['laneGeometry']['nodeSet']['NodeLLE'][i]['nodePoint']
-            if lane['lane_number'] == 1:
+            if lane['lane_number'] == dataLane:
                 lane_coordinate = []
                 if point.get('node-3Dabsolute') is not None: #Store coordinates of node for use later
                     lane_coordinate.append(int(point['node-3Dabsolute']['long'])/10000000)
@@ -165,12 +194,12 @@ def extract_nodes(RSM, wzd, ids):
 
             lanes_wzdx.append(lane)
 
-        if ids:
-            # road_event_id
-            lanes_obj['road_event_id'] = road_event_id
+        # if ids:
+        #     # road_event_id
+        #     lanes_obj['road_event_id'] = road_event_id
 
-            # feed_info_id
-            lanes_obj['feed_info_id'] = wzd['road_event_feed_info']['feed_info_id']
+        #     # feed_info_id
+        #     lanes_obj['feed_info_id'] = wzd['road_event_feed_info']['feed_info_id']
 
         # road_name
         lanes_obj['road_name'] = 'unknown'
@@ -194,7 +223,8 @@ def extract_nodes(RSM, wzd, ids):
         lanes_obj['total_num_lanes'] = num_lanes
 
         # reduced_speed_limit
-        lanes_obj['reduced_speed_limit'] = reduced_speed_limit #Will either be set to the reference value or a lower value if found
+        if reduced_speed_limit != -1:
+            lanes_obj['reduced_speed_limit'] = reduced_speed_limit #Will either be set to the reference value or a lower value if found
 
         # workser_present
         lanes_obj['workers_present'] = people_present
@@ -225,9 +255,9 @@ def extract_nodes(RSM, wzd, ids):
         lanes_obj['types_of_work'] = []
         #if cause_code == 3: #No other options are available
         types_of_work = {}
-        if ids:
-            types_of_work['types_of_work_id'] = str(uuid.uuid4())
-            types_of_work['road_event_id'] = road_event_id
+        # if ids:
+        #     types_of_work['types_of_work_id'] = str(uuid.uuid4())
+        #     types_of_work['road_event_id'] = road_event_id
         types_of_work['type_name'] = 'roadside-work'
         types_of_work['is_architectual_change'] = False
         lanes_obj['types_of_work'].append(types_of_work)
@@ -243,14 +273,14 @@ def extract_nodes(RSM, wzd, ids):
         nodes_wzdx.append(lanes_obj_properties)
     return nodes_wzdx
 
-with open('C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_MapMsg/RSZW_MAP_xml_File-20200330-102959-1_of_1.exer', 'r') as frsm:
-    #rsm = rsm_creator('heh')
-    #f.write(json2xml.Json2xml(rsm).to_xml())
-    #rsm_xml = xmltodict.unparse(rsm, pretty=True)
-    xmlSTRING = frsm.read()
-    rsm_obj = xmltodict.parse(xmlSTRING)
-    #with open('RSM_example.json', 'w') as frsm_json:
-    #    frsm_json.write(json.dumps(rsm_obj, indent=2))
-    wzdx = wzdx_creator(rsm_obj)
-    with open('wzdx_test.geojson', 'w') as fwzdx:
-        fwzdx.write(json.dumps(wzdx, indent=2))
+# with open('C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_MapMsg/RSZW_MAP_xml_File-20200330-102959-1_of_1.exer', 'r') as frsm:
+#     #rsm = rsm_creator('heh')
+#     #f.write(json2xml.Json2xml(rsm).to_xml())
+#     #rsm_xml = xmltodict.unparse(rsm, pretty=True)
+#     xmlSTRING = frsm.read()
+#     rsm_obj = xmltodict.parse(xmlSTRING)
+#     #with open('RSM_example.json', 'w') as frsm_json:
+#     #    frsm_json.write(json.dumps(rsm_obj, indent=2))
+#     wzdx = wzdx_creator(rsm_obj)
+#     with open('wzdx_test.geojson', 'w') as fwzdx:
+#         fwzdx.write(json.dumps(wzdx, indent=2))
