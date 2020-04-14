@@ -300,6 +300,11 @@ def getConfigVars():
     wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
     wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
 
+    wzStartLat      = wzConfig['LOCATION']['wzstartlat']
+    wzStartLon      = wzConfig['LOCATION']['wzstartlon']
+    wzEndLat        = wzConfig['LOCATION']['wzendlat']
+    wzEndLon        = wzConfig['LOCATION']['wzendlon']
+
     if wzStartDate == "":                                               #wz start date and time are mandatory
         wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
         wzStartTime = time.strftime("%H:%M")
@@ -316,96 +321,6 @@ def getConfigVars():
 #   js_outFile  - data and array for JavaScript for visualization.
 #                 fixed file name in the visualization directory 
 ###
-
-def build_JS_file():
-
-    js_outFile  = "./WZ_Visualizer/RSZW_MAP_jsData.js"                  #output file for java script for visualization
-    jsfile      = open(js_outFile, "w")
-
-###
-#   wz description
-#   reference point location
-#   No of lanes
-#   Lane status
-#   Lane Width(m)
-###
-
-    build_jsvars (jsfile,"//\n//        --- CAMP .js file for RSZW/LC Mapping Project --- \n")
-    build_jsvars (jsfile,"//        --- Data points overlay on Google Map --- \n")
-    build_jsvars (jsfile,"//        --- File Created: "+cDT+" ---\n//\n")
-    build_jsvars (jsfile,"//\n//   Work zone description... \n")
-    build_jsvars (jsfile,"//   Mapped work zone length in meters (approach lane, wz lane)... \n")
-    build_jsvars (jsfile,"//   Reference Point coordinates... \n")
-    build_jsvars (jsfile,"//   no of lanes mapped for WZ...\n")
-    build_jsvars (jsfile,"//   Vehicle path data lane...\n")
-    build_jsvars (jsfile,"//   wz lane status...\n")
-    build_jsvars (jsfile,"//   wz lane width, lane padding for approach and WZ lanes...\n//\n")
-                  
-    build_jsvars (jsfile,"    var wzDesc = \""+wzDesc+"\";\n")                              #wz description
-    build_jsvars (jsfile,"    var wzLength = ["+str(int(wzMapLen[0]))+","+str(int(wzMapLen[1]))+"];\n") #WZ length info
-    build_jsvars (jsfile,"    var wzMapDate = \""+cDT+"\";\n")                              #map created date and time
-#    build_jsvars (jsfile,"    var refPoint = ["str(refPoint[0])+","+str(refPoint[1])+","+str(refPoint[2])+"];\n")  #reference point
-    build_jsvars (jsfile,"    var refPoint = ["+str(refPtIdx)+","+str(refPoint[0])+","+str(refPoint[1])+","+str(refPoint[2])+"];\n")  #reference point
-
-    build_jsvars (jsfile,"    var noLanes = "+str(laneStat[0][0])+";\n")                    #no of lanes
-    build_jsvars (jsfile,"    var mappedLaneNo = "+str(dataLane)+";\n")                     #data collected lane
-    build_jsvars (jsfile,"    var laneStat = "+str(laneStat)+";\n")                         #lane status
-    build_jsvars (jsfile,"    var laneWidth = "+str(laneWidth)+";\n")                       #lane width
-    build_jsvars (jsfile,"    var lanePadApp = "+str(lanePadApp)+";\n")                     #lane padding for approach lanes
-    build_jsvars (jsfile,"    var lanePadWZ = "+str(lanePadWZ)+";\n")                       #lane padding for wz lanes
-    build_jsvars (jsfile,"    var wpStat = "+str(wpStat)+";\n")                             #workers present status
-    build_jsvars (jsfile,"    var msgSegments = "+str(msgSegList[0][0])+";\n")              #number of message segments
-    build_jsvars (jsfile,"    var nodesPerSegment = "+str(msgSegList[0][1])+";\n")          #number of nodes per segment per lane
-
-###
-#   Following builds list of nodes in message segments...
-###
-
-    build_jsvars (jsfile,"//\n//   List of start and end nodes for approach and wx lane nodes per message segment\n")     
-    build_jsvars (jsfile,"//   Approach lane nodes are in segment #1 (always...)\n//\n")
-    build_jsvars (jsfile,"    var appNodesMsgSegment = "+str(msgSegList[1])+";\n")          #number of nodes per segment per lane
-
-    build_jsarray (jsfile,msgSegList,"//\n//  Message segmentation list... \n//\n    var msgSegList = [\n")              
-
-###
-#   Write the collected vehicle path data points array...
-###
-
-    build_jsarray (jsfile,pathPt,"//\n//  Collected vehicle data points for WZ mapping... \n"
-                   "//   Veh speed, lat, lon, alt, heading \n"  
-                   "//\n    var mapData = [\n")
-
-###
-#   Write the constructed approach lane data points array...
-###
-
-    build_jsarray (jsfile,appMapPt,"//\n//   Approach Lanes --- data points... \n//\n"
-                   "//   The list has lat,lon,alt,lcloStat for each node for each lane +\n"
-                   "//   heading + WP flag + distVec (dist from prev. node) \n"  
-                   "//\n    var appMapData = [\n")
-
-###
-#   Write the constructed work zone lane data points array...
-###
-
-    build_jsarray (jsfile,wzMapPt,"//\n//   Work Zone Lanes --- data points... \n//\n"
-                   "//   The list has lat,lon,alt,lcloStat for each node for each lane +\n"
-                   "//   heading + WP flag + distVec (dist from prev. node) \n"  
-                   "//\n    var wzMapData = [\n")
-    jsfile.close()
-
-
-###########   ------------------------------------------------------------------------------------   ########
-##
-##      END of .js file build for array/variables for overlaying on Google Earth using JavaScript application...
-##
-###########   ------------------------------------------------------------------------------------   ########
-
-###########   ------------------------------------------------------------------------------------   ########
-##
-##      START of xml file here...
-##
-###########   ------------------------------------------------------------------------------------   ########
 
 def build_XML_file():
     global uper_failed
@@ -488,7 +403,7 @@ def build_XML_file():
 ###
        
         ##xml_outFile = "./WZ_XML_File/RSZW_MAP_xmlFile-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
-        xml_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
+        xml_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".xml"
         uper_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".uper"
         xmlFile = open(xml_outFile, "w")
         files_list.append(xml_outFile)
@@ -770,13 +685,6 @@ def startMainProcess():
                       " --- Message segment list: "  +str(msgSegList)+"\n\n")
     pass
 
-
-###
-#   Build JS File...
-###
-
-    build_JS_file()    
-
 ###
 #   Build XML File...
 ###
@@ -883,9 +791,9 @@ ctrDT   = datetime.datetime.now().strftime("%Y%m%d-") + time.strftime("%H%M%S")
 # ---------------------------- Automatically Export Files ------------------------------------
 #
 ###############################################################################################
-
-def export_files(config_path):
-    inputFileDialog(config_path)
+local_config_path = './Config Files/WZ_COPIED_CONFIG.wzc'
+def export_files():
+    inputFileDialog(local_config_path)
     startMainProcess()
 
     zipObj = zipfile.ZipFile('CAMP-Exports-' + ctrDT + '.zip', 'w')
@@ -896,6 +804,3 @@ def export_files(config_path):
     
     # close the Zip File
     zipObj.close()
-
-
-export_files('C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/wz_default_config.wzc')

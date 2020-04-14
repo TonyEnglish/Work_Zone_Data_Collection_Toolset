@@ -39,36 +39,17 @@ import  datetime                                        #Date and Time methods..
 import  time                                            #do I need time???
 import  math                                            #math library for math functions
 import  random                                          #random number generator
-import  xmltodict                                       #dict to xml converter
 import  json                                            #json manipulation
+import  shutil
 
-from    wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
-
-from    wz_map_constructor  import getLanePt            #get lat/lon points for lanes 
-from    wz_map_constructor  import getEndPoint          #calculates lat/lon for an end point from distance and heading (bearing)
-                                                        #   called from getLanePt
-from    wz_map_constructor  import getDist              #get distance in meters between pair of lat/lon points
-                                                        #   called from getLanePt
 
 ###
 #   Following modules create:
 #   .exer file (xml format) for based on ASN.1 definition for RSM as proposed to SAE for J2945/4 and J2735 (Data Dictionary)
 ###
 
-from wz_xml_builder         import build_xml_CC         #common container
-from wz_xml_builder         import build_xml_WZC        #WZ container
 from WZ_MapBuilder_automated import export_files
 
-
-###
-#   .js file cotaining several arrays and data elements to be used by javaScript processing s/w for overlaying constructed
-#   map for visualization using Google Satellite view
-###
-
-from wz_jsarray_builder     import build_jsvars         #create js variables used in processing array for overlaying on Google Map
-from wz_jsarray_builder     import build_jsarray        #create js array for overlaying on Google Map
-
-from wz_msg_segmentation    import buildMsgSegNodeList  #msg segmentation node list builder
 
 
 ###
@@ -319,6 +300,11 @@ def getConfigVars():
     wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
     wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
 
+    wzStartLat      = wzConfig['LOCATION']['wzstartlat']
+    wzStartLon      = wzConfig['LOCATION']['wzstartlon']
+    wzEndLat        = wzConfig['LOCATION']['wzendlat']
+    wzEndLon        = wzConfig['LOCATION']['wzendlon']
+
     if wzStartDate == "":                                               #wz start date and time are mandatory
         wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
         wzStartTime = time.strftime("%H:%M")
@@ -345,11 +331,13 @@ def set_config_description(config_file):
     msg['text'] = config_description
 
 def launch_WZ_veh_path_data_acq():
+    config_file = wzConfig_file.get()
+    shutil.copy(config_file, local_config_path)
     WZ_dataacq = "WZ_VehPathDataAcq_automated.pyw"
     if os.path.exists(WZ_dataacq):
         os.system(WZ_dataacq)
-        export_files(wzConfig_file.get())
-        
+        export_files()
+        os.remove(local_config_path)
     else:
         messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
 
@@ -451,6 +439,7 @@ msgSegList      = []                    #WZ message node segmentation list
 #############################################################################
 
 wzConfig_file = StringVar()
+local_config_path = './Config Files/WZ_COPIED_CONFIG.wzc'
 
 lbl_top = Label(text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.pack()
@@ -481,7 +470,7 @@ wzConfig_file_name  = Entry(relief=SUNKEN, textvariable=wzConfig_file, width=80)
 wzConfig_file_name.place(x=150,y=235)
 
 #photoimage = PhotoImage(file="button_test.png").subsample(3, 3)
-btnBegin = Button(text='Begin Data\nCollection',border=0,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
+btnBegin = Button(text='Begin Data\nCollection', font='Helvetica 14',border=0,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
 btnBegin.place(x=280,y=320)
 
 if most_recent_file['Name']:
