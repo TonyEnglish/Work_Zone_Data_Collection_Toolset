@@ -447,7 +447,7 @@ lbl_top.pack()
 winSize = Label(root, height=15, width=100)
 winSize.pack()
 
-configDirectory = './Config Files/'
+configDirectory = './Config Files'
 most_recent_file = {'Name': '', 'Time': -1}
 for config_file in os.listdir(configDirectory): #Find most recently edited config file in specified directory
     if '.wzc' in config_file:

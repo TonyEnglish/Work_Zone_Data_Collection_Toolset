@@ -43,3 +43,8 @@ wzenddate = 2019-11-10
 wzendtime = 23:59
 wzdaysofweek = Sun,Mon,Tue,Wed,Thu,Fri,Sat
 
+[LOCATION]
+wzstartlat = -105.209947
+wzstartlon = 40.058232
+wzendlat = -105.185182
+wzendlon = 40.93977
