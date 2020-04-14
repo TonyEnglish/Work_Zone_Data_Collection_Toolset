@@ -28,8 +28,11 @@ import      csv                                     #CSV file read/write
 import      os.path
 import      math
 import serial.tools.list_ports                      #used to enumerate COMM ports
+import configparser
 
 from        serial import SerialException           #serial port exception
+
+# from WZ_Main_UI import getConfigVars
 
 
 ###
@@ -60,7 +63,7 @@ from parseNMEA      import parseGxGSA           #parse GSA for Hdop
 def startMainFunc():
 
     global  appRunning                          #boolean
-    
+    getConfigVars()
     if (appRunning):
         getNMEA_String()                        #Get NMEA String and process it until "appRunning is True..."
 
@@ -68,6 +71,115 @@ def startMainFunc():
 #
 #   ------------------  END of the Main Func... --------------------------------------
 #
+
+def getConfigVars(wzConfig):
+
+###
+#   Following are global variables are later used by other functions/methods...
+###
+    global error
+    global error_message
+
+    global  vehPathDataFile                                 #collected vehicle path data file
+    global  sampleFreq                                      #GPS sampling freq.
+
+    global  totalLanes                                      #total number of lanes in wz
+    global  laneWidth                                       #average lane width in meters
+    global  lanePadApp                                      #approach lane padding in meters
+    global  lanePadWZ                                       #WZ lane padding in meters
+    global  dataLane                                        #lane used for collecting veh path data
+    global  wzDesc                                          #WZ Description
+
+    global  speedList                                       #speed limits
+    global  c_sc_codes                                      #cause/subcause code
+
+##
+#   WZ schedule
+##
+
+    global  wzStartDate                                     #wz start date
+    global  wzStartTime                                     #wz start time    
+    global  wzEndDate                                       #wz end date
+    global  wzEndTime                                       #wz end time
+    global  wzDaysOfWeek                                    #wz active days of week
+
+
+###
+#   Get collected vehicle path data point .csv file name from user input saved in wz config
+###
+
+    dirName     = wzConfig['FILES']['VehiclePathDataDir']   #veh path data file directory
+    fileName    = wzConfig['FILES']['VehiclePathDataFile']  #veh path data file name
+
+###
+#   Assure that the vehicle path data file directory and file name exist.
+#   If NOT, ask user to go back to WZ Configuration Step and correct file location
+#   This can happen if the directory/file name is changed after doing the WZ configuration step...
+#
+#   Added on Nov. 6, 2018
+#
+###
+#   vehPathDataFile - input data file
+###
+
+    vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
+
+###
+#   Convert str from the config file to proper data types... VERY Important...
+###
+
+###
+#   Get sampling frequency...
+###
+
+    sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
+
+###
+#   Get LANE relevant information...
+###
+
+    totalLanes      = int(wzConfig['LANES']['NumberOfLanes'])           #total number of lanes in wz
+    laneWidth       = float(wzConfig['LANES']['AverageLaneWidth'])      #average lane width in meters
+    lanePadApp      = float(wzConfig['LANES']['ApproachLanePadding'])   #approach lane padding in meters
+    lanePadWZ       = float(wzConfig['LANES']['WorkzoneLanePadding'])   #WZ lane padding in meters
+    dataLane        = int(wzConfig['LANES']['VehiclePathDataLane'])     #lane used for collecting veh path data
+    wzDesc          = wzConfig['LANES']['Description']                  #WZ Description
+
+###
+#   Get SPEED information...
+###
+
+    speedList       = wzConfig['SPEED']['NormalSpeed'], wzConfig['SPEED']['ReferencePointSpeed'], \
+                      wzConfig['SPEED']['WorkersPresentSpeed']              
+###
+#   Get WZ CAUSE/SUBCAUSE Codes... Entered by the User
+#
+#   Cause code - 3 = Roadworks, Subcause code - (1=..., 2=..., 4=Short term stationary, 5= ... upto 255)
+###
+
+    c_sc_codes      = [int(wzConfig['CAUSE']['CauseCode']), int(wzConfig['CAUSE']['SubCauseCode'])]
+
+###
+#   Get WZ SCHEDULE Information...
+###
+
+    wzStartDate     = wzConfig['SCHEDULE']['WZStartDate']
+    wzStartTime     = wzConfig['SCHEDULE']['WZStartTime']
+    wzEndDate       = wzConfig['SCHEDULE']['WZEndDate']
+    wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
+    wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
+
+    wzStartLat      = wzConfig['LOCATION']['wzstartlat']
+    wzStartLon      = wzConfig['LOCATION']['wzstartlon']
+    wzEndLat        = wzConfig['LOCATION']['wzendlat']
+    wzEndLon        = wzConfig['LOCATION']['wzendlon']
+
+    if wzStartDate == "":                                               #wz start date and time are mandatory
+        wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
+        wzStartTime = time.strftime("%H:%M")
+    pass
+
+
 #
 #   ------------------  Process non blocking key press event... ----------------------
 #
@@ -188,21 +300,16 @@ def getNMEA_String():
             #print ("GSA Hdop:", GSA_out)
         pass
         
-        GPSLat,GPSLon,GPSAlt,GPSSpeed,GPSHeading
-        refLonStart = 40.058232
-        refLatStart = -105.209947
-        refLonEnd = 40.93977
-        refLatEnd = -105.185182
         R = 6371000 #in meters
         pi = 3.14159
         if dataLog:
-            distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, refLatEnd*pi/180, refLonEnd*pi/180))
+            distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
             if distance < 100: #Leaving Workzone
                 dataLog = False
                 appRunning = False
 
         else:
-            distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, refLatStart*pi/180, refLonStart*pi/180))
+            distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
             if distance < 100: #Entering Workzone
                 dataLog = True
 
@@ -583,6 +690,8 @@ wpStat      = False                             #workers not present
 laneStat    = [True,True,True,True,True,True,True,True,True] #all 8 lanes are open (default), Lane 0 is not used...
                                                 #pressing the same lane # key will toggle the from close to open  
 
+local_config_path = './Config Files/WZ_COPIED_CONFIG.wzc'
+
 #############################################################################
 # MAIN LOOP
 #############################################################################
@@ -596,7 +705,7 @@ laneStat    = [True,True,True,True,True,True,True,True,True] #all 8 lanes are op
 
 
 root = Tk()
-root.title('CAMP V2I-SA Work Zone Mapping - Vehicle Path Data Acquisition v1.0')
+root.title('Work Zone Mapping - Vehicle Path Data Acquisition')
 root.bind_all('<Key>', keyPress)                #key press event...
 
 
@@ -606,7 +715,7 @@ root.bind_all('<Key>', keyPress)                #key press event...
 #
 #############################################################################
 
-lbl_top = Label(text='CAMP V2I-SA Veh Path Data Acq. v1.0\n\n', font='Helvetica 14', fg='royalblue', pady=10)
+lbl_top = Label(text='Vehivle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.pack()
 
 winSize = Label(root, height=30, width=120) #width was 110
@@ -777,6 +886,8 @@ dataOutFile = outDir + "/WZ_Path_Data_"+cDT+".csv"
 #   Open outFile for csv write...
 #   make sure newline is set to null, otherwise will get extra cr.. 
 ###
+config = configparser.ConfigParser(delimiters=('=')).read_file(local_config_path)
+getConfigVars(config)
 
 outFile     = open(dataOutFile,"w",newline='')
 writeData   = csv.writer(outFile)
