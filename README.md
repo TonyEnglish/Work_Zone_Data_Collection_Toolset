@@ -29,9 +29,9 @@ Java
 
 3/30/2020
 - Added POC RSM to WZDx translator
-- - Verified WZDx files against example files from https://github.com/usdot-jpo-ode/jpo-wzdx/tree/master/create-feed/examples
+  - Verified WZDx files against example files from https://github.com/usdot-jpo-ode/jpo-wzdx/tree/master/create-feed/examples
 - Updated CAMP RSM output
-- - Integrated xmltodict library to make RSM generation more dynamic
+  - Integrated xmltodict library to make RSM generation more dynamic
 - Updated CAMP gps COMM port detection
 - Added requirements file
 
