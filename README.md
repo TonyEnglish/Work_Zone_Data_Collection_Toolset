@@ -20,6 +20,13 @@ Python
 Java
 
 # Updates
+4/14/2020
+- Automated major components
+- - Created new Work Zone Data Collection main interface
+- - Data acquisition automatically starts and stops based on locations set in config
+- - Automated export sequence now zips together WZDx and RSM (XML and UPER) files
+- - Decompiled and edited UPER conversion JAR file to allow for command line interfacing
+
 3/30/2020
 - Added POC RSM to WZDx translator
 - - Verified WZDx files against example files from https://github.com/usdot-jpo-ode/jpo-wzdx/tree/master/create-feed/examples
