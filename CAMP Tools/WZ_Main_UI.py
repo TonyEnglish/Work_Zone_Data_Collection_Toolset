@@ -90,7 +90,7 @@ uper_failed = False
 ###
 
 def inputFileDialog():
-    filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.wzc")])
+    filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.json")])
     if len(filename): 
         wzConfig_file.set(filename)
         configRead(filename)
@@ -320,9 +320,9 @@ def getConfigVars():
 ###############################################################################################
 
 def set_config_description(config_file):
-    startDate_split = wzStartDate.split('-')
+    startDate_split = wzStartDate.split('/')
     start_date = startDate_split[1] + '/' + startDate_split[2] + '/' + startDate_split[0]
-    endDate_split = wzEndDate.split('-')
+    endDate_split = wzEndDate.split('/')
     end_date = endDate_split[1] + '/' + endDate_split[2] + '/' + endDate_split[0]
     config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nNumber of Lanes: ' + str(totalLanes) + \
         '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
