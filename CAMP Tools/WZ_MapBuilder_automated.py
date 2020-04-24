@@ -162,7 +162,7 @@ def configRead(file):
     if os.path.exists(file):
         try:
             cfg = open(file)
-            wzConfig.read_file(cfg)
+            wzConfig = json.loads(cfg.read())
             cfg.close()
             getConfigVars()
 		
@@ -197,6 +197,8 @@ def getConfigVars():
 
     global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
+
+    global roadName
 
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
@@ -266,6 +268,12 @@ def getConfigVars():
     sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
 
 ###
+#   Get INFO...
+###
+
+    roadName        = wzConfig['INFO']['RoadName']
+
+###
 #   Get LANE relevant information...
 ###
 
@@ -300,10 +308,10 @@ def getConfigVars():
     wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
     wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
 
-    wzStartLat      = wzConfig['LOCATION']['wzstartlat']
-    wzStartLon      = wzConfig['LOCATION']['wzstartlon']
-    wzEndLat        = wzConfig['LOCATION']['wzendlat']
-    wzEndLon        = wzConfig['LOCATION']['wzendlon']
+    wzStartLat      = wzConfig['LOCATION']['WSStartLat']
+    wzStartLon      = wzConfig['LOCATION']['WZStartLon']
+    wzEndLat        = wzConfig['LOCATION']['WZEndLat']
+    wzEndLon        = wzConfig['LOCATION']['WZEndLon']
 
     if wzStartDate == "":                                               #wz start date and time are mandatory
         wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -707,7 +715,7 @@ def startMainProcess():
 #   WZ config parser object....
 ###
 
-wzConfig        = configparser.ConfigParser(delimiters=('='))
+wzConfig        = {}
 
 ###
 #   --------------------------------------------------------------------------------------------------
@@ -791,15 +799,38 @@ ctrDT   = datetime.datetime.now().strftime("%Y%m%d-") + time.strftime("%H%M%S")
 # ---------------------------- Automatically Export Files ------------------------------------
 #
 ###############################################################################################
-local_config_path = './Config Files/WZ_COPIED_CONFIG.wzc'
+local_config_path = './Config Files/ACTIVE_CONFIG.json'
 def export_files():
     inputFileDialog(local_config_path)
     startMainProcess()
+    files_list.append(vehPathDataFile)
+    files_list.append(local_config_path)
 
-    zipObj = zipfile.ZipFile('CAMP-Exports-' + ctrDT + '.zip', 'w')
+    road_name = roadName
+    begin_date = wzStartDate
+    end_date = wzEndDate
+    name_id = road_name + '--' + begin_date + '--' + end_date
+
+    zipObj = zipfile.ZipFile('wzdc-exports--' + name_id + '.zip', 'w')
     
     for filename in files_list:
         name = filename.split('/')[-1]
+        name_orig = name
+        name_wo_ext = name[:name.rfind('.')]
+        if '.csv' in filename.lower():
+            name = 'path-data--' + name_id + '.csv'
+        elif '.json' in filename.lower():
+            name = 'config--' + name_id + '.json'
+        elif '.xml' in filename.lower():
+            number = name[name.rfind('-')+1:name.rfind('.')]
+            name = 'xml--' + name_id + '--' + number + '.xml'
+        elif '.uper' in filename.lower():
+            number = name[name.rfind('-')+1:name.rfind('.')]
+            name = 'uper--' + name_id + '--' + number + '.uper'
+        elif '.geojson' in filename.lower():
+            name = 'wzdx--' + name_id + '.geojson'
+        else:
+            continue
         zipObj.write(filename, name)
     
     # close the Zip File

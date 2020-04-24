@@ -48,8 +48,6 @@ import  shutil
 #   .exer file (xml format) for based on ASN.1 definition for RSM as proposed to SAE for J2945/4 and J2735 (Data Dictionary)
 ###
 
-from WZ_MapBuilder_automated import export_files
-
 
 
 ###
@@ -172,7 +170,7 @@ def configRead(file):
     if os.path.exists(file):
         try:
             cfg = open(file)
-            wzConfig.read_file(cfg)
+            wzConfig = json.loads(cfg.read())
             cfg.close()
             getConfigVars()
 		
@@ -300,10 +298,10 @@ def getConfigVars():
     wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
     wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
 
-    wzStartLat      = wzConfig['LOCATION']['wzstartlat']
-    wzStartLon      = wzConfig['LOCATION']['wzstartlon']
-    wzEndLat        = wzConfig['LOCATION']['wzendlat']
-    wzEndLon        = wzConfig['LOCATION']['wzendlon']
+    wzStartLat      = wzConfig['LOCATION']['WZStartLat']
+    wzStartLon      = wzConfig['LOCATION']['WZStartLon']
+    wzEndLat        = wzConfig['LOCATION']['WZEndLat']
+    wzEndLon        = wzConfig['LOCATION']['WZEndLon']
 
     if wzStartDate == "":                                               #wz start date and time are mandatory
         wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -332,14 +330,17 @@ def set_config_description(config_file):
 
 def launch_WZ_veh_path_data_acq():
     config_file = wzConfig_file.get()
-    shutil.copy(config_file, local_config_path)
-    WZ_dataacq = "WZ_VehPathDataAcq_automated.pyw"
-    if os.path.exists(WZ_dataacq):
-        os.system(WZ_dataacq)
-        export_files()
+    if os.path.exists(local_config_path):
         os.remove(local_config_path)
-    else:
-        messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
+    shutil.copy(config_file, local_config_path)
+    #WZ_dataacq = "WZ_VehPathDataAcq_automated.pyw"
+    #if os.path.exists(WZ_dataacq):
+    #    os.system(WZ_dataacq)
+    sys.exit(0)
+    os.system('WZ_VehPathDataAcq_automated.pyw')
+    #initialize(config_file, '')
+    #else:
+    #    messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
 
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
@@ -358,7 +359,7 @@ root.geometry("700x400")
 #   WZ config parser object....
 ###
 
-wzConfig        = configparser.ConfigParser(delimiters=('='))
+wzConfig        = {}
 
 ###
 #   --------------------------------------------------------------------------------------------------
@@ -439,7 +440,7 @@ msgSegList      = []                    #WZ message node segmentation list
 #############################################################################
 
 wzConfig_file = StringVar()
-local_config_path = './Config Files/WZ_COPIED_CONFIG.wzc'
+local_config_path = './Config Files/ACTIVE_CONFIG.json'
 
 lbl_top = Label(text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.pack()
@@ -450,7 +451,7 @@ winSize.pack()
 configDirectory = './Config Files'
 most_recent_file = {'Name': '', 'Time': -1}
 for config_file in os.listdir(configDirectory): #Find most recently edited config file in specified directory
-    if '.wzc' in config_file:
+    if '.json' in config_file:
         time = os.path.getmtime(configDirectory + '/' + config_file)
         if time > most_recent_file['Time']:
             most_recent_file['Name'] = config_file
