@@ -835,3 +835,4 @@ def export_files():
     
     # close the Zip File
     zipObj.close()
+    os.remove(local_config_path)

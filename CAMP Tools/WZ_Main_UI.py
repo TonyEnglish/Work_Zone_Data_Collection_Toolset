@@ -197,7 +197,7 @@ def getConfigVars():
 #   Following are global variables are later used by other functions/methods...
 ###
 
-    global  vehPathDataFile                                 #collected vehicle path data file
+    # global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
     global  totalLanes                                      #total number of lanes in wz
@@ -239,19 +239,19 @@ def getConfigVars():
 #   vehPathDataFile - input data file
 ###
 
-    vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
+    # vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
            
-    if os.path.exists(dirName) == False:
-        messagebox.showinfo("Veh Path Data Dir", "Vehicle Path Data file directory:\n\n"+dirName+"\n\nNOT found, correct directory name in WZ Configuration step...")
-        btnStart["state"] = "disabled"                                  #enable button to view log file...
-        btnStart["bg"] = "gray75"        
-        sys.exit(0)
+    # if os.path.exists(dirName) == False:
+    #     messagebox.showinfo("Veh Path Data Dir", "Vehicle Path Data file directory:\n\n"+dirName+"\n\nNOT found, correct directory name in WZ Configuration step...")
+    #     btnStart["state"] = "disabled"                                  #enable button to view log file...
+    #     btnStart["bg"] = "gray75"        
+    #     sys.exit(0)
 
-    if os.path.exists(vehPathDataFile) == False:
-        messagebox.showinfo("Veh Path Data file", "Vehicle Path Data file:\n\n"+fileName+"\n\nNOT found, correct file name in WZ Configuration step...")
-        btnStart["state"] = "disabled"                                  #enable button to view log file...
-        btnStart["bg"] = "gray75"        
-        sys.exit(0)
+    # if os.path.exists(vehPathDataFile) == False:
+    #     messagebox.showinfo("Veh Path Data file", "Vehicle Path Data file:\n\n"+fileName+"\n\nNOT found, correct file name in WZ Configuration step...")
+    #     btnStart["state"] = "disabled"                                  #enable button to view log file...
+    #     btnStart["bg"] = "gray75"        
+    #     sys.exit(0)
 
 ###
 #   Convert str from the config file to proper data types... VERY Important...
@@ -329,6 +329,7 @@ def set_config_description(config_file):
     msg['text'] = config_description
 
 def launch_WZ_veh_path_data_acq():
+    print(wzConfig_file.get())
     config_file = wzConfig_file.get()
     if os.path.exists(local_config_path):
         os.remove(local_config_path)
@@ -336,8 +337,8 @@ def launch_WZ_veh_path_data_acq():
     #WZ_dataacq = "WZ_VehPathDataAcq_automated.pyw"
     #if os.path.exists(WZ_dataacq):
     #    os.system(WZ_dataacq)
-    sys.exit(0)
     os.system('WZ_VehPathDataAcq_automated.pyw')
+    sys.exit(0)
     #initialize(config_file, '')
     #else:
     #    messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
@@ -451,7 +452,7 @@ winSize.pack()
 configDirectory = './Config Files'
 most_recent_file = {'Name': '', 'Time': -1}
 for config_file in os.listdir(configDirectory): #Find most recently edited config file in specified directory
-    if '.json' in config_file:
+    if '.json' in config_file and config_file != 'ACTIVE_CONFIG.json':
         time = os.path.getmtime(configDirectory + '/' + config_file)
         if time > most_recent_file['Time']:
             most_recent_file['Name'] = config_file
