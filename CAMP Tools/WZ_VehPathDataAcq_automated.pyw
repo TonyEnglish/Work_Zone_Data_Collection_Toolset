@@ -593,16 +593,17 @@ def toggle_btn_text(gotKey):
     global  gotReflanes
     
     if gotKey == 's':                                   #Start/Stop data log    
-        if bDL["text"] == "Manually Start Data\nLog (s)":
-            bDL["text"] = "Manually Stop Data\nLog (s)"
+        if bDL["text"] == "Manually Start\nData Log (s)":
+            bDL["text"] = "Manually Stop\nData Log (s)"
             bDL["bg"] = "gray92"
             bDL["fg"] = "red3"
         else:
-            if bDL["text"] == "Manually Stop Data\nLog (s)":
-                appRunning = False
+            if bDL["text"] == "Manually Stop\nData Log (s)":
+                gotKey = '\x1b'
+                processKeyPress(gotKey)
                 # bDL["text"] = "Start Data\nLog (s)"
                 # bDL["bg"]   = "green"
-                # bDL["fg"]   = "white"   
+                # bDL["fg"]   = "white"
         pass   
     pass
 
@@ -808,7 +809,7 @@ lanes = [0]*9
 #   The following in a above loop DOESN'T WORK...     Callback routine gotLane does not pass correct button lane number...
 ###
 for i in range(1, totalLanes+1):
-    lanes[i] = Button(text=i, font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress(i))
+    lanes[i] = Button(text=i, font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress(str(i)))
     lanes[i].place(x=250+50*i, y=310)
 # #lane 1
 # lanes[1] = Button(text='1', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('1'))
