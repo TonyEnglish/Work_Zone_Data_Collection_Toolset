@@ -220,6 +220,11 @@ def getConfigVars():
     global  wzEndTime                                       #wz end time
     global  wzDaysOfWeek                                    #wz active days of week
 
+    global  wzStartLat                                     #wz start date
+    global  wzStartLon                                     #wz start time    
+    global  wzEndLat                                       #wz end date
+    global  wzEndLon                                       #wz end time
+
 
 ###
 #   Get collected vehicle path data point .csv file name from user input saved in wz config

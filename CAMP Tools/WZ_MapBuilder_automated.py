@@ -220,6 +220,11 @@ def getConfigVars():
     global  wzEndTime                                       #wz end time
     global  wzDaysOfWeek                                    #wz active days of week
 
+    global  wzStartLat                                     #wz start date
+    global  wzStartLon                                     #wz start time    
+    global  wzEndLat                                       #wz end date
+    global  wzEndLon                                       #wz end time
+
 
 ###
 #   Get collected vehicle path data point .csv file name from user input saved in wz config
@@ -363,8 +368,8 @@ def build_XML_file():
 #       event length same as workzone length
 ###
 
-    wzStart     = wzStartDate.split('-') + wzStartTime.split(':')
-    wzEnd       = wzEndDate.split('-')   + wzEndTime.split(':')
+    wzStart     = wzStartDate.split('/') + wzStartTime.split(':')
+    wzEnd       = wzEndDate.split('/')   + wzEndTime.split(':')
 
     timeOffset  = -300                                      #UTC time offset in minutes for Eastern Time Zone
     hTolerance  = 20                                        #applicable heading tolerance set to 20 degrees (+/- 20deg?)
@@ -807,8 +812,8 @@ def export_files():
     files_list.append(local_config_path)
 
     road_name = roadName
-    begin_date = wzStartDate
-    end_date = wzEndDate
+    begin_date = wzStartDate.replace('/', '-')
+    end_date = wzEndDate.replace('/', '-')
     name_id = road_name + '--' + begin_date + '--' + end_date
 
     zipObj = zipfile.ZipFile('wzdc-exports--' + name_id + '.zip', 'w')
@@ -824,7 +829,7 @@ def export_files():
         elif '.xml' in filename.lower():
             number = name[name.rfind('-')+1:name.rfind('.')]
             name = 'xml--' + name_id + '--' + number + '.xml'
-        elif '.uper' in filename.lower():
+        elif '.uper' in filename.lower() and not uper_failed:
             number = name[name.rfind('-')+1:name.rfind('.')]
             name = 'uper--' + name_id + '--' + number + '.uper'
         elif '.geojson' in filename.lower():

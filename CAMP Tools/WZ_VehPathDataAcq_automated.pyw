@@ -103,6 +103,8 @@ def getConfigVars():
     global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
+    global roadName
+
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
     global  lanePadApp                                      #approach lane padding in meters
@@ -122,6 +124,11 @@ def getConfigVars():
     global  wzEndDate                                       #wz end date
     global  wzEndTime                                       #wz end time
     global  wzDaysOfWeek                                    #wz active days of week
+
+    global  wzStartLat                                     #wz start date
+    global  wzStartLon                                     #wz start time    
+    global  wzEndLat                                       #wz end date
+    global  wzEndLon                                       #wz end time
 
 
 ###
@@ -323,13 +330,14 @@ def getNMEA_String():
         if dataLog:
             distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
             if distance < 20: #Leaving Workzone
-                dataLog = False
-                appRunning = False
+                gotBtnPress('s')
+                #appRunning = False
 
         else:
             distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
             if distance < 20: #Entering Workzone
-                dataLog = True
+                gotBtnPress('s')
+                #dataLog = True
 
 ###
 #
@@ -585,15 +593,16 @@ def toggle_btn_text(gotKey):
     global  gotReflanes
     
     if gotKey == 's':                                   #Start/Stop data log    
-        if bDL["text"] == "Start Data\nLog (s)":
-            bDL["text"] = "Stop Data\nLog (s)"
+        if bDL["text"] == "Manually Start Data\nLog (s)":
+            bDL["text"] = "Manually Stop Data\nLog (s)"
             bDL["bg"] = "gray92"
             bDL["fg"] = "red3"
         else:
-            if bDL["text"] == "Stop Data\nLog (s)":
-                bDL["text"] = "Start Data\nLog (s)"
-                bDL["bg"]   = "green"
-                bDL["fg"]   = "white"   
+            if bDL["text"] == "Manually Stop Data\nLog (s)":
+                appRunning = False
+                # bDL["text"] = "Start Data\nLog (s)"
+                # bDL["bg"]   = "green"
+                # bDL["fg"]   = "white"   
         pass   
     pass
 
@@ -650,7 +659,7 @@ def checkForGPS(root, portNum, first):
     ports = serial.tools.list_ports.comports(include_links=False)
     gpsFound = False
     if len(ports)==0:
-        messagebox.showerror("GPS Receiver Missing", "*** GPS Receiver missing ***\n\n")
+        messagebox.showwarning("GPS Receiver Missing", "*** GPS Receiver missing ***\n\n")
     if (len(ports)>=1):
         for port in ports:
             if ("1546:01A6" in port.hwid):
@@ -764,8 +773,8 @@ msg.place(x=50, y=50)
 #   Start/Stop Data Logging...
 ###
 
-#bDL = Button(text='Manually Start\nData Log (s)', font='Helvetica 10', fg = 'white', bg='green',padx=5,command=lambda:gotBtnPress('s'))
-#bDL.place(x=50, y=300)
+bDL = Button(text='Manually Start\nData Log (s)', font='Helvetica 10', fg = 'white', bg='green',padx=5,command=lambda:gotBtnPress('s'))
+bDL.place(x=50, y=300)
 
 ###
 #   WZ Reference Point...
@@ -940,9 +949,14 @@ startMainFunc()                                         #main function, starts N
 
 ser.close()                                             #close serial IO
 outFile.close()                                         #end of data acquisition and logging
+road_name = roadName
+begin_date = wzStartDate.replace('/', '-')
+end_date = wzEndDate.replace('/', '-')
+name_id = road_name + '--' + begin_date + '--' + end_date
 
-messagebox.showinfo("Veh Path Data Acq. Ended", "Vehicle Path Data Acq Ended")
+zip_name = 'wzdc-exports--' + name_id + '.zip'
 export_files()
+messagebox.showinfo("Veh Path Data Acq. Ended", "Vehicle Path Data Acq Ended\nCollecting and zipping files\nOutput location: \n" + zip_name)
 #os.remove(local_config_path)
 sys.exit(0)                                             #Stop the program
 root.mainloop()
