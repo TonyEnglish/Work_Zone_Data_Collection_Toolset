@@ -200,6 +200,8 @@ def getConfigVars():
     # global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
+    global  roadName
+
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
     global  lanePadApp                                      #approach lane padding in meters
@@ -269,6 +271,12 @@ def getConfigVars():
     sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
 
 ###
+#   Get INFO...
+###
+
+    roadName        = wzConfig['INFO']['RoadName']
+
+###
 #   Get LANE relevant information...
 ###
 
@@ -326,15 +334,14 @@ def getConfigVars():
 
 def set_config_description(config_file):
     startDate_split = wzStartDate.split('/')
-    start_date = startDate_split[1] + '/' + startDate_split[2] + '/' + startDate_split[0]
+    start_date = startDate_split[0] + '/' + startDate_split[1] + '/' + startDate_split[2]
     endDate_split = wzEndDate.split('/')
-    end_date = endDate_split[1] + '/' + endDate_split[2] + '/' + endDate_split[0]
-    config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nNumber of Lanes: ' + str(totalLanes) + \
+    end_date = endDate_split[0] + '/' + endDate_split[1] + '/' + endDate_split[2]
+    config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nRoad Name: ' + roadName + \
         '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
     msg['text'] = config_description
 
 def launch_WZ_veh_path_data_acq():
-    print(wzConfig_file.get())
     config_file = wzConfig_file.get()
     if os.path.exists(local_config_path):
         os.remove(local_config_path)
