@@ -313,7 +313,7 @@ def getConfigVars():
     wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
     wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
 
-    wzStartLat      = wzConfig['LOCATION']['WSStartLat']
+    wzStartLat      = wzConfig['LOCATION']['WZStartLat']
     wzStartLon      = wzConfig['LOCATION']['WZStartLon']
     wzEndLat        = wzConfig['LOCATION']['WZEndLat']
     wzEndLon        = wzConfig['LOCATION']['WZEndLon']

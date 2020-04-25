@@ -288,7 +288,7 @@ def getNMEA_String():
         if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == "$GNGGA":
             GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid)
 
-            if GGA_out[3] == True:         
+            if GGA_out[3] == True:
                 GPSTime = GGA_out[0]
                 GPSSats = GGA_out[1]
                 GPSAlt  = GGA_out[2]
@@ -426,7 +426,7 @@ def processKeyPress(key):
 #   Ref. point
 ###    
 
-    if (key == 'r' or key == 'R') and gotRefPt == False: #Mark reference point
+    if (key == 'r' or key == 'R') and gotRefPt == False and dataLog == True: #Mark reference point
         markerStr = "   *** Reference Point Marked @ "+str(GPSLat)+", "+str(GPSLon)+", "+str(GPSAlt)+" ***"
         ##T.insert (END, markerStr)
         keyMarker = ["RP",'']                       #reference point
@@ -609,7 +609,7 @@ def toggle_btn_text(gotKey):
 
 
     #if gotKey == 'r':                                   #Ref point
-    if (gotKey == 'r' or gotKey == 'w' or (gotKey >= '1' and gotKey <= '9')) and gotRefPt == False:
+    if (gotKey == 'r' or gotKey == 'w' or (gotKey >= '1' and gotKey <= '9')) and gotRefPt == False and dataLog == True:
     
         if bR["text"] == "Mark Ref.\nPoint (r)":
             bR["text"] = "Ref.Point\nMarked"

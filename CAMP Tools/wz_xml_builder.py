@@ -164,9 +164,9 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,wzDaysOfWeek,c
 ###
 
     commonContainer['eventInfo']['startDateTime'] = {}
-    commonContainer['eventInfo']['startDateTime']['year'] = eDateTime[0]
-    commonContainer['eventInfo']['startDateTime']['month'] = eDateTime[1]
-    commonContainer['eventInfo']['startDateTime']['day'] = eDateTime[2]
+    commonContainer['eventInfo']['startDateTime']['year'] = eDateTime[2]
+    commonContainer['eventInfo']['startDateTime']['month'] = eDateTime[0]
+    commonContainer['eventInfo']['startDateTime']['day'] = eDateTime[1]
     commonContainer['eventInfo']['startDateTime']['hour'] = eDateTime[3]
     commonContainer['eventInfo']['startDateTime']['minute'] = eDateTime[4]
     commonContainer['eventInfo']['startDateTime']['offset'] = timeOffset
@@ -188,9 +188,9 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,wzDaysOfWeek,c
            
     if str(endDateTime[0]) != "":
         commonContainer['eventInfo']['endDateTime'] = {}
-        commonContainer['eventInfo']['endDateTime']['year'] = endDateTime[0]
-        commonContainer['eventInfo']['endDateTime']['month'] = endDateTime[1]
-        commonContainer['eventInfo']['endDateTime']['day'] = endDateTime[2]
+        commonContainer['eventInfo']['endDateTime']['year'] = endDateTime[2]
+        commonContainer['eventInfo']['endDateTime']['month'] = endDateTime[0]
+        commonContainer['eventInfo']['endDateTime']['day'] = endDateTime[1]
         commonContainer['eventInfo']['endDateTime']['hour'] = endDateTime[3]
         commonContainer['eventInfo']['endDateTime']['minute'] = endDateTime[4]
         # xmlFile.write (5*tab+"<endDateTime>\n" + \
@@ -223,13 +223,13 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,wzDaysOfWeek,c
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime']['minute'] = endDateTime[4]
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endTime']['second'] = 0
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate'] = {}
-    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['year'] = eDateTime[0]
-    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['month'] = eDateTime[1]
-    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['day'] = eDateTime[2]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['year'] = eDateTime[2]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['month'] = eDateTime[0]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['startDate']['day'] = eDateTime[1]
     commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate'] = {}
-    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate']['year'] = endDateTime[0]
-    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate']['month'] = endDateTime[1]
-    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate']['day'] = endDateTime[2]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate']['year'] = endDateTime[2]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate']['month'] = endDateTime[0]
+    commonContainer['eventInfo']['eventRecurrence']['EventRecurrence']['endDate']['day'] = endDateTime[1]
     days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
     days_of_week_convert = {'monday': 'Mon', 'tuesday': 'Tue', 'wednesday': 'Wen', 'thursday': 'Thu', 'friday': 'Fri', 'saturday': 'Sat', 'sunday': 'Sun'}
     for day in days_of_week:
