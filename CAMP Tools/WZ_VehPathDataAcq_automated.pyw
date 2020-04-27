@@ -27,13 +27,12 @@ import      string                                  #string functions
 import      csv                                     #CSV file read/write
 import      os.path
 import      math
-import serial.tools.list_ports                      #used to enumerate COMM ports
-import configparser
+import      json
+import      serial.tools.list_ports                      #used to enumerate COMM ports
 
 from        serial import SerialException           #serial port exception
 
-# from WZ_Main_UI import getConfigVars
-
+from WZ_MapBuilder_automated import export_files
 
 ###
 #   thread for tkinter for text window...
@@ -66,22 +65,45 @@ def startMainFunc():
     getConfigVars()
     if (appRunning):
         getNMEA_String()                        #Get NMEA String and process it until "appRunning is True..."
+    
 
 ###
 #
 #   ------------------  END of the Main Func... --------------------------------------
 #
 
-def getConfigVars(wzConfig):
+def configRead():
+    global wzConfig
+    file = local_config_path
+    if os.path.exists(file):
+        cfg = open(file, 'r+')
+        wzConfig = json.loads(cfg.read())
+        update_config(cfg)
+        cfg.close()
+        getConfigVars()
+
+###
+# ----------------- End of config_read --------------------
+###
+#
+#   Following user specified values are read from the WZ config file specified by user in WZ_Config_UI.pyw...
+#
+#   WZ Configuration file is parsed here to get the user input values for used by different modules/functions...
+#
+#   Added: Aug. 2018
+#
+### -------------------------------------------------------------------------------------------------------
+
+def getConfigVars():
 
 ###
 #   Following are global variables are later used by other functions/methods...
 ###
-    global error
-    global error_message
 
     global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
+
+    global roadName
 
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
@@ -103,26 +125,15 @@ def getConfigVars(wzConfig):
     global  wzEndTime                                       #wz end time
     global  wzDaysOfWeek                                    #wz active days of week
 
+    global  wzStartLat                                     #wz start date
+    global  wzStartLon                                     #wz start time    
+    global  wzEndLat                                       #wz end date
+    global  wzEndLon                                       #wz end time
+
 
 ###
 #   Get collected vehicle path data point .csv file name from user input saved in wz config
 ###
-
-    dirName     = wzConfig['FILES']['VehiclePathDataDir']   #veh path data file directory
-    fileName    = wzConfig['FILES']['VehiclePathDataFile']  #veh path data file name
-
-###
-#   Assure that the vehicle path data file directory and file name exist.
-#   If NOT, ask user to go back to WZ Configuration Step and correct file location
-#   This can happen if the directory/file name is changed after doing the WZ configuration step...
-#
-#   Added on Nov. 6, 2018
-#
-###
-#   vehPathDataFile - input data file
-###
-
-    vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
 
 ###
 #   Convert str from the config file to proper data types... VERY Important...
@@ -133,6 +144,12 @@ def getConfigVars(wzConfig):
 ###
 
     sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
+
+###
+#   Get INFO...
+###
+
+    roadName        = wzConfig['INFO']['RoadName']
 
 ###
 #   Get LANE relevant information...
@@ -169,15 +186,23 @@ def getConfigVars(wzConfig):
     wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
     wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
 
-    wzStartLat      = wzConfig['LOCATION']['wzstartlat']
-    wzStartLon      = wzConfig['LOCATION']['wzstartlon']
-    wzEndLat        = wzConfig['LOCATION']['wzendlat']
-    wzEndLon        = wzConfig['LOCATION']['wzendlon']
+    wzStartLat      = wzConfig['LOCATION']['WZStartLat']
+    wzStartLon      = wzConfig['LOCATION']['WZStartLon']
+    wzEndLat        = wzConfig['LOCATION']['WZEndLat']
+    wzEndLon        = wzConfig['LOCATION']['WZEndLon']
 
     if wzStartDate == "":                                               #wz start date and time are mandatory
         wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
         wzStartTime = time.strftime("%H:%M")
     pass
+
+
+def update_config(cfg):
+    cfg.truncate(0)
+    cfg.seek(0)
+    wzConfig['FILES']['VehiclePathDataDir'] = os.path.abspath(outDir).replace('\\', '/')
+    wzConfig['FILES']['VehiclePathDataFile'] = dataOutFileName
+    cfg.write(json.dumps(wzConfig, indent='    '))
 
 
 #
@@ -263,7 +288,7 @@ def getNMEA_String():
         if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == "$GNGGA":
             GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid)
 
-            if GGA_out[3] == True:         
+            if GGA_out[3] == True:
                 GPSTime = GGA_out[0]
                 GPSSats = GGA_out[1]
                 GPSAlt  = GGA_out[2]
@@ -304,14 +329,15 @@ def getNMEA_String():
         pi = 3.14159
         if dataLog:
             distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
-            if distance < 100: #Leaving Workzone
-                dataLog = False
-                appRunning = False
+            if distance < 20: #Leaving Workzone
+                gotBtnPress('s')
+                #appRunning = False
 
         else:
             distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if distance < 100: #Entering Workzone
-                dataLog = True
+            if distance < 20: #Entering Workzone
+                gotBtnPress('s')
+                #dataLog = True
 
 ###
 #
@@ -400,7 +426,7 @@ def processKeyPress(key):
 #   Ref. point
 ###    
 
-    if (key == 'r' or key == 'R') and gotRefPt == False: #Mark reference point
+    if (key == 'r' or key == 'R') and gotRefPt == False and dataLog == True: #Mark reference point
         markerStr = "   *** Reference Point Marked @ "+str(GPSLat)+", "+str(GPSLon)+", "+str(GPSAlt)+" ***"
         ##T.insert (END, markerStr)
         keyMarker = ["RP",'']                       #reference point
@@ -567,21 +593,23 @@ def toggle_btn_text(gotKey):
     global  gotReflanes
     
     if gotKey == 's':                                   #Start/Stop data log    
-        if bDL["text"] == "Start Data\nLog (s)":
-            bDL["text"] = "Stop Data\nLog (s)"
+        if bDL["text"] == "Manually Start\nData Log (s)":
+            bDL["text"] = "Manually Stop\nData Log (s)"
             bDL["bg"] = "gray92"
             bDL["fg"] = "red3"
         else:
-            if bDL["text"] == "Stop Data\nLog (s)":
-                bDL["text"] = "Start Data\nLog (s)"
-                bDL["bg"]   = "green"
-                bDL["fg"]   = "white"   
+            if bDL["text"] == "Manually Stop\nData Log (s)":
+                gotKey = '\x1b'
+                processKeyPress(gotKey)
+                # bDL["text"] = "Start Data\nLog (s)"
+                # bDL["bg"]   = "green"
+                # bDL["fg"]   = "white"
         pass   
     pass
 
 
     #if gotKey == 'r':                                   #Ref point
-    if (gotKey == 'r' or gotKey == 'w' or (gotKey >= '1' and gotKey <= '9')) and gotRefPt == False:
+    if (gotKey == 'r' or gotKey == 'w' or (gotKey >= '1' and gotKey <= '9')) and gotRefPt == False and dataLog == True:
     
         if bR["text"] == "Mark Ref.\nPoint (r)":
             bR["text"] = "Ref.Point\nMarked"
@@ -628,17 +656,17 @@ def commSelect(*args):
 ###
 #  Check for GPS computer
 ###
-def checkForGPS(root, portNum):
+def checkForGPS(root, portNum, first):
     ports = serial.tools.list_ports.comports(include_links=False)
     gpsFound = False
     if len(ports)==0:
-        messagebox.showerror("GPS Receiver Missing", "*** GPS Receiver missing ***\n\n")
+        messagebox.showwarning("GPS Receiver Missing", "*** GPS Receiver missing ***\n\n")
     if (len(ports)>=1):
         for port in ports:
             if ("1546:01A6" in port.hwid):
                 portNum = port.device
                 gpsFound = True
-        if (not gpsFound):
+        if (not gpsFound) and first:
             mainframe = Frame(root)
             # Add a grid
             mainframe.pack()
@@ -690,8 +718,6 @@ wpStat      = False                             #workers not present
 laneStat    = [True,True,True,True,True,True,True,True,True] #all 8 lanes are open (default), Lane 0 is not used...
                                                 #pressing the same lane # key will toggle the from close to open  
 
-local_config_path = './Config Files/WZ_COPIED_CONFIG.wzc'
-
 #############################################################################
 # MAIN LOOP
 #############################################################################
@@ -703,6 +729,19 @@ local_config_path = './Config Files/WZ_COPIED_CONFIG.wzc'
 #
 ###
 
+
+local_config_path = './Config Files/ACTIVE_CONFIG.json'
+cDT       = datetime.datetime.now().strftime("%Y%m%d_")+time.strftime("%H%M%S")
+date_time = datetime.datetime.now().strftime("%Y/%m/%d - ")+time.strftime("%H:%M:%S")
+
+###
+#   Open output file for data logging...
+###
+
+outDir      = "./WZ_VehPathData"
+dataOutFileName = "WZ_Path_Data_"+cDT+".csv"
+dataOutFile = outDir + '/' + dataOutFileName
+configRead()
 
 root = Tk()
 root.title('Work Zone Mapping - Vehicle Path Data Acquisition')
@@ -723,11 +762,11 @@ winSize.pack()
 
 
 msg = Button(text="Click appropriate button or press (key) to:\n"       \
-                 "-- Start/Stop Data Log(s): vehicle path data logging\n"   \
-                 "-- Mark Ref. Point(r):     indicate start of WZ\n"  \
-                 "-- Lane number(1..8):      mark lane open/close (Green: Open, Red: Closed)\n" \
-                 "-- Workers Present(w):     mark presence/absence of workers\n\t\t\t   (Green: Absence, Red: Present)",  \
-                 font='Courier 10', bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=20)
+                "-- Start/Stop Data Log(s): vehicle path data logging\n"   \
+                "-- Mark Ref. Point(r):     indicate start of WZ\n"  \
+                "-- Lane number(1..8):      mark lane open/close (Green: Open, Red: Closed)\n" \
+                "-- Workers Present(w):     mark presence/absence of workers\n\t\t\t   (Green: Absence, Red: Present)",  \
+                font='Courier 10', bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=20)
 
 msg.place(x=50, y=50)
 
@@ -769,39 +808,41 @@ lanes = [0]*9
 ###
 #   The following in a above loop DOESN'T WORK...     Callback routine gotLane does not pass correct button lane number...
 ###
-    
-#lane 1
-lanes[1] = Button(text='1', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('1'))
-lanes[1].place(x=300, y=310)
-#lanes[1].pack(side=LEFT, padx=10)
+for i in range(1, totalLanes+1):
+    lanes[i] = Button(text=i, font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress(str(i)))
+    lanes[i].place(x=250+50*i, y=310)
+# #lane 1
+# lanes[1] = Button(text='1', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('1'))
+# lanes[1].place(x=300, y=310)
+# #lanes[1].pack(side=LEFT, padx=10)
 
-#lane 2
-lanes[2] = Button(text='2', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('2'))
-lanes[2].place(x=350, y=310)
+# #lane 2
+# lanes[2] = Button(text='2', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('2'))
+# lanes[2].place(x=350, y=310)
 
-#lane 3
-lanes[3] = Button(text='3', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('3'))
-lanes[3].place(x=400, y=310)
+# #lane 3
+# lanes[3] = Button(text='3', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('3'))
+# lanes[3].place(x=400, y=310)
 
-#lane 4
-lanes[4] = Button(text='4', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('4'))
-lanes[4].place(x=450, y=310)
+# #lane 4
+# lanes[4] = Button(text='4', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('4'))
+# lanes[4].place(x=450, y=310)
 
-#lane 5
-lanes[5] = Button(text='5', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('5'))
-lanes[5].place(x=500, y=310)
+# #lane 5
+# lanes[5] = Button(text='5', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('5'))
+# lanes[5].place(x=500, y=310)
 
-#lane 6
-lanes[6] = Button(text='6', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('6'))
-lanes[6].place(x=550, y=310)
+# #lane 6
+# lanes[6] = Button(text='6', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('6'))
+# lanes[6].place(x=550, y=310)
 
-#lane 7
-lanes[7] = Button(text='7', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('7'))
-lanes[7].place(x=600, y=310)
+# #lane 7
+# lanes[7] = Button(text='7', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('7'))
+# lanes[7].place(x=600, y=310)
 
-#lane 8
-lanes[8] = Button(text='8', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('8'))
-lanes[8].place(x=650, y=310)
+# #lane 8
+# lanes[8] = Button(text='8', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('8'))
+# lanes[8].place(x=650, y=310)
 
 #lane 9   --- Modified to 8 lanes Aug. 30, 2019 ---
 #lanes[9] = Button(text='9', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('9'))
@@ -826,10 +867,8 @@ bQuit.place(x=400,y=380)
 ###
 
 appMsgWin = Button(text="Application Message Window...                                             ",      \
-                   font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
+                font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
 appMsgWin.place(x=50, y=440)
-
-
 
 ##############################################################
 #   ------------------ END of LAYOUT -------------------------
@@ -841,22 +880,32 @@ appMsgWin.place(x=50, y=440)
 #
 ###
 
-try:
-    xPos = 50
-    yPos = 450
-    portNum     = 'COM4'
-    baudRate    = 115200
-    timeOut     = 1
-    portNum = checkForGPS(root, portNum)
-    ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
-    msgStr      = "Vehicle Path Data Acquisition is Ready - You May Start Data Logging"
-    displayStatusMsg(xPos, yPos, msgStr)                                                        #system ready
+#configRead()
 
-except SerialException:
+gps_found = False
+first = True
+while not gps_found:
+    try:
+        xPos = 50
+        yPos = 450
+        portNum     = 'COM4'
+        baudRate    = 115200
+        timeOut     = 1
+        portNum = checkForGPS(root, portNum, first)
+        first = False
+        ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
+        msgStr      = "Vehicle Path Data Acquisition is Ready - You May Start Data Logging"
+        displayStatusMsg(xPos, yPos, msgStr)                                                        #system ready
+        gps_found = True
 
-    messagebox.showerror("GPS Receiver", "*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n"   \
-                        "   --- Configure to Virtual COM5 and Try Again ---")
-    sys.exit(0)
+    except SerialException:
+        MsgBox = messagebox.askquestion ('GPS Receiver NOT Found',"*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n"   \
+                    "   --- Press Yes to try again, No to exit the application ---",icon = 'warning')
+        if MsgBox == 'no':
+            sys.exit(0)
+        #if MsgBox == 'no':
+            #sys.exit(0)
+        
 
     
 ###
@@ -870,24 +919,12 @@ sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
 #   Get current date and time...
 ###
 
-cDT       = datetime.datetime.now().strftime("%Y%m%d_")+time.strftime("%H%M%S")
-date_time = datetime.datetime.now().strftime("%Y/%m/%d - ")+time.strftime("%H:%M:%S")
-
-###
-#   Open output file for data logging...
-###
-
-outDir      = "./WZ_VehPathData"
-dataOutFile = outDir + "/WZ_Path_Data_"+cDT+".csv"
-
-
-
 ###
 #   Open outFile for csv write...
 #   make sure newline is set to null, otherwise will get extra cr.. 
 ###
-config = configparser.ConfigParser(delimiters=('=')).read_file(local_config_path)
-getConfigVars(config)
+
+#configRead(local_config_path)
 
 outFile     = open(dataOutFile,"w",newline='')
 writeData   = csv.writer(outFile)
@@ -913,7 +950,14 @@ startMainFunc()                                         #main function, starts N
 
 ser.close()                                             #close serial IO
 outFile.close()                                         #end of data acquisition and logging
+road_name = roadName
+begin_date = wzStartDate.replace('/', '-')
+end_date = wzEndDate.replace('/', '-')
+name_id = road_name + '--' + begin_date + '--' + end_date
 
-messagebox.showinfo("Veh Path Data Acq. Ended", "Vehicle Path Data Acq Ended")   
+zip_name = 'wzdc-exports--' + name_id + '.zip'
+export_files()
+messagebox.showinfo("Veh Path Data Acq. Ended", "Vehicle Path Data Acq Ended\nCollecting and zipping files\nOutput location: \n" + zip_name)
+#os.remove(local_config_path)
 sys.exit(0)                                             #Stop the program
 root.mainloop()

@@ -20,11 +20,28 @@ Python
 Java
 
 # Updates
+4/27/2020
+- Made edits from end-to-end testing
+  - Updated time/date formatting to match configuration files generated from TMC
+  - App now exits and begins export upon completion of data collection
+  - Export process now conforms to new naming convention (road_name--start_date--end_date)
+  
+- Included extra data in config
+  - Road_name now included and utilized in WZDx output message
+  - *More data to come
+
+4/14/2020
+- Automated major components
+  - Created new Work Zone Data Collection main interface
+  - Data acquisition automatically starts and stops based on locations set in config
+  - Automated export sequence now zips together WZDx and RSM (XML and UPER) files
+  - Decompiled and edited UPER conversion JAR file to allow for command line interfacing
+
 3/30/2020
 - Added POC RSM to WZDx translator
-- - Verified WZDx files against example files from https://github.com/usdot-jpo-ode/jpo-wzdx/tree/master/create-feed/examples
+  - Verified WZDx files against example files from https://github.com/usdot-jpo-ode/jpo-wzdx/tree/master/create-feed/examples
 - Updated CAMP RSM output
-- - Integrated xmltodict library to make RSM generation more dynamic
+  - Integrated xmltodict library to make RSM generation more dynamic
 - Updated CAMP gps COMM port detection
 - Added requirements file
 

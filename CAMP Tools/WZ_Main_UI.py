@@ -48,8 +48,6 @@ import  shutil
 #   .exer file (xml format) for based on ASN.1 definition for RSM as proposed to SAE for J2945/4 and J2735 (Data Dictionary)
 ###
 
-from WZ_MapBuilder_automated import export_files
-
 
 
 ###
@@ -92,7 +90,7 @@ uper_failed = False
 ###
 
 def inputFileDialog():
-    filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.wzc")])
+    filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.json")])
     if len(filename): 
         wzConfig_file.set(filename)
         configRead(filename)
@@ -172,7 +170,7 @@ def configRead(file):
     if os.path.exists(file):
         try:
             cfg = open(file)
-            wzConfig.read_file(cfg)
+            wzConfig = json.loads(cfg.read())
             cfg.close()
             getConfigVars()
 		
@@ -199,8 +197,10 @@ def getConfigVars():
 #   Following are global variables are later used by other functions/methods...
 ###
 
-    global  vehPathDataFile                                 #collected vehicle path data file
+    # global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
+
+    global  roadName
 
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
@@ -222,6 +222,11 @@ def getConfigVars():
     global  wzEndTime                                       #wz end time
     global  wzDaysOfWeek                                    #wz active days of week
 
+    global  wzStartLat                                     #wz start date
+    global  wzStartLon                                     #wz start time    
+    global  wzEndLat                                       #wz end date
+    global  wzEndLon                                       #wz end time
+
 
 ###
 #   Get collected vehicle path data point .csv file name from user input saved in wz config
@@ -241,19 +246,19 @@ def getConfigVars():
 #   vehPathDataFile - input data file
 ###
 
-    vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
+    # vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
            
-    if os.path.exists(dirName) == False:
-        messagebox.showinfo("Veh Path Data Dir", "Vehicle Path Data file directory:\n\n"+dirName+"\n\nNOT found, correct directory name in WZ Configuration step...")
-        btnStart["state"] = "disabled"                                  #enable button to view log file...
-        btnStart["bg"] = "gray75"        
-        sys.exit(0)
+    # if os.path.exists(dirName) == False:
+    #     messagebox.showinfo("Veh Path Data Dir", "Vehicle Path Data file directory:\n\n"+dirName+"\n\nNOT found, correct directory name in WZ Configuration step...")
+    #     btnStart["state"] = "disabled"                                  #enable button to view log file...
+    #     btnStart["bg"] = "gray75"        
+    #     sys.exit(0)
 
-    if os.path.exists(vehPathDataFile) == False:
-        messagebox.showinfo("Veh Path Data file", "Vehicle Path Data file:\n\n"+fileName+"\n\nNOT found, correct file name in WZ Configuration step...")
-        btnStart["state"] = "disabled"                                  #enable button to view log file...
-        btnStart["bg"] = "gray75"        
-        sys.exit(0)
+    # if os.path.exists(vehPathDataFile) == False:
+    #     messagebox.showinfo("Veh Path Data file", "Vehicle Path Data file:\n\n"+fileName+"\n\nNOT found, correct file name in WZ Configuration step...")
+    #     btnStart["state"] = "disabled"                                  #enable button to view log file...
+    #     btnStart["bg"] = "gray75"        
+    #     sys.exit(0)
 
 ###
 #   Convert str from the config file to proper data types... VERY Important...
@@ -264,6 +269,12 @@ def getConfigVars():
 ###
 
     sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
+
+###
+#   Get INFO...
+###
+
+    roadName        = wzConfig['INFO']['RoadName']
 
 ###
 #   Get LANE relevant information...
@@ -300,10 +311,10 @@ def getConfigVars():
     wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
     wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
 
-    wzStartLat      = wzConfig['LOCATION']['wzstartlat']
-    wzStartLon      = wzConfig['LOCATION']['wzstartlon']
-    wzEndLat        = wzConfig['LOCATION']['wzendlat']
-    wzEndLon        = wzConfig['LOCATION']['wzendlon']
+    wzStartLat      = wzConfig['LOCATION']['WZStartLat']
+    wzStartLon      = wzConfig['LOCATION']['WZStartLon']
+    wzEndLat        = wzConfig['LOCATION']['WZEndLat']
+    wzEndLon        = wzConfig['LOCATION']['WZEndLon']
 
     if wzStartDate == "":                                               #wz start date and time are mandatory
         wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -322,24 +333,27 @@ def getConfigVars():
 ###############################################################################################
 
 def set_config_description(config_file):
-    startDate_split = wzStartDate.split('-')
-    start_date = startDate_split[1] + '/' + startDate_split[2] + '/' + startDate_split[0]
-    endDate_split = wzEndDate.split('-')
-    end_date = endDate_split[1] + '/' + endDate_split[2] + '/' + endDate_split[0]
-    config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nNumber of Lanes: ' + str(totalLanes) + \
+    startDate_split = wzStartDate.split('/')
+    start_date = startDate_split[0] + '/' + startDate_split[1] + '/' + startDate_split[2]
+    endDate_split = wzEndDate.split('/')
+    end_date = endDate_split[0] + '/' + endDate_split[1] + '/' + endDate_split[2]
+    config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nRoad Name: ' + roadName + \
         '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
     msg['text'] = config_description
 
 def launch_WZ_veh_path_data_acq():
     config_file = wzConfig_file.get()
-    shutil.copy(config_file, local_config_path)
-    WZ_dataacq = "WZ_VehPathDataAcq_automated.pyw"
-    if os.path.exists(WZ_dataacq):
-        os.system(WZ_dataacq)
-        export_files()
+    if os.path.exists(local_config_path):
         os.remove(local_config_path)
-    else:
-        messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
+    shutil.copy(config_file, local_config_path)
+    #WZ_dataacq = "WZ_VehPathDataAcq_automated.pyw"
+    #if os.path.exists(WZ_dataacq):
+    #    os.system(WZ_dataacq)
+    os.system('WZ_VehPathDataAcq_automated.pyw')
+    sys.exit(0)
+    #initialize(config_file, '')
+    #else:
+    #    messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
 
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
@@ -358,7 +372,7 @@ root.geometry("700x400")
 #   WZ config parser object....
 ###
 
-wzConfig        = configparser.ConfigParser(delimiters=('='))
+wzConfig        = {}
 
 ###
 #   --------------------------------------------------------------------------------------------------
@@ -439,7 +453,7 @@ msgSegList      = []                    #WZ message node segmentation list
 #############################################################################
 
 wzConfig_file = StringVar()
-local_config_path = './Config Files/WZ_COPIED_CONFIG.wzc'
+local_config_path = './Config Files/ACTIVE_CONFIG.json'
 
 lbl_top = Label(text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.pack()
@@ -450,7 +464,7 @@ winSize.pack()
 configDirectory = './Config Files'
 most_recent_file = {'Name': '', 'Time': -1}
 for config_file in os.listdir(configDirectory): #Find most recently edited config file in specified directory
-    if '.wzc' in config_file:
+    if '.json' in config_file and config_file != 'ACTIVE_CONFIG.json':
         time = os.path.getmtime(configDirectory + '/' + config_file)
         if time > most_recent_file['Time']:
             most_recent_file['Name'] = config_file

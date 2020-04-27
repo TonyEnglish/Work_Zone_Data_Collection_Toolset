@@ -27,7 +27,6 @@
 ###
 
 import  os.path
-import  subprocess
 
 ###
 #     Open and read csv file...    
@@ -38,25 +37,11 @@ import  datetime                                        #Date and Time methods..
 import  time                                            #do I need time???
 import  math                                            #math library for math functions
 import  random                                          #random number generator
-import  xmltodict                                       #dict to xml converter
 import  json                                            #json manipulation
 
 from    wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
 
-from    wz_map_constructor  import getLanePt            #get lat/lon points for lanes 
-from    wz_map_constructor  import getEndPoint          #calculates lat/lon for an end point from distance and heading (bearing)
-                                                        #   called from getLanePt
-from    wz_map_constructor  import getDist              #get distance in meters between pair of lat/lon points
-                                                        #   called from getLanePt
-
-###
-#   Folllowing modules create:
-#   .exer file (xml format) for based on ASN.1 definition for RSM as proposed to SAE for J2945/4 and J2735 (Data Dictionary)
-###
-
-from wz_xml_builder         import build_xml_CC         #common container
-from wz_xml_builder         import build_xml_WZC        #WZ container
-from rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
+from    wz_map_constructor  import getLanePt            #get lat/lon points for lanes
 
 ###
 #   .js file cotaining several arrays and data elements to be used by javaScript processing s/w for overlaying constructed
@@ -86,16 +71,6 @@ from wz_msg_segmentation    import buildMsgSegNodeList  #msg segmentation node l
 
 ###
 
-###if sys.version_info[0] == 3:
-from tkinter                import *   
-from tkinter                import messagebox
-from tkinter                import filedialog
-
-###
-#   Following added to read and parse WZ config file
-###
-
-import  configparser                                    #config file parser
 
 
 ### ------------------------------------------------------------------------------------------------------------------
@@ -112,26 +87,11 @@ def inputFileDialog(filename):
     # filename = filedialog.askopenfilename(initialdir=".", title="Select Input File", filetypes=[("Config File","*.wzc")])
     if len(filename): 
         config_filename = filename
-        configRead(filename)   
+        configRead(filename)
     pass
 
 ##
 #   -------------- End of input_file_dialog ------------------
-##
-
-
-def displayStatusMsg(xPos, yPos, msgStr):
-
-    blankStr = " "*256
-    Text = Label(root,anchor='w', justify=LEFT, text=blankStr)
-    Text.place(x=xPos,y=yPos)    
-
-    Text = Label(root,anchor='w', justify=LEFT, text=msgStr)
-    Text.place(x=xPos,y=yPos)    
-
-
-##
-#   -------------- End of display_msg_str ---------------------
 ##
 
 def buildWZMap():
@@ -141,40 +101,14 @@ def buildWZMap():
 ##
 #   -------------- End of build_WZ_map ------------------------
 ##
-
-def quitIt():
-    
-    if messagebox.askyesno("Quit", "Sure you want to quit?") == True:
-        sys.exit(0)  
-##
-#   -------------- End of quitIt ------------------
-##
-
-def viewMapLogFile():
-  
-    WZ_mapLogFile = "./WZ_MapMsg/map_builder_log.txt"
-    if os.path.exists(WZ_mapLogFile):
-        os.system("notepad " + WZ_mapLogFile)        
-    
-    else:
-        messagebox.showinfo("WZ Map Log File","Work Zone Map Log File " + WZ_mapLogFile + " NOT Found ...")
-##
-#   -------------- End of viewLogFile ------------------------
-##
    
 def configRead(file):
     global wzConfig
     if os.path.exists(file):
-        try:
-            cfg = open(file)
-            wzConfig.read_file(cfg)
-            cfg.close()
-            getConfigVars()
-		
-        except Exception as e:
-            messagebox.showinfo("Read Config File", "Configuration file read failed: " + file + "\n" + str(e))
-    else:
-        messagebox.showinfo("Read Config", "Configuration file NOT FOUND: " + file + "\n" + str(e))
+        cfg = open(file)
+        wzConfig = json.loads(cfg.read())
+        cfg.close()
+        getConfigVars()
 
 ###
 # ----------------- End of config_read --------------------
@@ -237,18 +171,6 @@ def getConfigVars():
 ###
 
     vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
-           
-    if os.path.exists(dirName) == False:
-        messagebox.showinfo("Veh Path Data Dir", "Vehicle Path Data file directory:\n\n"+dirName+"\n\nNOT found, correct directory name in WZ Configuration step...")
-        btnStart["state"] = "disabled"                                  #enable button to view log file...
-        btnStart["bg"] = "gray75"        
-        sys.exit(0)
-
-    if os.path.exists(vehPathDataFile) == False:
-        messagebox.showinfo("Veh Path Data file", "Vehicle Path Data file:\n\n"+fileName+"\n\nNOT found, correct file name in WZ Configuration step...")
-        btnStart["state"] = "disabled"                                  #enable button to view log file...
-        btnStart["bg"] = "gray75"        
-        sys.exit(0)
 
 ###
 #   Convert str from the config file to proper data types... VERY Important...
@@ -294,6 +216,11 @@ def getConfigVars():
     wzEndDate       = wzConfig['SCHEDULE']['WZEndDate']
     wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
     wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
+
+    wzStartLat      = wzConfig['LOCATION']['WSStartLat']
+    wzStartLon      = wzConfig['LOCATION']['WZStartLon']
+    wzEndLat        = wzConfig['LOCATION']['WZEndLat']
+    wzEndLon        = wzConfig['LOCATION']['WZEndLon']
 
     if wzStartDate == "":                                               #wz start date and time are mandatory
         wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -594,7 +521,7 @@ def startMainProcess():
 #   WZ config parser object....
 ###
 
-wzConfig        = configparser.ConfigParser(delimiters=('='))
+wzConfig        = {}
 
 ###
 #   --------------------------------------------------------------------------------------------------
