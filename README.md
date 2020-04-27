@@ -24,6 +24,7 @@ Java
 - Made edits from end-to-end testing
   - Updated time/date formatting to match configuration files generated from TMC
   - App now exits and begins export upon completion of data collection
+  - Export process now conforms to new naming convention (road_name--start_date--end_date)
   
 - Included extra data in config
   - Road_name now included and utilized in WZDx output message
