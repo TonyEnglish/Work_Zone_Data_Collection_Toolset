@@ -20,6 +20,15 @@ Python
 Java
 
 # Updates
+4/27/2020
+- Made edits from end-to-end testing
+  - Updated time/date formatting to match configuration files generated from TMC
+  - App now exits and begins export upon completion of data collection
+  
+- Included extra data in config
+  - Road_name now included and utilized in WZDx output message
+  - *More data to come
+
 4/14/2020
 - Automated major components
   - Created new Work Zone Data Collection main interface
