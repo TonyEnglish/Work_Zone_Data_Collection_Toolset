@@ -43,6 +43,8 @@ import  xmltodict                                       #dict to xml converter
 import  json                                            #json manipulation
 import  zipfile
 
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+
 from    wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
 
 from    wz_map_constructor  import getLanePt            #get lat/lon points for lanes 
@@ -518,8 +520,9 @@ def build_XML_file():
 
         currSeg = currSeg+1
     pass
-
-    wzdx = wzdx_creator(rsmSegments, dataLane)
+    info = {}
+    info['road_name'] = roadName
+    wzdx = wzdx_creator(rsmSegments, dataLane, info)
     wzdxFile.write(json.dumps(wzdx, indent=2))
     wzdxFile.close()
 
@@ -811,12 +814,13 @@ def export_files():
     files_list.append(vehPathDataFile)
     files_list.append(local_config_path)
 
-    road_name = roadName
+    road_name = roadName.lower()
     begin_date = wzStartDate.replace('/', '-')
     end_date = wzEndDate.replace('/', '-')
     name_id = road_name + '--' + begin_date + '--' + end_date
+    zip_name = 'wzdc-exports--' + name_id + '.zip'
 
-    zipObj = zipfile.ZipFile('wzdc-exports--' + name_id + '.zip', 'w')
+    zipObj = zipfile.ZipFile(zip_name, 'w')
     
     for filename in files_list:
         name = filename.split('/')[-1]
@@ -841,3 +845,12 @@ def export_files():
     # close the Zip File
     zipObj.close()
     os.remove(local_config_path)
+
+    connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+    #print("\nDownloading blob to \n\t" + download_file_path)
+
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+    # container_client = blob_service_client.get_container_client("unzippedworkzonedatauploads")
+    blob_client = blob_service_client.get_blob_client(container="workzonedatauploads", blob=zip_name)
+    with open(zip_name, "rb") as data:
+        blob_client.upload_blob(data)

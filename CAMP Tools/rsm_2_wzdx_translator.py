@@ -1,12 +1,11 @@
 import xml.etree.ElementTree as ET 
 import json
-import xmltodict
 from datetime import datetime
 import uuid
 #with open('rsm.json', 'r') as f:
 
 
-def wzdx_creator(messages, dataLane):
+def wzdx_creator(messages, dataLane, info):
     wzd = {}
     ids = False # Enables ids linking tables together within file
     wzd['road_event_feed_info'] = {}
@@ -19,7 +18,7 @@ def wzdx_creator(messages, dataLane):
     nodes = []
     for message in messages:
         RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
-        node_list = extract_nodes(RSM, wzd, ids, int(dataLane))
+        node_list = extract_nodes(RSM, wzd, ids, int(dataLane), info)
         for node in node_list:
             nodes.append(node)
     wzd['features'] = wzdx_collapser(nodes)
@@ -90,7 +89,7 @@ def form_len(string):
     num = int(string)
     return format(num, '02d')
 
-def extract_nodes(RSM, wzd, ids, dataLane):
+def extract_nodes(RSM, wzd, ids, dataLane, info):
     lanes = RSM['rszContainer']['rszRegion']['roadwayGeometry']['rsmLanes']['RSMLane']
     num_lanes = len(lanes)
     nodes = lanes[0]['laneGeometry']['nodeSet']['NodeLLE']
@@ -202,7 +201,7 @@ def extract_nodes(RSM, wzd, ids, dataLane):
         #     lanes_obj['feed_info_id'] = wzd['road_event_feed_info']['feed_info_id']
 
         # road_name
-        lanes_obj['road_name'] = 'unknown'
+        lanes_obj['road_name'] = info['road_name']
 
         # direction
         lanes_obj['direction'] = 'unknown'

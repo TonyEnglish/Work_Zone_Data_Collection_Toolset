@@ -42,6 +42,7 @@ import  random                                          #random number generator
 import  json                                            #json manipulation
 import  shutil
 
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 ###
 #   Following modules create:
@@ -355,6 +356,17 @@ def launch_WZ_veh_path_data_acq():
     #else:
     #    messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
 
+def downloadBlob(blobName):
+    local_blob_path = './Config Files/' + blobName.split('/')[-1]
+    blob_client = blob_service_client.get_blob_client(container='unzippedworkzonedatauploads', blob=blobName)
+    with open(local_blob_path, "wb") as download_file:
+        download_file.write(blob_client.download_blob().readall())
+
+def downloadConfig():
+    blobName = listbox.get(listbox.curselection())
+    blob_full_name = blob_names_dict[blobName]
+    downloadBlob(blob_full_name)
+
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
 ##
@@ -365,7 +377,7 @@ def launch_WZ_veh_path_data_acq():
 
 root = Tk()
 root.title('Work Zone Data Collection')
-root.geometry("700x400")
+root.geometry("1300x400")
 #root.configure(bg='white')
 
 ###
@@ -455,6 +467,11 @@ msgSegList      = []                    #WZ message node segmentation list
 wzConfig_file = StringVar()
 local_config_path = './Config Files/ACTIVE_CONFIG.json'
 
+
+
+#with open(download_file_path, "wb") as download_file:
+#    download_file.write(blob_client.download_blob().readall())
+
 lbl_top = Label(text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.pack()
 
@@ -471,18 +488,63 @@ for config_file in os.listdir(configDirectory): #Find most recently edited confi
             most_recent_file['Time'] = time
 
 msg = Label(text='No config file found, please select a config file below',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=("Calibri", 12))
-msg.place(x=210, y=80)
+msg.place(x=100, y=80)
 
 ###
 #   Get WZ configuration input file...
 ###
 
-diag_wzConfig_file  = Button(text='Choose Different\nConfig File', command=inputFileDialog, anchor=W,padx=5)
+diag_wzConfig_file  = Button(text='Choose Different\nLocal Config File', command=inputFileDialog, anchor=W,padx=5)
 diag_wzConfig_file.place(x=10,y=220)
 
 wzConfig_file_name  = Entry(relief=SUNKEN, textvariable=wzConfig_file, width=80)
 wzConfig_file_name.place(x=150,y=235)
 
+
+connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+if connect_str:
+    download_file_path = './Config Files/local_config.json'
+    #print("\nDownloading blob to \n\t" + download_file_path)
+
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+    container_client = blob_service_client.get_container_client("unzippedworkzonedatauploads")
+    #blob_client = blob_service_client.get_blob_client(container='', blob='')
+
+    blob_list = container_client.list_blobs()
+    i = 0
+
+    frame = Frame(root)
+    frame.place(x=700, y=75)
+
+    listbox = Listbox(frame, width=50, height=6, font=("Helvetica", 12), bg='slategray1')
+    listbox.pack(side="left", fill="y")
+
+    scrollbar = Scrollbar(frame, orient="vertical")
+    scrollbar.config(command=listbox.yview)
+    scrollbar.pack(side="right", fill="y")
+
+    listbox.config(yscrollcommand=scrollbar.set)
+
+    # listbox = Listbox(root, height=10, width=30)
+    # listbox.place(x=700, y=50)
+    # Scrollbar(listbox, orient="vertical")
+    blob_names_dict = {}
+    for blob in blob_list:
+        blob_name = blob.name.split('/')[-1]
+        if '.json' in blob_name:
+            blob_names_dict[blob_name] = blob.name
+            listbox.insert(END, blob_name)
+        #temp_btn = Button(text=blob.name, font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:downloadBlob(blob.name))
+        #temp_btn.place(x=50, y=0+30*i)
+        #i += 1
+        #print("\t" + blob.name)
+
+    temp_btn = Button(text='Download Config', font='Helvetica 10', padx=5, command=lambda:downloadConfig())
+    temp_btn.place(x=700, y=220)
+else:
+    messagebox.showinfo("Unable to retrieve azure credentials", "Unable to Retrieve Azure Credentials:\nTo enable cloud connection, configure your \
+    \nenvironment variables and restart your command window")
+    root.geometry("700x400")
 #photoimage = PhotoImage(file="button_test.png").subsample(3, 3)
 btnBegin = Button(text='Begin Data\nCollection', font='Helvetica 14',border=0,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
 btnBegin.place(x=280,y=320)
