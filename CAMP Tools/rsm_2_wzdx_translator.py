@@ -95,9 +95,10 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
     nodes = lanes[0]['laneGeometry']['nodeSet']['NodeLLE']
     nodes_wzdx = []
     prev_attr_list = []
+    prev_attributes_general = {'peoplePresent': False, 'reducedSpeedLimit': 0}
     for k in range(len(lanes)):
-        prev_attributes = {'laneClosed': False, 'peoplePresent': False}
-        prev_attr_list.append(prev_attributes)
+        prev_attributes_lane = {'laneClosed': False}
+        prev_attr_list.append(prev_attributes_lane)
     for i in range(len(nodes)):
         lanes_obj = {}
         lanes_wzdx = []
@@ -182,14 +183,17 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
                 units = node_contents['nodeAttributes']['speedLimit']['speedUnits']
                 if units.get('kph', {}) == None:
                     reduced_speed_limit = round(reduced_speed_limit*0.6214)
+            else:
+                reduced_speed_limit = prev_attributes_general['reducedSpeedLimit']
+            prev_attributes_general['reducedSpeedLimit'] = reduced_speed_limit
 
             if node_contents.get('nodeAttributes', {}).get('peoplePresent', {}).get('true', {}) == None: #People present
                 people_present = True
             elif node_contents.get('nodeAttributes', {}).get('peoplePresent', {}).get('false', {}) == None: #No people present
                 people_present = False
             else:
-                people_present = prev_attr_list[j]['peoplePresent']
-            prev_attr_list[j]['peoplePresent'] = people_present #Set previous value
+                people_present = prev_attributes_general['peoplePresent']
+            prev_attributes_general['peoplePresent'] = people_present #Set previous value
 
             lanes_wzdx.append(lane)
 

@@ -510,7 +510,7 @@ def build_XML_file():
 ###   
 
         xmlFile.close()
-        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper.jar', str(xml_outFile), str(uper_outFile)], stdout=devnull)
+        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper_v8.jar', str(xml_outFile), str(uper_outFile)], stdout=devnull)
         #Throw error if doesnt fully execute
         #check if uper file has nonzero size?
         #Suppress output
@@ -848,9 +848,11 @@ def export_files():
 
     connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
     #print("\nDownloading blob to \n\t" + download_file_path)
-
-    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-    # container_client = blob_service_client.get_container_client("unzippedworkzonedatauploads")
-    blob_client = blob_service_client.get_blob_client(container="workzonedatauploads", blob=zip_name)
-    with open(zip_name, "rb") as data:
-        blob_client.upload_blob(data)
+    if connect_str:
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+        # container_client = blob_service_client.get_container_client("unzippedworkzonedatauploads")
+        blob_client = blob_service_client.get_blob_client(container="workzonedatauploads", blob=zip_name)
+        with open(zip_name, "rb") as data:
+            blob_client.upload_blob(data)
+    else:
+        print('Failed to upload files; make sure you have your environment variables correctly configured and restarted your command window')

@@ -357,8 +357,8 @@ def launch_WZ_veh_path_data_acq():
     #    messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
 
 def downloadBlob(blobName):
-    local_blob_path = './Config Files/' + blobName.split('/')[-1]
-    blob_client = blob_service_client.get_blob_client(container='unzippedworkzonedatauploads', blob=blobName)
+    local_blob_path = configDirectory + '/' + blobName.split('/')[-1]
+    blob_client = blob_service_client.get_blob_client(container='publishedconfigfiles', blob=blobName)
     with open(local_blob_path, "wb") as download_file:
         download_file.write(blob_client.download_blob().readall())
 
@@ -366,6 +366,13 @@ def downloadConfig():
     blobName = listbox.get(listbox.curselection())
     blob_full_name = blob_names_dict[blobName]
     downloadBlob(blob_full_name)
+
+    rel_path = configDirectory + '/' + blobName
+    configRead(rel_path)
+    wzConfig_file.set(os.path.abspath(rel_path))
+    set_config_description(rel_path)
+    btnBegin["state"]   = "normal"                    #enable the start button for map building...
+    btnBegin["bg"]      = "green"        
 
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
@@ -507,7 +514,7 @@ if connect_str:
     #print("\nDownloading blob to \n\t" + download_file_path)
 
     blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-    container_client = blob_service_client.get_container_client("unzippedworkzonedatauploads")
+    container_client = blob_service_client.get_container_client("publishedconfigfiles")
     #blob_client = blob_service_client.get_blob_client(container='', blob='')
 
     blob_list = container_client.list_blobs()
@@ -528,16 +535,22 @@ if connect_str:
     # listbox = Listbox(root, height=10, width=30)
     # listbox.place(x=700, y=50)
     # Scrollbar(listbox, orient="vertical")
+    now = datetime.datetime.now()
+    def getModTimeDelta(blob):
+        time_delta = now-blob.last_modified.replace(tzinfo=None)
+        return time_delta
+
     blob_names_dict = {}
+    blobListSorted = []
     for blob in blob_list:
+        blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
+    blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
+    for blob in blobListSorted:
         blob_name = blob.name.split('/')[-1]
         if '.json' in blob_name:
             blob_names_dict[blob_name] = blob.name
             listbox.insert(END, blob_name)
-        #temp_btn = Button(text=blob.name, font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:downloadBlob(blob.name))
-        #temp_btn.place(x=50, y=0+30*i)
-        #i += 1
-        #print("\t" + blob.name)
+            print(blob.last_modified)
 
     temp_btn = Button(text='Download Config', font='Helvetica 10', padx=5, command=lambda:downloadConfig())
     temp_btn.place(x=700, y=220)
