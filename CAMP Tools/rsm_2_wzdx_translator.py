@@ -95,16 +95,17 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
     nodes = lanes[0]['laneGeometry']['nodeSet']['NodeLLE']
     nodes_wzdx = []
     prev_attr_list = []
-    prev_attributes_general = {'peoplePresent': False, 'reducedSpeedLimit': 0}
+    reduced_speed_limit = int(RSM['rszContainer'].get('speedLimit').get('speed', 0))
+    if RSM['rszContainer']['speedLimit'].get('kph', {}) == None: #If kph, convert to mph
+        reduced_speed_limit = round(reduced_speed_limit*0.6214)
+    prev_attributes_general = {'peoplePresent': False, 'reducedSpeedLimit': reduced_speed_limit}
     for k in range(len(lanes)):
         prev_attributes_lane = {'laneClosed': False}
         prev_attr_list.append(prev_attributes_lane)
     for i in range(len(nodes)):
         lanes_obj = {}
         lanes_wzdx = []
-        reduced_speed_limit = int(RSM['rszContainer'].get('speedLimit').get('speed', 0))
-        if RSM['rszContainer']['speedLimit'].get('kph', {}) == None: #If kph, convert to mph
-            reduced_speed_limit = round(reduced_speed_limit*0.6214)
+        
         people_present = False #initialization
         geometry = {}
         geometry['type'] = 'LineString'

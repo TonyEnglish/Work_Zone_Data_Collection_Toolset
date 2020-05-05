@@ -42,6 +42,7 @@ import  random                                          #random number generator
 import  xmltodict                                       #dict to xml converter
 import  json                                            #json manipulation
 import  zipfile
+import  requests
 
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
@@ -68,10 +69,12 @@ from rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
 #   map for visualization using Google Satellite view
 ###
 
-from wz_jsarray_builder     import build_jsvars         #create js variables used in processing array for overlaying on Google Map
-from wz_jsarray_builder     import build_jsarray        #create js array for overlaying on Google Map
-
 from wz_msg_segmentation    import buildMsgSegNodeList  #msg segmentation node list builder
+
+
+from tkinter                import *   
+from tkinter                import messagebox
+from tkinter                import filedialog
 
 
 ###
@@ -79,7 +82,7 @@ from wz_msg_segmentation    import buildMsgSegNodeList  #msg segmentation node l
 ### ---------------------------------------------------------------------------------------------------------------------
 
 ###
-#   User input/output for work zone map builder is created using "Tkinter" (TK Interface) module. The  Tkinter
+#   User input/output for work zone map builder is created using 'Tkinter' (TK Interface) module. The  Tkinter
 #   is the standard Python interface to the Tk GUI toolkit from Scriptics (formerly developed by Sun Labs).
 #
 #   The public interface is provided through a number of Python modules. The most important interface module is the
@@ -131,13 +134,13 @@ def buildWZMap(filename):
     if msgSegList[0][0] == -1:                          #Segmentation failed...
         error = True
         error_message = 'Failed to build message segmentation'
-        logFile.write('Error in building message segmentation')
+        logMsg('Error in building message segmentation')
     elif uper_failed:   
         error = True
         error_message = 'Failed to run message builder UPER conversion'
-        logFile.write("UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH")
+        logMsg('UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH')
     else:
-        logFile.write("WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...")
+        logMsg('WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...')
     pass
 
 ##
@@ -146,12 +149,12 @@ def buildWZMap(filename):
 
 # def viewMapLogFile():
   
-#     WZ_mapLogFile = "./WZ_MapMsg/map_builder_log.txt"
+#     WZ_mapLogFile = './WZ_MapMsg/map_builder_log.txt'
 #     if os.path.exists(WZ_mapLogFile):
-#         os.system("notepad " + WZ_mapLogFile)        
+#         os.system('notepad ' + WZ_mapLogFile)        
     
 #     else:
-#         messagebox.showinfo("WZ Map Log File","Work Zone Map Log File " + WZ_mapLogFile + " NOT Found ...")
+#         messagebox.showinfo('WZ Map Log File','Work Zone Map Log File ' + WZ_mapLogFile + ' NOT Found ...')
 
 ##
 #   -------------- End of viewLogFile ------------------------
@@ -171,11 +174,11 @@ def configRead(file):
         except Exception as e:
             error = True
             error_message = 'Configuration file read failed: ' + file + '\n' + str(e)
-            logFile.write("Configuration file read failed: " + file + "\n" + str(e))
+            logMsg('Configuration file read failed: ' + file + '\n' + str(e))
     else:
         error = True
         error_message = 'Configuration file NOT FOUND: ' + file + '\n' + str(e)
-        logFile.write("Configuration file NOT FOUND: " + file + "\n" + str(e))
+        logMsg('Configuration file NOT FOUND: ' + file + '\n' + str(e))
 
 ###
 # ----------------- End of config_read --------------------
@@ -246,22 +249,19 @@ def getConfigVars():
 #   vehPathDataFile - input data file
 ###
 
-    vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
+    vehPathDataFile = dirName + '/' + fileName                          #complete file name with directory
            
-    if os.path.exists(dirName) == False:
-        error = True
-        error_message = 'Vehicle Path Data file directory: '+dirName+' NOT found, correct directory name in WZ Configuration step'
-        logFile.write("Vehicle Path Data file directory:\n\n"+dirName+"\n\nNOT found, correct directory name in WZ Configuration step")
-        btnStart["state"] = "disabled"                                  #enable button to view log file...
-        btnStart["bg"] = "gray75"        
-        sys.exit(0)
+    # if os.path.exists(dirName) == False:
+    #     error = True
+    #     error_message = 'Vehicle Path Data file directory: '+dirName+' NOT found, correct directory name in WZ Configuration step'
+    #     logMsg('Vehicle Path Data file directory: '+dirName+' NOT found, correct directory name in WZ Configuration step')
+    #     sys.exit(0)
 
     if os.path.exists(vehPathDataFile) == False:
         error = True
-        error_message = 'Vehicle Path Data file: '+fileName+' NOT found, correct file name in WZ Configuration step...'
-        logFile.write('Vehicle Path Data file: '+fileName+' NOT found, correct file name in WZ Configuration step...')
-        btnStart["state"] = "disabled"                                  #enable button to view log file...
-        btnStart["bg"] = "gray75"        
+        error_message = 'Vehicle Path Data file: '+fileName+' NOT found, ensure that you are using a valid configuration file and running this application in the correct order'
+        logMsg('Vehicle Path Data file: '+fileName+' NOT found, ensure that you are using a valid configuration file and running this application in the correct order')
+        logFile.close()
         sys.exit(0)
 
 ###
@@ -320,9 +320,9 @@ def getConfigVars():
     wzEndLat        = wzConfig['LOCATION']['WZEndLat']
     wzEndLon        = wzConfig['LOCATION']['WZEndLon']
 
-    if wzStartDate == "":                                               #wz start date and time are mandatory
-        wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
-        wzStartTime = time.strftime("%H:%M")
+    if wzStartDate == '':                                               #wz start date and time are mandatory
+        wzStartDate = datetime.datetime.now().strftime('%Y-%m-%d')
+        wzStartTime = time.strftime('%H:%M')
     pass
 
 ###
@@ -337,12 +337,12 @@ def getConfigVars():
 #                 fixed file name in the visualization directory 
 ###
 
-def build_XML_file():
+def build_messages():
     global uper_failed
     global files_list
     
 ###
-#   Data elements for "common" container...
+#   Data elements for 'common' container...
 ###
 
     msgID       = 33                                #RSM message ID is assigned as 33
@@ -384,11 +384,11 @@ def build_XML_file():
 #   Set speed limits in WZ as vehicle max speed..from user input saved in config file...
 ###
 
-    speedLimit  = ["<vehicleMaxSpeed/>",speedList[0],speedList[1],speedList[2],"<mph/>"]#NEW Version of XER... Nov. 2017
+    speedLimit  = ['<vehicleMaxSpeed/>',speedList[0],speedList[1],speedList[2],'<mph/>']#NEW Version of XER... Nov. 2017
 
 ### -------------------------------------------------
 #
-#   BUILD XML (exer) file for "Common Container"...
+#   BUILD XML (exer) file for 'Common Container'...
 #
 ### -------------------------------------------------
 
@@ -405,8 +405,9 @@ def build_XML_file():
     totSeg  = msgSegList[0][0]                              #total message segments
     rsmSegments = []
         
-    wzdx_outFile = "./WZ_MapMsg/WZDx_File-" + ctrDT + ".geojson"
-    wzdxFile = open(wzdx_outFile, "w")
+    wzdx_outFile = './WZ_MapMsg/WZDx_File-' + ctrDT + '.geojson'
+    logMsg('WZDx output file path: ' + wzdx_outFile)
+    wzdxFile = open(wzdx_outFile, 'w')
     files_list.append(wzdx_outFile)
     
     devnull = open(os.devnull, 'w')
@@ -417,10 +418,12 @@ def build_XML_file():
 ### Create and open output xml file...
 ###
        
-        ##xml_outFile = "./WZ_XML_File/RSZW_MAP_xmlFile-" + str(currSeg)+"_of_"+str(totSeg)+".exer"
-        xml_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".xml"
-        uper_outFile = "./WZ_MapMsg/RSZW_MAP_xml_File-" + ctrDT + "-" + str(currSeg)+"_of_"+str(totSeg)+".uper"
-        xmlFile = open(xml_outFile, "w")
+        ##xml_outFile = './WZ_XML_File/RSZW_MAP_xmlFile-' + str(currSeg)+'_of_'+str(totSeg)+'.exer'
+        xml_outFile = './WZ_MapMsg/RSZW_MAP_xml_File-' + ctrDT + '-' + str(currSeg)+'_of_'+str(totSeg)+'.xml'
+        logMsg('RSM XML output file path: ' + xml_outFile)
+        uper_outFile = './WZ_MapMsg/RSZW_MAP_xml_File-' + ctrDT + '-' + str(currSeg)+'_of_'+str(totSeg)+'.uper'
+        logMsg('RSM UPER output file path: ' + uper_outFile)
+        xmlFile = open(xml_outFile, 'w')
         files_list.append(xml_outFile)
         files_list.append(uper_outFile)
     
@@ -429,14 +432,14 @@ def build_XML_file():
 #   Introductory lines...
 ###
       
-        # xmlFile.write ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + \
-        #                "<!-- \n" + \
-        #                "\t CAMP xml file for RSZW/LC Mapping Project\n" + \
-        #                "\t Message segment file "+ str(currSeg)+" of "+str(totSeg)+"...\n\n" + \
-        #                "\t Version 1.5 - June, 2018\n" + \
-        #                "\t for RSMv5.1 ASN\n" + \
-        #                "\t File Name: "+xml_outFile+"\n" + \
-        #                "\t Created: "+cDT+"\n\n-->\n")
+        # xmlFile.write ('<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n' + \
+        #                '<!-- \n' + \
+        #                '\t CAMP xml file for RSZW/LC Mapping Project\n' + \
+        #                '\t Message segment file '+ str(currSeg)+' of '+str(totSeg)+'...\n\n' + \
+        #                '\t Version 1.5 - June, 2018\n' + \
+        #                '\t for RSMv5.1 ASN\n' + \
+        #                '\t File Name: '+xml_outFile+'\n' + \
+        #                '\t Created: '+cDT+'\n\n-->\n')
 
 ###
 #   Build common container...
@@ -471,11 +474,11 @@ def build_XML_file():
                       speedLimit,laneWidth,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
 
         #if currSeg == 1:
-            #logFile.write("\n ---Constructed Approach Lane Node Points/Lane: "+str(len(appMapPt))+"\t(Must between 2 and 63)")
-            #logFile.write("\n ---Message Segmentation for Work Zone Lanes")        
+            #logMsg('\n ---Constructed Approach Lane Node Points/Lane: '+str(len(appMapPt))+'\t(Must between 2 and 63)')
+            #logMsg('\n ---Message Segmentation for Work Zone Lanes')        
         #pass
 
-        #logFile.write("\t ---Segment#: "+str(currSeg)+"Start Node#: "+str(startNode)+"\n\t\t New Ref. Pt: "+str(newRefPt))
+        #logMsg('\t ---Segment#: '+str(currSeg)+'Start Node#: '+str(startNode)+'\n\t\t New Ref. Pt: '+str(newRefPt))
 
 ###
 #       WZ length, LC characteristic, workers present, etc. 
@@ -501,7 +504,7 @@ def build_XML_file():
 
         rsmSegments.append(rsm)
 
-        rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent="  ")
+        rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent='  ')
         xmlFile.write(rsm_xml)
 
     
@@ -511,17 +514,18 @@ def build_XML_file():
 
         xmlFile.close()
         subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper_v8.jar', str(xml_outFile), str(uper_outFile)], stdout=devnull)
-        #Throw error if doesnt fully execute
-        #check if uper file has nonzero size?
-        #Suppress output
-        if not os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
-            #Error, uper conversion not successful
-            uper_failed = True
+        if os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
+            logMsg('ERROR: RSM UPER conversion FAILED, ensure that you have java installed (>=1.8 or jdk>=8) and added to your system path')
+            messagebox.showerror('RSM Binary conversion FAILED', 'RSM Binary (UPER) conversion failed\nEnsure that you have java installed (version>=1.8 or jdk>=8) and added to your system path\nThen run WZ_BuildMsgs_and_Export.pyw')
+            logMsg('Exiting Application')
+            logFile.close()
+            sys.exit(0)
 
         currSeg = currSeg+1
     pass
     info = {}
     info['road_name'] = roadName
+    logMsg('Converting RSM XMl to WZDx message')
     wzdx = wzdx_creator(rsmSegments, dataLane, info)
     wzdxFile.write(json.dumps(wzdx, indent=2))
     wzdxFile.close()
@@ -530,8 +534,8 @@ def build_XML_file():
 #   May want to print WZ length per segment and total WZ length...
 ###
 
-    logFile.write("\n --- Done Building WZ MAP and Visualizer...")
-    logFile.close()    
+    logMsg('--- Done Building WZ MAP ---')
+    #logFile.close()    
 
 ###
 #   > > > > > > > > > > > START MAIN PROCESS < < < < < < < < < < < < < < <
@@ -551,13 +555,12 @@ def startMainProcess():
     
     totRows = len(list(csv.reader(open(vehPathDataFile)))) - 1      ###total records or lines in file
 
-    logFile.write ("\n *** - "+wzDesc+" - ***\n")    
-    logFile.write ("\n\n --- Processing Input File: \n\t "+vehPathDataFile+    \
-                   "\n\t Total input lines: "+str(totRows)+"\n\n")
+    logMsg('*** - '+wzDesc+' - ***')    
+    logMsg('--- Processing Input File: '+vehPathDataFile+', Total input lines: '+str(totRows))
 
 ###
 #
-#   Call function to read and parse the vehicle path data file created by the "vehPathDataAcq.pyw"
+#   Call function to read and parse the vehicle path data file created by the 'vehPathDataAcq.pyw'
 #   to build vehicle path data array, lane status and workers presence status arrays.
 #
 #   refPtIdx, wzLen and appHeading values are returned in atRefPoint list...
@@ -573,8 +576,8 @@ def startMainProcess():
     wzLen       = atRefPoint[1]
     appHeading  = atRefPoint[2]
 
-    logFile.write (" --- Start of Work Zone at Data Point: "+str(refPtIdx)+"; "     \
-                   "Reference Point @ "+refPoint[0]+", "+refPoint[1]+", "+refPoint[2]+"\n\n")
+    logMsg(' --- Start of Work Zone at Data Point: '+str(refPtIdx))
+    logMsg('Reference Point @ '+refPoint[0]+', '+refPoint[1]+', '+refPoint[2])
 
     
 
@@ -591,21 +594,21 @@ def startMainProcess():
 ###
 
 ###
-#   "laneType"              1 = Approach lanes, 2 = wz Lanes for mapping
-#   "pathPt"                contains list of data points collected by driving the vehicle on one open WZ lane
-#   "appMapPt/wzMapPt"      constructed node list for lane map for BIM (RSM)
+#   'laneType'              1 = Approach lanes, 2 = wz Lanes for mapping
+#   'pathPt'                contains list of data points collected by driving the vehicle on one open WZ lane
+#   'appMapPt/wzMapPt'      constructed node list for lane map for BIM (RSM)
 #                           contains lat,lon,alt,lcloStat for each node, each lane + heading + WP flag + distVec (dist from prev. node)
-#   "lanePadApp/lanePadWz"  lane padding in addition to laneWidth
-#   "refPtIdx"              Data location of the reference point in pathPt array
-#   "laneStat"              A two-dimensional list to hold lane status, 0=open, 1=closed.
+#   'lanePadApp/lanePadWz'  lane padding in addition to laneWidth
+#   'refPtIdx'              Data location of the reference point in pathPt array
+#   'laneStat'              A two-dimensional list to hold lane status, 0=open, 1=closed.
 #                               Generated from lane closed/opened marker from collected data
 #                               List location [0,0,0] provides total number of lanes
 #                               It holds for each lane closed/opened instance, data point index, lane number and lane status (1/0)
-#   "wpStat"                list containing location where "workers present" is set/unset
-#   "dataLane"              Lane on which the vehicle path data for wz mapping was collected.
-#                               "dataLane" is used to derive map data for the adjacent lanes. One lane to the left of the "dataLane" and one to right in
+#   'wpStat'                list containing location where 'workers present' is set/unset
+#   'dataLane'              Lane on which the vehicle path data for wz mapping was collected.
+#                               'dataLane' is used to derive map data for the adjacent lanes. One lane to the left of the 'dataLane' and one to right in
 #                               case of total 3 lanes. For more than 5 lanes, data from multiple lanes to be collected to create map for adjascent lanes
-#   "laneWidth"             lane width in meters
+#   'laneWidth'             lane width in meters
 #
 #   For approach lanes, map for all lanes are created
 #
@@ -617,7 +620,7 @@ def startMainProcess():
     laneType = 1                                        #approach lanes
     getLanePt(laneType,pathPt,appMapPt,laneWidth,lanePadApp,refPtIdx,appMapPtDist,laneStat,wpStat,dataLane,wzMapLen)
 
-    logFile.write (" --- Mapped Approach Lanes: "+str(int(wzMapLen[0]))+" meters\n\n")
+    logMsg(' --- Mapped Approach Lanes: '+str(int(wzMapLen[0]))+' meters')
 
     
 ###
@@ -630,7 +633,7 @@ def startMainProcess():
     laneType    = 2                                     #wz lanes
     getLanePt(laneType,pathPt,wzMapPt,laneWidth,lanePadWZ,refPtIdx,wzMapPtDist,laneStat,wpStat,dataLane,wzMapLen)
 
-    logFile.write (" --- Mapped Work zone Lanes: "+str(int(wzMapLen[1]))+" meters\n\n")
+    logMsg(' --- Mapped Work zone Lanes: '+str(int(wzMapLen[1]))+' meters')
 
 
 ###
@@ -639,12 +642,12 @@ def startMainProcess():
 
     laneStatIdx = len(laneStat)
     if laneStatIdx > 1:                               #have lane closures...NOTE: Index 0 location is dummy value...
-        logFile.write ("\n --- Start/End of lane closure Offset from the reference point ---\n")
+        logMsg(' --- Start/End of lane closure Offset from the reference point ---')
         for L in range(1, laneStatIdx):
-            stat = "Start"
-            if laneStat[L][2] == 0: stat = "End"
-            logFile.write ("\t "+stat+" of lane: "+str(laneStat[L][1])+" closure at data point: "+str(laneStat[L][0])+" Offset: "+ \
-                           str(int(laneStat[L][3]))+" meters\n")
+            stat = 'Start'
+            if laneStat[L][2] == 0: stat = 'End'
+            logMsg('\t '+stat+' of lane '+str(laneStat[L][1])+' closure, at data point: '+str(laneStat[L][0])+', Offset: '+ \
+                           str(int(laneStat[L][3]))+' meters')
         pass
     pass                                            
 
@@ -653,12 +656,12 @@ def startMainProcess():
 ###
     wpStatIdx = len(wpStat)    
     if wpStatIdx > 0:                                       #have workers present/not present
-        logFile.write ("\n --- Start/End of workers present offset from the reference point ---\n")
+        logMsg(' --- Start/End of workers present offset from the reference point ---')
         for w in range(0, wpStatIdx):
-            stat = "End"
-            if wpStat[w][1] == 1:  stat = "Start"
-            logFile.write ("\t "+stat+" of workers present @ data point: "+str(wpStat[w][0])+  \
-                           "; Offset: "+str(wpStat[w][2])+" meters\n")
+            stat = 'End'
+            if wpStat[w][1] == 1:  stat = 'Start'
+            logMsg('\t '+stat+' of workers present @ data point: '+str(wpStat[w][0])+  \
+                           ', Offset: '+str(wpStat[w][2])+' meters')
         pass
     pass                                            
 
@@ -678,12 +681,16 @@ def startMainProcess():
     if msgSegList[0][0] == -1:                                                  #Error
         ANPL = msgSegList[1][2]
         MNPL = msgSegList[0][1]
-        logFile.write("\n\n --- ERROR ... MESSAGE SEGMENTATION ... ERROR ---\n\t"+  \
-                      " The 1st message segment must be able to include all nodes for approach lane\n\t" +  \
-                      " plus at atleast first 2 nodes of WZ lane\n\t" +   \
-                      "\n\n --- Nodes per approach lane: "+str(ANPL)+" > allowed max nodes per lane: " +str(MNPL)+" to stay within message payload size\n\t"+ \
-                      " Reduce length of vehicle path data for approach lane to no more than 1km and try again...\n\n")
-        logFile.close()                                                         #stopping the program, close file so eror message is saved...
+        logMsg('ERROR: MESSAGE SEGMENTATION FAILED')
+        logMsg('\tThe 1st message segment must be able to include all nodes for approach lane plus at atleast first 2 nodes of WZ lane')
+        logMsg('\tNodes per approach lane: '+str(ANPL)+' > allowed max nodes per lane: ' +str(MNPL)+' to stay within message payload size\n\t')
+        logMsg('\tThe 1st message segment must be able to include all nodes for approach lane')
+        logMsg('\tReduce length of vehicle path data for approach lane to no more than 1km and try again')
+        messagebox.showerror('MESSAGE SEGMENTATION ERROR', 'Reduce length of vehicle path data for approach lane to no more than 1km and try again')
+        # TODO: Fix this error/make this never happen. throw away some data from start of approach region?
+        logFile.close()
+        sys.exit(0)
+        #logFile.close()                                                         #stopping the program, close file so eror message is saved...
         return                                                                  #return to caller                  
 
     else:    
@@ -693,19 +700,19 @@ def startMainProcess():
         TNPL    = ANPL + WZNPL
         MS      = msgSegList[0][0]                                              #Constructed message segments
         NPL     = msgSegList[0][1]                                              #no of Nodes Per Lane
-        logFile.write("\n\n --- Total Nodes per Lane: " +str(TNPL)+"\n\t"+      \
-                      " Total Nodes per Approach Lane: "+str(ANPL)+"\n\t"+      \
-                      " Total Nodes per WZ Lane: "  +str(WZNPL)+"\n\t"+         \
-                      " Total message segment(s): "  +str(MS)+"\n\t"+           \
-                      " Nodes per Message Segment: "+str(NPL)+"\n\n"+           \
-                      " --- Message segment list: "  +str(msgSegList)+"\n\n")
+        logMsg('Total Nodes per Lane: ' +str(TNPL))
+        logMsg('Total Nodes per Approach Lane: '+str(ANPL))
+        logMsg('Total Nodes per WZ Lane: '  +str(WZNPL))
+        logMsg('Total message segment(s): '  +str(MS))
+        logMsg('Nodes per Message Segment: '+str(NPL))
+        logMsg('Message segment list: '  +str(msgSegList))
     pass
 
 ###
 #   Build XML File...
 ###
-
-    build_XML_file()
+    logMsg('Building messages')
+    build_messages()
 
 
 ##############################################################################################
@@ -713,11 +720,51 @@ def startMainProcess():
 # ----------------------------- END of startMainProcess --------------------------------------
 #
 ###############################################################################################
+def openLog():
+    global logFile
+    if os.path.exists(logFileName):
+        append_write = 'a' # append if already exists
+    else:
+        append_write = 'w' # make a new file if not
+    logFile = open(logFileName, append_write)
 
+def logMsg(msg):
+    formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
+    logFile.write('[' + formattedTime + '] ' + msg + '\n')
+
+def internet_on():
+    url='http://www.google.com/'
+    timeout=5
+    try:
+        _ = requests.get(url, timeout=timeout)
+        return True
+    except requests.ConnectionError:
+        return False
+
+def uploadArchive():
+    if internet_on():
+        logMsg('Creating blob in azure: ' + zip_name + ', in container: ' + container_name)
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob=zip_name)
+        logMsg('Uploading zip archive to blob')
+        with open(zip_name, 'rb') as data:
+            blob_client.upload_blob(data, overwrite=True)
+        logMsg('Closing log file in Message Builder and Export')
+        logFile.close()
+        messagebox.showinfo('Upload Successful', 'Data upload successful! Please navigate to\nhttp://www.neaeraconsulting.com/V2x_Verification\nto view and verify the mapped workzone.\nYou will find your data under\n' + name_id)
+        sys.exit(0)
+
+    else:
+        logMsg('Attempted uploadArchive, no internet connection detected')
+        messagebox.showerror('No Internet Cnnection', 'No internet connection detected\nConnect and try again')
 
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
 ##
+
+root = Tk()
+root.title('Work Zone Data Export and Upload')
+root.geometry('400x300')
+
 
 ###
 #   WZ config parser object....
@@ -731,15 +778,12 @@ wzConfig        = {}
 #   Get current date and time...
 ###
 
-cDT = datetime.datetime.now().strftime("%m/%d/%Y - ") + time.strftime("%H:%M:%S")
+cDT = datetime.datetime.now().strftime('%m/%d/%Y - ') + time.strftime('%H:%M:%S')
 
 ###
 #   Map builder output log file...
 ###
 
-logFile = open("./WZ_MapMsg/map_builder_log.txt", "w")         #log file
-##logFile.write ("\n *** - "+wzDesc+" - ***\n")
-logFile.write ("\n *** - Created: "+cDT+" ***\n")            
 
 ### --------------------------------------------------------------------------------------------------
 #       Following are local variables with set default values...
@@ -800,7 +844,14 @@ msgSegList      = []                    #WZ message node segmentation list
 
 files_list      = []
 
-ctrDT   = datetime.datetime.now().strftime("%Y%m%d-") + time.strftime("%H%M%S")
+ctrDT   = datetime.datetime.now().strftime('%Y%m%d-') + time.strftime('%H%M%S')
+
+logFileName = './data_collection_log.txt'
+logFile = ''
+
+
+load_config = Button(text='Upload Data\nFiles', font='Helvetica 20', padx=5,bg='green',command=uploadArchive)
+load_config.place(x=100, y=100)
 
 ##############################################################################################
 #
@@ -808,51 +859,58 @@ ctrDT   = datetime.datetime.now().strftime("%Y%m%d-") + time.strftime("%H%M%S")
 #
 ###############################################################################################
 local_config_path = './Config Files/ACTIVE_CONFIG.json'
-def export_files():
-    inputFileDialog(local_config_path)
-    startMainProcess()
-    files_list.append(vehPathDataFile)
-    files_list.append(local_config_path)
 
-    road_name = roadName.lower()
-    begin_date = wzStartDate.replace('/', '-')
-    end_date = wzEndDate.replace('/', '-')
-    name_id = road_name + '--' + begin_date + '--' + end_date
-    zip_name = 'wzdc-exports--' + name_id + '.zip'
+openLog()
+logMsg('*** Running Message Builder and Export ***')
 
-    zipObj = zipfile.ZipFile(zip_name, 'w')
-    
-    for filename in files_list:
-        name = filename.split('/')[-1]
-        name_orig = name
-        name_wo_ext = name[:name.rfind('.')]
-        if '.csv' in filename.lower():
-            name = 'path-data--' + name_id + '.csv'
-        elif '.json' in filename.lower():
-            name = 'config--' + name_id + '.json'
-        elif '.xml' in filename.lower():
-            number = name[name.rfind('-')+1:name.rfind('.')]
-            name = 'xml--' + name_id + '--' + number + '.xml'
-        elif '.uper' in filename.lower() and not uper_failed:
-            number = name[name.rfind('-')+1:name.rfind('.')]
-            name = 'uper--' + name_id + '--' + number + '.uper'
-        elif '.geojson' in filename.lower():
-            name = 'wzdx--' + name_id + '.geojson'
-        else:
-            continue
-        zipObj.write(filename, name)
-    
-    # close the Zip File
-    zipObj.close()
-    os.remove(local_config_path)
+logMsg('Loading configuration file from local path: ' + local_config_path)
+inputFileDialog(local_config_path)
+startMainProcess()
+files_list.append(vehPathDataFile)
+files_list.append(local_config_path)
 
-    connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-    #print("\nDownloading blob to \n\t" + download_file_path)
-    if connect_str:
-        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-        # container_client = blob_service_client.get_container_client("unzippedworkzonedatauploads")
-        blob_client = blob_service_client.get_blob_client(container="workzonedatauploads", blob=zip_name)
-        with open(zip_name, "rb") as data:
-            blob_client.upload_blob(data)
+description = wzDesc.lower().strip().replace(' ', '-')
+road_name = roadName.lower().strip().replace(' ', '-')
+name_id = description + '--' + road_name
+logMsg('Work zone name id: ' + name_id)
+zip_name = 'wzdc-exports--' + name_id + '.zip'
+logMsg('Creating zip archive: ' + zip_name)
+
+zipObj = zipfile.ZipFile(zip_name, 'w')
+
+for filename in files_list:
+    name = filename.split('/')[-1]
+    name_orig = name
+    name_wo_ext = name[:name.rfind('.')]
+    if '.csv' in filename.lower():
+        name = 'path-data--' + name_id + '.csv'
+    elif '.json' in filename.lower():
+        name = 'config--' + name_id + '.json'
+    elif '.xml' in filename.lower():
+        number = name[name.rfind('-')+1:name.rfind('.')]
+        name = 'rsm-xml--' + name_id + '--' + number + '.xml'
+    elif '.uper' in filename.lower():
+        number = name[name.rfind('-')+1:name.rfind('.')]
+        name = 'rsm-uper--' + name_id + '--' + number + '.uper'
+    elif '.geojson' in filename.lower():
+        name = 'wzdx--' + name_id + '.geojson'
     else:
-        print('Failed to upload files; make sure you have your environment variables correctly configured and restarted your command window')
+        continue
+    logMsg('Adding file to archive: ' + filename + ', as: ' + name)
+    zipObj.write(filename, name)
+
+# close the Zip File
+zipObj.close()
+
+logMsg('Removing local configuration file: ' + local_config_path)
+os.remove(local_config_path)
+
+connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
+connect_str = os.getenv(connect_str_env_var)
+#print('\nDownloading blob to \n\t' + download_file_path)
+logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
+blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+# container_client = blob_service_client.get_container_client('unzippedworkzonedatauploads')
+container_name = 'workzonedatauploads'
+
+root.mainloop()

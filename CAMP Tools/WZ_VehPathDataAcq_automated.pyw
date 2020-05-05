@@ -32,8 +32,6 @@ import      serial.tools.list_ports                      #used to enumerate COMM
 
 from        serial import SerialException           #serial port exception
 
-from WZ_MapBuilder_automated import export_files
-
 ###
 #   thread for tkinter for text window...
 ###
@@ -60,11 +58,12 @@ from parseNMEA      import parseGxGSA           #parse GSA for Hdop
 ###
 
 def startMainFunc():
-
     global  appRunning                          #boolean
-    getConfigVars()
     if (appRunning):
-        getNMEA_String()                        #Get NMEA String and process it until "appRunning is True..."
+        logMsg('App running, starting getNMEA_String loop')
+        getNMEA_String()                        #Get NMEA String and process it until 'appRunning is True...'
+    else:
+        logMsg('App not running, exiting')
     
 
 ###
@@ -191,9 +190,9 @@ def getConfigVars():
     wzEndLat        = wzConfig['LOCATION']['WZEndLat']
     wzEndLon        = wzConfig['LOCATION']['WZEndLon']
 
-    if wzStartDate == "":                                               #wz start date and time are mandatory
-        wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
-        wzStartTime = time.strftime("%H:%M")
+    if wzStartDate == '':                                               #wz start date and time are mandatory
+        wzStartDate = datetime.datetime.now().strftime('%Y-%m-%d')
+        wzStartTime = time.strftime('%H:%M')
     pass
 
 
@@ -270,6 +269,7 @@ def getNMEA_String():
     GGAValid    = False                             #Init value
     RMCValid    = False                             #Init value
     GSAValid    = False                             #Init value
+    prevDistance = 0
    
 
     while (appRunning):                             #continue reading and processing NMEA string while TRUE
@@ -285,7 +285,7 @@ def getNMEA_String():
 #
 ###
     
-        if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == "$GNGGA":
+        if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == '$GNGGA':
             GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid)
 
             if GGA_out[3] == True:
@@ -293,14 +293,14 @@ def getNMEA_String():
                 GPSSats = GGA_out[1]
                 GPSAlt  = GGA_out[2]
             pass
-            #print ("GGA: ", GPSTime, GPSSats,GPSAlt)
+            #print ('GGA: ', GPSTime, GPSSats,GPSAlt)
         pass
 
 ###
 #       --- Parse RMC ---
 ###
   
-        if NMEAData[0:6] == "$GPRMC":
+        if NMEAData[0:6] == '$GPRMC':
             RMC_out = parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid)
 
             if RMC_out[5] == True:
@@ -310,32 +310,38 @@ def getNMEA_String():
                 GPSSpeed    = RMC_out[3]*(1852.0/3600.0)    #Knot = 1.852 km/hr, Convert to m/s
                 GPSHeading  = RMC_out[4]
             pass
-            #print ("RMC Output:", RMC_out)
+            #print ('RMC Output:', RMC_out)
         pass
         
 ###
 #       --- Parse GSA ---
 ###
 
-        if NMEAData[0:6] == "$GPGSA":
+        if NMEAData[0:6] == '$GPGSA':
             GSA_out = parseGxGSA(NMEAData,GPSHdop,GSAValid)
             if GSA_out[1] == True:
                 GPSHdop = GSA_out[0]
             pass
-            #print ("GSA Hdop:", GSA_out)
+            #print ('GSA Hdop:', GSA_out)
         pass
         
-        R = 6371000 #in meters
         pi = 3.14159
         if dataLog:
-            distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
-            if distance < 20: #Leaving Workzone
+            distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
+            if distanceToEndPt < 20: #Leaving Workzone
+                logMsg('-------- Exiting Work Zone (by location, distance=' + distanceToEndPt.round(2) + ') -------')
                 gotBtnPress('s')
                 #appRunning = False
+            distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
+            if not gotRefPt and distanceToStartPt > prevDistance: #Auto mark reference point
+                logMsg('-------- Auto Marking Reference Point (by location, distance=' + distanceToStartPt.round(2) + ') -------')
+                gotBtnPress('r')
+            prevDistance = distanceToStartPt
 
         else:
-            distance = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if distance < 20: #Entering Workzone
+            distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
+            if distanceToStartPt < 100: #Entering Workzone
+                logMsg('-------- Entering Work Zone (by location, distance=' + distanceToStartPt.round(2) + ') -------')
                 gotBtnPress('s')
                 #dataLog = True
 
@@ -351,7 +357,7 @@ def getNMEA_String():
 ###
 
         if (dataLog == True) and (GPSTime != prevGPSTime) and (GPSDate != ''):              #log data only if next sentence(GPSTime) is different from the previous
-            time_date = GPSDate+"-"+GPSTime
+            time_date = GPSDate+'-'+GPSTime
             outStr  = time_date,GPSSats,GPSHdop,GPSLat,GPSLon,GPSAlt,GPSSpeed,GPSHeading,keyMarker[0],keyMarker[1]      #to CSV file...
             ##print (outStr)
             writeCSVFile (outStr)                       #write to CSV file
@@ -365,7 +371,8 @@ def getNMEA_String():
 
 
         if appRunning == False:                         #save the last record...
-            time_date = GPSDate+"-"+GPSTime
+            logMsg('App not running, save last dataset and exit')
+            time_date = GPSDate+'-'+GPSTime
             outStr  = time_date,GPSSats,GPSHdop,GPSLat,GPSLon,GPSAlt,GPSSpeed,GPSHeading,keyMarker[0],keyMarker[1]      #to CSV file...
             writeCSVFile (outStr)                       #write to CSV file
         pass
@@ -388,6 +395,7 @@ def gps_distance(lat1, lon1, lat2, lon2):
     return distance
 
 def processKeyPress(key):
+    logMsg('Key pressed: ' + key)
 
 ###
 #   Few Globals...
@@ -415,10 +423,12 @@ def processKeyPress(key):
     if key == 's' or key == 'S':                    #start/stop data logging
         dataLog = not dataLog                       #toggle logging
         if dataLog == True:
-            markerStr = "   *** Data Logging Started ***"
+            markerStr = '   *** Data Logging Started ***'
+            logMsg('*** Data Logging Started ***')
         else:
-            markerStr = "   *** Data Logging Stopped ***"
-        keyMarker = ["Data Log", dataLog]
+            markerStr = '   *** Data Logging Stopped ***'
+            logMsg('*** Data Logging Stopped ***')
+        keyMarker = ['Data Log', dataLog]
         gotMarker = True
     pass                                            #end of data log start/stop
 
@@ -427,9 +437,10 @@ def processKeyPress(key):
 ###    
 
     if (key == 'r' or key == 'R') and gotRefPt == False and dataLog == True: #Mark reference point
-        markerStr = "   *** Reference Point Marked @ "+str(GPSLat)+", "+str(GPSLon)+", "+str(GPSAlt)+" ***"
+        markerStr = '   *** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
+        logMsg('*** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
         ##T.insert (END, markerStr)
-        keyMarker = ["RP",'']                       #reference point
+        keyMarker = ['RP','']                       #reference point
         gotRefPt = True                             #got the reference point
         gotMarker = True                            #got the marker
     pass                                            #end of ref point
@@ -440,12 +451,13 @@ def processKeyPress(key):
 
     if key == 'w' or key == 'W':                    #workers present/not present
         wpStat = not wpStat                         #Toggle wp/np
-        markerStr = "   *** Workers Presence Marked: "+str(wpStat)+" ***"
+        markerStr = '   *** Workers Presence Marked: '+str(wpStat)+' ***'
+        logMsg('*** Workers Presence Marked: '+str(wpStat)+' ***')
         ##print (markerStr)
         ##T.insert (END, markerStr)
-        keyMarker[0] = "WP"                         #WP marker
+        keyMarker[0] = 'WP'                         #WP marker
         if gotRefPt == False:
-            keyMarker[0]="WP+RP"                    #WP+ref pt
+            keyMarker[0]='WP+RP'                    #WP+ref pt
             gotRefPt = True                         #gotRefPT True    
         keyMarker[1] = wpStat
 
@@ -459,18 +471,19 @@ def processKeyPress(key):
     if key > '0' and key <= '8':                    #Mark lane# closed point
         lane = int(key)                             #lane number
         laneStat[lane] = not laneStat[lane]         #Lane open status (T or F)
-        lc = "LC"                                   #set lc to "LC" - Lane Closed
+        lc = 'LC'                                   #set lc to 'LC' - Lane Closed
         if laneStat[lane] == True:
-            lc = "LO"                               #toggle lane status to Lane Open
+            lc = 'LO'                               #toggle lane status to Lane Open
         if gotRefPt == False:                       #if ref pt has not been marked yet
-            lc = lc + "+RP"                         #lc + ref. pt
+            lc = lc + '+RP'                         #lc + ref. pt
             gotRefPt = True                         #set to true
         pass
 
-        lStat = "Closed"
-        if lc == 'LO':       lStat = "Open"
+        lStat = 'Closed'
+        if lc == 'LO':       lStat = 'Open'
             
-        markerStr = "   *** Lane "+str(key)+" Status Marked: "+lStat+" @ "+str(GPSLat)+", "+str(GPSLon)+", "+str(GPSAlt)+" ***"
+        markerStr = '   *** Lane '+str(key)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
+        logMsg('*** Lane '+str(key)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
         ##print (markerStr)
         ##T.insert (END, markerStr)
         keyMarker = [lc, key]                 
@@ -483,10 +496,11 @@ def processKeyPress(key):
 ###
 
     if key == '\x1b':                               #Esc key pressed... Quit the logging routine...
-        markerStr = "   *** Application Ended ***"
+        markerStr = '   *** Application Ended ***'
+        logMsg('*** Application Ended ***')
         ##print (markerStr)
         ##T.insert (END, markerStr)
-        keyMarker = ["App Ended", '']
+        keyMarker = ['App Ended', '']
         gotMarker = True
         appRunning = not appRunning
     pass                                            #end of Esc key
@@ -529,7 +543,7 @@ def writeCSVFile (write_str):
 def displayStatusMsg(xPos, yPos, msgStr):
 
 
-    blankStr = " "*190
+    blankStr = ' '*190
     Text = Label(root,anchor='w', justify=LEFT, text=blankStr)
     Text.place(x=xPos,y=yPos)    
 
@@ -572,13 +586,13 @@ def toggle_lane_color(laneNum):
     global  lanes                                   #list to hold all button objects for lanes
    
     btnObj = lanes[int(laneNum)]
-    if btnObj["bg"] == "green":
-        btnObj["bg"] = "gray92"
-        btnObj["fg"] = "red3"
+    if btnObj['bg'] == 'green':
+        btnObj['bg'] = 'gray92'
+        btnObj['fg'] = 'red3'
 
     else:
-        btnObj["bg"] = "green"
-        btnObj["fg"] = "white"
+        btnObj['bg'] = 'green'
+        btnObj['fg'] = 'white'
               
 ###
 #   ----------------  End of toggle_lane_text  ---------------------------        
@@ -593,17 +607,17 @@ def toggle_btn_text(gotKey):
     global  gotReflanes
     
     if gotKey == 's':                                   #Start/Stop data log    
-        if bDL["text"] == "Manually Start\nData Log (s)":
-            bDL["text"] = "Manually Stop\nData Log (s)"
-            bDL["bg"] = "gray92"
-            bDL["fg"] = "red3"
+        if bDL['text'] == 'Manually Start\nData Log (s)':
+            bDL['text'] = 'Manually Stop\nData Log (s)'
+            bDL['bg'] = 'gray92'
+            bDL['fg'] = 'red3'
         else:
-            if bDL["text"] == "Manually Stop\nData Log (s)":
+            if bDL['text'] == 'Manually Stop\nData Log (s)':
                 gotKey = '\x1b'
                 processKeyPress(gotKey)
-                # bDL["text"] = "Start Data\nLog (s)"
-                # bDL["bg"]   = "green"
-                # bDL["fg"]   = "white"
+                # bDL['text'] = 'Start Data\nLog (s)'
+                # bDL['bg']   = 'green'
+                # bDL['fg']   = 'white'
         pass   
     pass
 
@@ -611,24 +625,24 @@ def toggle_btn_text(gotKey):
     #if gotKey == 'r':                                   #Ref point
     if (gotKey == 'r' or gotKey == 'w' or (gotKey >= '1' and gotKey <= '9')) and gotRefPt == False and dataLog == True:
     
-        if bR["text"] == "Mark Ref.\nPoint (r)":
-            bR["text"] = "Ref.Point\nMarked"
-            bR["bg"] = "gray92"
-            bR["fg"] = "red3"
+        if bR['text'] == 'Mark Ref.\nPoint (r)':
+            bR['text'] = 'Ref.Point\nMarked'
+            bR['bg'] = 'gray92'
+            bR['fg'] = 'red3'
         pass
     pass
 
     if gotKey == 'w':                                   #workers present toggle
-        if bWP["text"] == "Workers Not\nPresent (w)":
-            bWP["text"] = "Workers are\nPresent (w)"
-            bWP["bg"]   = "gray92"
-            bWP["fg"]   = "red3"
+        if bWP['text'] == 'Workers Not\nPresent (w)':
+            bWP['text'] = 'Workers are\nPresent (w)'
+            bWP['bg']   = 'gray92'
+            bWP['fg']   = 'red3'
             
         else:
-            if bWP["text"] == "Workers are\nPresent (w)":
-                bWP["text"] = "Workers Not\nPresent (w)"
-                bWP["bg"]   = "green"
-                bWP["fg"]   = "white"
+            if bWP['text'] == 'Workers are\nPresent (w)':
+                bWP['text'] = 'Workers Not\nPresent (w)'
+                bWP['bg']   = 'green'
+                bWP['fg']   = 'white'
               
 ###
 #   ----------------  End of toggle_btn_text  ---------------------------        
@@ -641,7 +655,7 @@ def toggle_btn_text(gotKey):
 def gotQuit():
     gotKey = '\x1b'
     processKeyPress(gotKey)
-    if messagebox.askyesno("Quit", "Sure you want to quit?") == True:
+    if messagebox.askyesno('Quit', 'Sure you want to quit?') == True:
         sys.exit(0)
 
 #---------------------------------------------------------------------
@@ -660,13 +674,16 @@ def checkForGPS(root, portNum, first):
     ports = serial.tools.list_ports.comports(include_links=False)
     gpsFound = False
     if len(ports)==0:
-        messagebox.showwarning("GPS Receiver Missing", "*** GPS Receiver missing ***\n\n")
+        logMsg('No serial ports open')
+        messagebox.showwarning('GPS Receiver Missing', '*** GPS Receiver missing ***\n\n')
     if (len(ports)>=1):
         for port in ports:
-            if ("1546:01A6" in port.hwid):
+            if ('1546:01A6' in port.hwid):
                 portNum = port.device
                 gpsFound = True
+                logMsg('GPS device found at port number: ' + portNum)
         if (not gpsFound) and first:
+            logMsg('GPS device not directly found')
             mainframe = Frame(root)
             # Add a grid
             mainframe.pack()
@@ -677,10 +694,23 @@ def checkForGPS(root, portNum, first):
             tkvar = StringVar(root)
             tkvar.set(ports[0].device) #default is first comm port
             popupMenu = OptionMenu(mainframe, tkvar, *ports)
-            Label(mainframe, text="Choose a comm port").pack()
+            logMsg('Creating comm port popup menu')
+            Label(mainframe, text='Choose a comm port').pack()
             popupMenu.pack()
             tkvar.trace('w', commSelect)
         return portNum
+        
+def openLog():
+    global logFile
+    if os.path.exists(logFileName):
+        append_write = 'a' # append if already exists
+    else:
+        append_write = 'w' # make a new file if not
+    logFile = open(logFileName, append_write)
+
+def logMsg(msg):
+    formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
+    logFile.write('[' + formattedTime + '] ' + msg + '\n')
 
 ###
 #   Few Variables... also used in different functions...
@@ -708,7 +738,7 @@ GSAValid    = False                             #Init value
 
 kt          = 0                                 #local count variable
 dataLog     = False                             #data logging off
-#outStr      = ''                                #output string in "tuple"
+#outStr      = ''                                #output string in 'tuple'
 keyMarker   = ['',0]                            #marker from key press
 appRunning  = True                              #set application running to TRUE
 gotRefPt    = False                             #got Ref. Point
@@ -731,17 +761,24 @@ laneStat    = [True,True,True,True,True,True,True,True,True] #all 8 lanes are op
 
 
 local_config_path = './Config Files/ACTIVE_CONFIG.json'
-cDT       = datetime.datetime.now().strftime("%Y%m%d_")+time.strftime("%H%M%S")
-date_time = datetime.datetime.now().strftime("%Y/%m/%d - ")+time.strftime("%H:%M:%S")
+cDT       = datetime.datetime.now().strftime('%Y%m%d_')+time.strftime('%H%M%S')
+date_time = datetime.datetime.now().strftime('%Y/%m/%d - ')+time.strftime('%H:%M:%S')
 
 ###
 #   Open output file for data logging...
 ###
 
-outDir      = "./WZ_VehPathData"
-dataOutFileName = "WZ_Path_Data_"+cDT+".csv"
-dataOutFile = outDir + '/' + dataOutFileName
+logFileName = './data_collection_log.txt'
+logFile = ''
+openLog()
+logMsg('*** Running Vehicle Path Data Acquisition ***')
+
+
+logMsg('Reading local config file')
 configRead()
+outDir      = './WZ_VehPathData'
+dataOutFileName = 'path-data--' + wzDesc + '--' + roadName + '.csv'
+dataOutFile = outDir + '/' + dataOutFileName
 
 root = Tk()
 root.title('Work Zone Mapping - Vehicle Path Data Acquisition')
@@ -761,11 +798,11 @@ winSize = Label(root, height=30, width=120) #width was 110
 winSize.pack()
 
 
-msg = Button(text="Click appropriate button or press (key) to:\n"       \
-                "-- Start/Stop Data Log(s): vehicle path data logging\n"   \
-                "-- Mark Ref. Point(r):     indicate start of WZ\n"  \
-                "-- Lane number(1..8):      mark lane open/close (Green: Open, Red: Closed)\n" \
-                "-- Workers Present(w):     mark presence/absence of workers\n\t\t\t   (Green: Absence, Red: Present)",  \
+msg = Button(text='Click appropriate button or press (key) to:\n'       \
+                '-- Start/Stop Data Log(s): vehicle path data logging\n'   \
+                '-- Mark Ref. Point(r):     indicate start of WZ\n'  \
+                '-- Lane number(1..8):      mark lane open/close (Green: Open, Red: Closed)\n' \
+                '-- Workers Present(w):     mark presence/absence of workers\n\t\t\t   (Green: Absence, Red: Present)',  \
                 font='Courier 10', bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=20)
 
 msg.place(x=50, y=50)
@@ -798,7 +835,7 @@ Text.place(x=300, y=240)
 #   for some reason, the loop in the following creates only the last value of x when any button is pressed...
 ###
 
-lanes = [0]*9
+lanes = [0]*totalLanes
 #kt = 1
 #while kt < 10:
 #    lanes[kt] = Button(text=kt, font='Helvetica 10 bold', fg = 'white', bg='red3', padx=5, command=lambda: gotLane(kt))
@@ -807,7 +844,7 @@ lanes = [0]*9
 
 ###
 #   The following in a above loop DOESN'T WORK...     Callback routine gotLane does not pass correct button lane number...
-###
+### 
 for i in range(1, totalLanes+1):
     lanes[i] = Button(text=i, font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress(str(i)))
     lanes[i].place(x=250+50*i, y=310)
@@ -866,7 +903,7 @@ bQuit.place(x=400,y=380)
 #   Application Message Window...
 ###
 
-appMsgWin = Button(text="Application Message Window...                                             ",      \
+appMsgWin = Button(text='Application Message Window...                                             ',      \
                 font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
 appMsgWin.place(x=50, y=440)
 
@@ -885,6 +922,7 @@ appMsgWin.place(x=50, y=440)
 gps_found = False
 first = True
 while not gps_found:
+    logMsg('Searching for GPS device')
     try:
         xPos = 50
         yPos = 450
@@ -894,14 +932,17 @@ while not gps_found:
         portNum = checkForGPS(root, portNum, first)
         first = False
         ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
-        msgStr      = "Vehicle Path Data Acquisition is Ready - You May Start Data Logging"
+        msgStr      = 'Vehicle Path Data Acquisition is Ready - You May Start Data Logging'
         displayStatusMsg(xPos, yPos, msgStr)                                                        #system ready
         gps_found = True
 
-    except SerialException:
-        MsgBox = messagebox.askquestion ('GPS Receiver NOT Found',"*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n"   \
-                    "   --- Press Yes to try again, No to exit the application ---",icon = 'warning')
+    except SerialException as e:
+        logMsg('Failed to find GPS device, SerialException: ' + str(e))
+        MsgBox = messagebox.askquestion ('GPS Receiver NOT Found','*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n'   \
+                    '   --- Press Yes to try again, No to exit the application ---',icon = 'warning')
         if MsgBox == 'no':
+            logMsg('User exited application')
+            logFile.close()
             sys.exit(0)
         #if MsgBox == 'no':
             #sys.exit(0)
@@ -913,6 +954,7 @@ while not gps_found:
 #   must use sio
 ###
 
+logMsg('Creating serial IO connection')
 sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))             
 
 ###
@@ -926,14 +968,16 @@ sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
 
 #configRead(local_config_path)
 
-outFile     = open(dataOutFile,"w",newline='')
+
+logMsg('Opening path data output file: ' + dataOutFile)
+outFile     = open(dataOutFile,'w',newline='')
 writeData   = csv.writer(outFile)
 
 ###
 #   Write Title in the data logging file...
 ###
 
-titleLine = "GPS Date & Time","# of Sats","HDOP","Latitude","Longitude","Altitude(m)","Speed(m/s)","Heading(Deg)","Marker","Value"
+titleLine = 'GPS Date & Time','# of Sats','HDOP','Latitude','Longitude','Altitude(m)','Speed(m/s)','Heading(Deg)','Marker','Value'
 writeCSVFile(titleLine)
 
 ###
@@ -942,7 +986,10 @@ writeCSVFile(titleLine)
 #
 ###
 
+logMsg('Starting main loop')
 startMainFunc()                                         #main function, starts NMEA processing 
+
+logMsg('Main loop ended, closing streams/files')
 
 ###
 #   Done, close everything...
@@ -950,14 +997,20 @@ startMainFunc()                                         #main function, starts N
 
 ser.close()                                             #close serial IO
 outFile.close()                                         #end of data acquisition and logging
-road_name = roadName
-begin_date = wzStartDate.replace('/', '-')
-end_date = wzEndDate.replace('/', '-')
-name_id = road_name + '--' + begin_date + '--' + end_date
+# road_name = roadName
+# begin_date = wzStartDate.replace('/', '-')
+# end_date = wzEndDate.replace('/', '-')
+# name_id = road_name + '--' + begin_date + '--' + end_date
 
-zip_name = 'wzdc-exports--' + name_id + '.zip'
-export_files()
-messagebox.showinfo("Veh Path Data Acq. Ended", "Vehicle Path Data Acq Ended\nCollecting and zipping files\nOutput location: \n" + zip_name)
+# zip_name = 'wzdc-exports--' + name_id + '.zip'
+# export_files()
+# messagebox.showinfo('Veh Path Data Acq. Ended', 'Vehicle Path Data Acq Ended\nCollecting and zipping files\nOutput location: \n' + zip_name)
+build_export_file = './WZ_BuildMsgs_and_Export.pyw'
+logMsg('Opening export script: ' + build_export_file + ', and closing data acquisition')
+logMsg('Closing log file from data acquisition')
+logFile.close()
+root.destroy()
+os.system(build_export_file)
 #os.remove(local_config_path)
-sys.exit(0)                                             #Stop the program
+sys.exit(0)
 root.mainloop()

@@ -41,6 +41,7 @@ import  math                                            #math library for math f
 import  random                                          #random number generator
 import  json                                            #json manipulation
 import  shutil
+import  requests
 
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
@@ -56,7 +57,7 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 ### ---------------------------------------------------------------------------------------------------------------------
 
 ###
-#   User input/output for work zone map builder is created using "Tkinter" (TK Interface) module. The  Tkinter
+#   User input/output for work zone map builder is created using 'Tkinter' (TK Interface) module. The  Tkinter
 #   is the standard Python interface to the Tk GUI toolkit from Scriptics (formerly developed by Sun Labs).
 #
 #   The public interface is provided through a number of Python modules. The most important interface module is the
@@ -90,79 +91,51 @@ uper_failed = False
 #   ACTIONS... input file dialog...
 ###
 
-def inputFileDialog():
-    filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.json")])
-    if len(filename): 
-        wzConfig_file.set(filename)
-        configRead(filename)
-        set_config_description(filename)
-        btnBegin["state"]   = "normal"                    #enable the start button for map building...
-        btnBegin["bg"]      = "green"        
-    pass
+# def inputFileDialog():
+#     filename = filedialog.askopenfilename(initialdir=configDirectory, title='Select Input File', filetypes=[('Config File','*.json')])
+#     if len(filename): 
+#         wzConfig_file.set(filename)
+#         configRead(filename)
+#         set_config_description(filename)
+#         btnBegin['state']   = 'normal'                    #enable the start button for map building...
+#         btnBegin['bg']      = 'green'        
+#     pass
 
 ##
 #   -------------- End of input_file_dialog ------------------
 ##
 
 
-def displayStatusMsg(xPos, yPos, msgStr):
+# def displayStatusMsg(xPos, yPos, msgStr):
 
-    blankStr = " "*256
-    Text = Label(root,anchor='w', justify=LEFT, text=blankStr)
-    Text.place(x=xPos,y=yPos)    
+#     blankStr = ' '*256
+#     Text = Label(root,anchor='w', justify=LEFT, text=blankStr)
+#     Text.place(x=xPos,y=yPos)    
 
-    Text = Label(root,anchor='w', justify=LEFT, text=msgStr)
-    Text.place(x=xPos,y=yPos)    
+#     Text = Label(root,anchor='w', justify=LEFT, text=msgStr)
+#     Text.place(x=xPos,y=yPos)    
 
 
 ##
 #   -------------- End of display_msg_str ---------------------
 ##
 
-def buildWZMap():
-    return
-    global uper_failed
+# def quitIt():
     
-    if len(wzConfig_file.get()): 
-        startMainProcess()
-
-        if msgSegList[0][0] == -1:                          #Segmentation failed...
-            messagebox.showinfo("WZ Map Builder", " ... ERROR -- in building message segmentation -- ERROR ...\n\n"+ \
-                                                  "Review map_builder.log file in WP_MapMsg folder for detail...")
-        elif uper_failed:
-            messagebox.showinfo("WZ Map Builder", "UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH")
-        else:
-            messagebox.showinfo("WZ Map Builder", "WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...")
-        pass
-    
-        btnView["state"]    = "normal"                      #enable button to view log file...
-        btnView["bg"]       = "green"                       #set bg color to green
-        btnStart["state"]   = "disabled"                    #disable start button so map can't be built more than once...
-        btnStart["bg"]      = "gray75"        
-
-    else:
-        messagebox.showinfo("Read Config", "Choose WZ Configuration file!!!")
-
-##
-#   -------------- End of build_WZ_map ------------------------
-##
-
-def quitIt():
-    
-    if messagebox.askyesno("Quit", "Sure you want to quit?") == True:
-        sys.exit(0)  
+#     if messagebox.askyesno('Quit', 'Sure you want to quit?') == True:
+#         sys.exit(0)  
 ##
 #   -------------- End of quitIt ------------------
 ##
 
-def viewMapLogFile():
-    return
-    WZ_mapLogFile = "./WZ_MapMsg/map_builder_log.txt"
-    if os.path.exists(WZ_mapLogFile):
-        os.system("notepad " + WZ_mapLogFile)        
+# def viewMapLogFile():
+#     return
+#     WZ_mapLogFile = './WZ_MapMsg/map_builder_log.txt'
+#     if os.path.exists(WZ_mapLogFile):
+#         os.system('notepad ' + WZ_mapLogFile)        
     
-    else:
-        messagebox.showinfo("WZ Map Log File","Work Zone Map Log File " + WZ_mapLogFile + " NOT Found ...")
+#     else:
+#         messagebox.showinfo('WZ Map Log File','Work Zone Map Log File ' + WZ_mapLogFile + ' NOT Found ...')
 ##
 #   -------------- End of viewLogFile ------------------------
 ##
@@ -174,11 +147,10 @@ def configRead(file):
             wzConfig = json.loads(cfg.read())
             cfg.close()
             getConfigVars()
-		
         except Exception as e:
-            messagebox.showinfo("Read Config File", "Configuration file read failed: " + file + "\n" + str(e))
+            messagebox.showinfo('Read Config File', 'Configuration file read failed: ' + file + '\n' + str(e))
     else:
-        messagebox.showinfo("Read Config", "Configuration file NOT FOUND: " + file + "\n" + str(e))
+        messagebox.showinfo('Read Config', 'Configuration file NOT FOUND: ' + file + '\n' + str(e))
 
 ###
 # ----------------- End of config_read --------------------
@@ -237,35 +209,6 @@ def getConfigVars():
     fileName    = wzConfig['FILES']['VehiclePathDataFile']  #veh path data file name
 
 ###
-#   Assure that the vehicle path data file directory and file name exist.
-#   If NOT, ask user to go back to WZ Configuration Step and correct file location
-#   This can happen if the directory/file name is changed after doing the WZ configuration step...
-#
-#   Added on Nov. 6, 2018
-#
-###
-#   vehPathDataFile - input data file
-###
-
-    # vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
-           
-    # if os.path.exists(dirName) == False:
-    #     messagebox.showinfo("Veh Path Data Dir", "Vehicle Path Data file directory:\n\n"+dirName+"\n\nNOT found, correct directory name in WZ Configuration step...")
-    #     btnStart["state"] = "disabled"                                  #enable button to view log file...
-    #     btnStart["bg"] = "gray75"        
-    #     sys.exit(0)
-
-    # if os.path.exists(vehPathDataFile) == False:
-    #     messagebox.showinfo("Veh Path Data file", "Vehicle Path Data file:\n\n"+fileName+"\n\nNOT found, correct file name in WZ Configuration step...")
-    #     btnStart["state"] = "disabled"                                  #enable button to view log file...
-    #     btnStart["bg"] = "gray75"        
-    #     sys.exit(0)
-
-###
-#   Convert str from the config file to proper data types... VERY Important...
-###
-
-###
 #   Get sampling frequency...
 ###
 
@@ -317,63 +260,78 @@ def getConfigVars():
     wzEndLat        = wzConfig['LOCATION']['WZEndLat']
     wzEndLon        = wzConfig['LOCATION']['WZEndLon']
 
-    if wzStartDate == "":                                               #wz start date and time are mandatory
-        wzStartDate = datetime.datetime.now().strftime("%Y-%m-%d")
-        wzStartTime = time.strftime("%H:%M")
+    if wzStartDate == '':                                               #wz start date and time are mandatory
+        wzStartDate = datetime.datetime.now().strftime('%Y-%m-%d')
+        wzStartTime = time.strftime('%H:%M')
     pass
 
-###
-#   > > > > > > > > > > > START MAIN PROCESS < < < < < < < < < < < < < < <
-###
-
-
-##############################################################################################
-#
-# ----------------------------- END of startMainProcess --------------------------------------
-#
-###############################################################################################
-
 def set_config_description(config_file):
-    startDate_split = wzStartDate.split('/')
-    start_date = startDate_split[0] + '/' + startDate_split[1] + '/' + startDate_split[2]
-    endDate_split = wzEndDate.split('/')
-    end_date = endDate_split[0] + '/' + endDate_split[1] + '/' + endDate_split[2]
-    config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nRoad Name: ' + roadName + \
-        '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
-    msg['text'] = config_description
+    if config_file:
+        startDate_split = wzStartDate.split('/')
+        start_date = startDate_split[0] + '/' + startDate_split[1] + '/' + startDate_split[2]
+        endDate_split = wzEndDate.split('/')
+        end_date = endDate_split[0] + '/' + endDate_split[1] + '/' + endDate_split[2]
+        config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nRoad Name: ' + roadName + \
+            '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
+        logMsg('Configuration File Summary: \n' + config_description)
+        msg['text'] = config_description
+    else:
+        msg['text'] = 'No config file found, please select a config file below'
 
 def launch_WZ_veh_path_data_acq():
+    logMsg('Copying config file to ' + local_config_path)
     config_file = wzConfig_file.get()
     if os.path.exists(local_config_path):
         os.remove(local_config_path)
     shutil.copy(config_file, local_config_path)
-    #WZ_dataacq = "WZ_VehPathDataAcq_automated.pyw"
-    #if os.path.exists(WZ_dataacq):
-    #    os.system(WZ_dataacq)
-    os.system('WZ_VehPathDataAcq_automated.pyw')
+    data_acq_file = 'WZ_VehPathDataAcq_automated.pyw'
+    logMsg('Opening data acquisition file: ' + data_acq_file + ', and closing main ui')
+    logMsg('Closing log file in Main UI')
+    logFile.close()
+    root.destroy()
+    os.system(data_acq_file)
     sys.exit(0)
-    #initialize(config_file, '')
-    #else:
-    #    messagebox.showinfo("WZ Vehicle Path Data Acq","WZ Vehicle Path Data Acquisition NOT Found...")
 
-def downloadBlob(blobName):
-    local_blob_path = configDirectory + '/' + blobName.split('/')[-1]
-    blob_client = blob_service_client.get_blob_client(container='publishedconfigfiles', blob=blobName)
-    with open(local_blob_path, "wb") as download_file:
+def downloadBlob(local_blob_path, blobName):
+    logMsg('Downloading blob: ' + blobName + ', from container: ' + container_name + ', to local path: ' + local_blob_path)
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blobName)
+    with open(local_blob_path, 'wb') as download_file:
         download_file.write(blob_client.download_blob().readall())
 
 def downloadConfig():
     blobName = listbox.get(listbox.curselection())
+    logMsg('Blob selected to download: ' + blobName)
+
     blob_full_name = blob_names_dict[blobName]
-    downloadBlob(blob_full_name)
+    if blob_service_client.exists(container_name, blob_full_name.replace('json', 'zip')):
+        messagebox.showwarning('Work zone already exists', 'If you continue you will overwrite the unpublished work zone data')
 
-    rel_path = configDirectory + '/' + blobName
-    configRead(rel_path)
-    wzConfig_file.set(os.path.abspath(rel_path))
-    set_config_description(rel_path)
-    btnBegin["state"]   = "normal"                    #enable the start button for map building...
-    btnBegin["bg"]      = "green"        
+    local_blob_path = configDirectory + '/' + blobName
 
+    downloadBlob(local_blob_path, blob_full_name)
+
+    logMsg('Reading configuration file')
+    configRead(local_blob_path)
+
+    abs_path = os.path.abspath(local_blob_path)
+    logMsg('Setting configuration path: ' + abs_path)
+    wzConfig_file.set(abs_path)
+    set_config_description(local_blob_path)
+    btnBegin['state']   = 'normal'                    #enable the start button for map building...
+    btnBegin['bg']      = 'green'
+
+def internet_on():
+    url='http://www.google.com/'
+    timeout=5
+    try:
+        _ = requests.get(url, timeout=timeout)
+        return True
+    except requests.ConnectionError:
+        return False
+
+def logMsg(msg):
+    formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
+    logFile.write('[' + formattedTime + '] ' + msg + '\n')
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
 ##
@@ -384,7 +342,7 @@ def downloadConfig():
 
 root = Tk()
 root.title('Work Zone Data Collection')
-root.geometry("1300x400")
+root.geometry('1300x500')
 #root.configure(bg='white')
 
 ###
@@ -399,16 +357,27 @@ wzConfig        = {}
 #   Get current date and time...
 ###
 
-cDT = datetime.datetime.now().strftime("%m/%d/%Y - ") + time.strftime("%H:%M:%S")
+cDT = datetime.datetime.now().strftime('%m/%d/%Y - ') + time.strftime('%H:%M:%S')
 
 ###
 #   Map builder output log file...
 ###
+logFileName = './data_collection_log.txt'
+if os.path.exists(logFileName):
+    append_write = 'a' # append if already exists
+else:
+    append_write = 'w' # make a new file if not
+logFile = open(logFileName, append_write)         #log file
+##logMsg ('\n *** - '+wzDesc+' - ***\n')
+logMsg('*** Running Main UI ***')
 
-logFile = open("./WZ_MapMsg/map_builder_log.txt", "w")         #log file
-##logFile.write ("\n *** - "+wzDesc+" - ***\n")
-logFile.write ("\n *** - Created: "+cDT+" ***\n")            
 
+
+if not internet_on():
+    logMsg('Internet connectivity test failed, application exiting')
+    messagebox.showerror('No internet connection was detected', 'This application requires an internet connection to function\nPlease reconnect and restart this application')
+    sys.exit(0)
+logMsg('Internet connectivity test succeeded')
 ### --------------------------------------------------------------------------------------------------
 #       Following are local variables with set default values...
 #
@@ -472,11 +441,10 @@ msgSegList      = []                    #WZ message node segmentation list
 #############################################################################
 
 wzConfig_file = StringVar()
+configDirectory = './Config Files'
 local_config_path = './Config Files/ACTIVE_CONFIG.json'
 
-
-
-#with open(download_file_path, "wb") as download_file:
+#with open(download_file_path, 'wb') as download_file:
 #    download_file.write(blob_client.download_blob().readall())
 
 lbl_top = Label(text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
@@ -485,106 +453,90 @@ lbl_top.pack()
 winSize = Label(root, height=15, width=100)
 winSize.pack()
 
-configDirectory = './Config Files'
-most_recent_file = {'Name': '', 'Time': -1}
-for config_file in os.listdir(configDirectory): #Find most recently edited config file in specified directory
-    if '.json' in config_file and config_file != 'ACTIVE_CONFIG.json':
-        time = os.path.getmtime(configDirectory + '/' + config_file)
-        if time > most_recent_file['Time']:
-            most_recent_file['Name'] = config_file
-            most_recent_file['Time'] = time
-
-msg = Label(text='No config file found, please select a config file below',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=("Calibri", 12))
+msg = Label(text='No config file found, please select a config file below',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
 msg.place(x=100, y=80)
 
 ###
 #   Get WZ configuration input file...
 ###
 
-diag_wzConfig_file  = Button(text='Choose Different\nLocal Config File', command=inputFileDialog, anchor=W,padx=5)
-diag_wzConfig_file.place(x=10,y=220)
+# diag_wzConfig_file  = Button(text='Choose Different\nLocal Config File', command=inputFileDialog, anchor=W,padx=5)
+# diag_wzConfig_file.place(x=10,y=220)
 
-wzConfig_file_name  = Entry(relief=SUNKEN, textvariable=wzConfig_file, width=80)
-wzConfig_file_name.place(x=150,y=235)
+# wzConfig_file_name  = Entry(relief=SUNKEN, textvariable=wzConfig_file, width=80)
+# wzConfig_file_name.place(x=150,y=235)
 
 
-connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-if connect_str:
-    download_file_path = './Config Files/local_config.json'
-    #print("\nDownloading blob to \n\t" + download_file_path)
-
-    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-    container_client = blob_service_client.get_container_client("publishedconfigfiles")
-    #blob_client = blob_service_client.get_blob_client(container='', blob='')
-
-    blob_list = container_client.list_blobs()
-    i = 0
-
-    frame = Frame(root)
-    frame.place(x=700, y=75)
-
-    listbox = Listbox(frame, width=50, height=6, font=("Helvetica", 12), bg='slategray1')
-    listbox.pack(side="left", fill="y")
-
-    scrollbar = Scrollbar(frame, orient="vertical")
-    scrollbar.config(command=listbox.yview)
-    scrollbar.pack(side="right", fill="y")
-
-    listbox.config(yscrollcommand=scrollbar.set)
-
-    # listbox = Listbox(root, height=10, width=30)
-    # listbox.place(x=700, y=50)
-    # Scrollbar(listbox, orient="vertical")
-    now = datetime.datetime.now()
-    def getModTimeDelta(blob):
-        time_delta = now-blob.last_modified.replace(tzinfo=None)
-        return time_delta
-
-    blob_names_dict = {}
-    blobListSorted = []
-    for blob in blob_list:
-        blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
-    blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
-    for blob in blobListSorted:
-        blob_name = blob.name.split('/')[-1]
-        if '.json' in blob_name:
-            blob_names_dict[blob_name] = blob.name
-            listbox.insert(END, blob_name)
-            print(blob.last_modified)
-
-    temp_btn = Button(text='Download Config', font='Helvetica 10', padx=5, command=lambda:downloadConfig())
-    temp_btn.place(x=700, y=220)
+connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
+connect_str = os.getenv(connect_str_env_var)
+if not connect_str:
+    logMsg('ERROR: Failed to load connection string from environment variable: ' + connect_str_env_var)
+    logFile.close()
+    messagebox.showerror('Unable to retrieve azure credentials', 'Unable to Retrieve Azure Credentials:\nTo enable cloud connection, configure your \
+    \nenvironment variables and restart your command window')
+    sys.exit(0)
 else:
-    messagebox.showinfo("Unable to retrieve azure credentials", "Unable to Retrieve Azure Credentials:\nTo enable cloud connection, configure your \
-    \nenvironment variables and restart your command window")
-    root.geometry("700x400")
-#photoimage = PhotoImage(file="button_test.png").subsample(3, 3)
-btnBegin = Button(text='Begin Data\nCollection', font='Helvetica 14',border=0,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
-btnBegin.place(x=280,y=320)
+    logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
 
-if most_recent_file['Name']:
-    rel_path = configDirectory + '/' + most_recent_file['Name']
-    configRead(rel_path)
-    wzConfig_file.set(os.path.abspath(rel_path))
-    set_config_description(rel_path)
-    btnBegin["state"]   = "normal"                    #enable the start button for map building...
-    btnBegin["bg"]      = "green"        
+download_file_path = './Config Files/local_config.json'
+#print('\nDownloading blob to \n\t' + download_file_path)
 
-###
-#   Quit...
-###
-
-# btnQuit = Button(text='Quit',bg="red3",fg="white",command=quitIt, anchor=W,padx=5)
-# btnQuit.place(x=440,y=330)
+blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+container_name = 'publishedconfigfiles'
+container_client = blob_service_client.get_container_client(container_name)
+#blob_client = blob_service_client.get_blob_client(container='', blob='')
 
 
-###
-#   View Map Log File...
-###
+logMsg('Listing blobs in container:' + container_name)
+blob_list = container_client.list_blobs()
 
-# btnView = Button(text='View\nLog File',bg="grey75",fg="white",state=DISABLED,command=viewMapLogFile, anchor=W,padx=5)
-# btnView.place(x=630,y=320)
+frame = Frame(root)
+frame.place(x=100, y=200)
 
+listbox = Listbox(frame, width=50, height=6, font=('Helvetica', 12), bg='white')
+listbox.pack(side='left', fill='y')
+
+scrollbar = Scrollbar(frame, orient='vertical')
+scrollbar.config(command=listbox.yview)
+scrollbar.pack(side='right', fill='y')
+
+listbox.config(yscrollcommand=scrollbar.set)
+
+# listbox = Listbox(root, height=10, width=30)
+# listbox.place(x=700, y=50)
+# Scrollbar(listbox, orient='vertical')
+now = datetime.datetime.now()
+def getModTimeDelta(blob):
+    time_delta = now-blob.last_modified.replace(tzinfo=None)
+    return time_delta
+
+blob_names_dict = {}
+blobListSorted = []
+for blob in blob_list:
+    logMsg('Blob Name: ' + blob.name)
+    blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
+blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
+for blob in blobListSorted:
+    blob_name = blob.name.split('/')[-1]
+    if '.json' in blob_name:
+        blob_names_dict[blob_name] = blob.name
+        listbox.insert(END, blob_name)
+
+logMsg('Blobs sorted, filtered and inserted into listbox')
+load_config = Button(text='Load Configuration File', font='Helvetica 10', padx=5, command=downloadConfig)
+load_config.place(x=100, y=320)
+instructions = '''This is the configuration file selection component of the 
+Work Zone Data Collection tool. To use the tool,
+select a file from the list of punlished configuration files and
+select 'Download Config'. When the correct configuration file
+is selected and shown in the description box, select the
+'Begin Data Collection' button to start data acquisition.
+The data acquisition component will not record data until the set
+starting location is reached, or data collection is manually started'''
+instr_label = Label(text=instructions,justify=CENTER, bg='slategray1',anchor=W,padx=10,pady=10, font=('Calibri', 12))
+instr_label.place(x=700, y=100)
+
+btnBegin = Button(text='Begin Data\nCollection', font='Helvetica 14',border=2,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
+btnBegin.place(x=570,y=350)
 
 root.mainloop()
-
