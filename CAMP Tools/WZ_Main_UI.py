@@ -303,8 +303,9 @@ def downloadConfig():
     logMsg('Blob selected to download: ' + blobName)
 
     blob_full_name = blob_names_dict[blobName]
-    if blob_service_client.exists(container_name, blob_full_name.replace('json', 'zip')):
-        messagebox.showwarning('Work zone already exists', 'If you continue you will overwrite the unpublished work zone data')
+    # blob_blob_service = BlockBlobService(account_name="{Storage Account Name}", account_key="{Storage Account Key}")
+    # if blob_blob_service.exists(container_name, blob_full_name.replace('json', 'zip')):
+    #     messagebox.showwarning('Work zone already exists', 'If you continue you will overwrite the unpublished work zone data')
 
     local_blob_path = configDirectory + '/' + blobName
 
