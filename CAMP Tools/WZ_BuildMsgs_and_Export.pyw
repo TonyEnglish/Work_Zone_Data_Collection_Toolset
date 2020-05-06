@@ -903,7 +903,7 @@ for filename in files_list:
 zipObj.close()
 
 logMsg('Removing local configuration file: ' + local_config_path)
-os.remove(local_config_path)
+# os.remove(local_config_path)
 
 connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
 connect_str = os.getenv(connect_str_env_var)

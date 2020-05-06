@@ -36,12 +36,10 @@ from        serial import SerialException           #serial port exception
 #   thread for tkinter for text window...
 ###
 
-if sys.version_info[0] == 3:
-    from    tkinter     import *
-    from    tkinter     import      messagebox
+from    tkinter     import *
+from    tkinter     import      messagebox
 
-else:
-    from    Tkinter     import *
+from PIL import ImageTk, Image
 
 ###
 #   Following are for parsing NMEA string
@@ -77,9 +75,9 @@ def configRead():
     if os.path.exists(file):
         cfg = open(file, 'r+')
         wzConfig = json.loads(cfg.read())
+        getConfigVars()
         update_config(cfg)
         cfg.close()
-        getConfigVars()
 
 ###
 # ----------------- End of config_read --------------------
@@ -102,7 +100,7 @@ def getConfigVars():
     global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
-    global roadName
+    global  roadName
 
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
@@ -197,6 +195,10 @@ def getConfigVars():
 
 
 def update_config(cfg):
+    global dataOutFile
+    
+    dataOutFileName = 'path-data--' + wzDesc + '--' + roadName + '.csv'
+    dataOutFile = outDir + '/' + dataOutFileName
     cfg.truncate(0)
     cfg.seek(0)
     wzConfig['FILES']['VehiclePathDataDir'] = os.path.abspath(outDir).replace('\\', '/')
@@ -270,6 +272,7 @@ def getNMEA_String():
     RMCValid    = False                             #Init value
     GSAValid    = False                             #Init value
     prevDistance = 0
+    pi = 3.14159
    
 
     while (appRunning):                             #continue reading and processing NMEA string while TRUE
@@ -325,14 +328,13 @@ def getNMEA_String():
             #print ('GSA Hdop:', GSA_out)
         pass
         
-        pi = 3.14159
         if dataLog:
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
             if distanceToEndPt < 20: #Leaving Workzone
                 logMsg('-------- Exiting Work Zone (by location, distance=' + distanceToEndPt.round(2) + ') -------')
                 gotBtnPress('s')
                 #appRunning = False
-            distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
+            distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
             if not gotRefPt and distanceToStartPt > prevDistance: #Auto mark reference point
                 logMsg('-------- Auto Marking Reference Point (by location, distance=' + distanceToStartPt.round(2) + ') -------')
                 gotBtnPress('r')
@@ -343,6 +345,7 @@ def getNMEA_String():
             if distanceToStartPt < 100: #Entering Workzone
                 logMsg('-------- Entering Work Zone (by location, distance=' + distanceToStartPt.round(2) + ') -------')
                 gotBtnPress('s')
+                enableForm()
                 #dataLog = True
 
 ###
@@ -393,6 +396,126 @@ def gps_distance(lat1, lon1, lat2, lon2):
     avg_lat = (lat1+lat2)/2
     distance = R*math.sqrt((lat1-lat2)**2+math.cos(avg_lat)**2*(lon1-lon2)**2)
     return distance
+
+def laneClicked(lane):
+    global gotRefPt
+    global laneStat
+    global laneSymbols
+
+    laneStat[lane] = not laneStat[lane]         #Lane open status (T or F)
+    lc = 'LC'                                   #set lc to 'LC' - Lane Closed
+    if laneStat[lane]:
+        lc = 'LO'                               #toggle lane status to Lane Open
+        lanes[lane]['bg']   = 'green'
+        lanes[lane]['fg']   = 'white'
+        laneLabels[lane]['fg'] = 'green'
+        laneLabels[lane]['text'] = 'OPEN'
+        laneLabels[lane].place(x=marginLeft+22 + (lane-1)*110, y=100)
+        # laneSymbols[lane] = Label(image = laneClosedImg)
+        # laneSymbols[lane].place(x=marginLeft+13 + (lane-1)*110, y=120)
+    else:
+        lanes[lane]['bg']   = 'gray92'
+        lanes[lane]['fg']   = 'red3'
+        laneLabels[lane]['fg'] = 'red3'
+        laneLabels[lane]['text'] = 'CLOSED'
+        laneLabels[lane].place(x=marginLeft+18 + (lane-1)*110, y=100)
+        # laneSymbols[lane].destroy()
+
+    if not gotRefPt:                       #if ref pt has not been marked yet
+        lc = lc + '+RP'                         #lc + ref. pt
+        gotRefPt = True                         #set to true
+    pass
+
+    lStat = 'Closed'
+    if lc == 'LO': lStat = 'Open'
+        
+    markerStr = '   *** Lane '+str(i)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
+    logMsg('*** Lane '+str(i)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
+    keyMarker = [lc, str(i)]
+    displayStatusMsg(markerStr)
+
+def workersPresentClicked():
+    global gotRefPt
+    global wpStat
+    global keyMarker
+    global worksersPresentLabel
+
+    wpStat = not wpStat                         #Toggle wp/np
+
+    if wpStat:
+        bWP['text'] = 'Workers No\nLonger Present (w)'
+        bWP['bg']   = 'green'
+        bWP['fg']   = 'white'
+        worksersPresentLabel = Label(image = workersPresentImg)
+        worksersPresentLabel.place(x=marginLeft+60 + (totalLanes)*110, y=100)
+    else:
+        bWP['text'] = 'Workers are\nPresent (w)'
+        bWP['bg']   = 'gray92'
+        bWP['fg']   = 'red3'
+        worksersPresentLabel.destroy()
+
+    markerStr = '   *** Workers Presence Marked: '+str(wpStat)+' ***'
+    logMsg('*** Workers Presence Marked: '+str(wpStat)+' ***')
+
+    keyMarker[0] = 'WP'                         #WP marker
+    if gotRefPt == False:
+        keyMarker[0]='WP+RP'                    #WP+ref pt
+        gotRefPt = True                         #gotRefPT True    
+    keyMarker[1] = wpStat
+    displayStatusMsg(markerStr)
+
+def startDataLog():
+    global dataLog
+    global keyMarker
+
+    dataLog = True
+
+    markerStr = '   *** Data Logging Started ***'
+    logMsg('*** Data Logging Started ***')
+
+    keyMarker = ['Data Log', dataLog]
+
+    enableForm()
+
+    displayStatusMsg(markerStr)
+
+def stopDataLog():
+    global dataLog
+    global keyMarker
+    global appRunning
+
+    dataLog = False
+
+    markerStr = '   *** Data Logging Stopped ***'
+    logMsg('*** Data Logging Stopped ***')
+
+    keyMarker = ['Data Log', dataLog]
+
+    displayStatusMsg(markerStr)
+    appRunning = False
+
+def markRefPt():
+    global gotRefPt
+    global keyMarker
+
+    markerStr = '   *** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
+    logMsg('*** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
+    ##T.insert (END, markerStr)
+    keyMarker = ['RP','']                       #reference point
+    gotRefPt = True                             #got the reference point
+
+def processEvent(key):
+    if key in range(1, totalLanes+1):
+        print('lane pressed')
+    elif key == 'w':
+        print('workers pressed')
+    elif key == 'start':
+        print('start data logging')
+    elif key == 'end':
+        print('end data logging')
+    elif key == 'refPt':
+        print('reference PointMarked')
+
 
 def processKeyPress(key):
     logMsg('Key pressed: ' + key)
@@ -516,7 +639,7 @@ def processKeyPress(key):
     if gotMarker == True:
         xPos = 50
         yPos = 450
-        displayStatusMsg(xPos, yPos, markerStr)        
+        displayStatusMsg(markerStr)
     pass                                            #end of marker tag
 
 ###
@@ -540,9 +663,10 @@ def writeCSVFile (write_str):
 ###
 
 
-def displayStatusMsg(xPos, yPos, msgStr):
+def displayStatusMsg(msgStr):
 
-
+    xPos = 45
+    yPos = 400
     blankStr = ' '*190
     Text = Label(root,anchor='w', justify=LEFT, text=blankStr)
     Text.place(x=xPos,y=yPos)    
@@ -589,7 +713,6 @@ def toggle_lane_color(laneNum):
     if btnObj['bg'] == 'green':
         btnObj['bg'] = 'gray92'
         btnObj['fg'] = 'red3'
-
     else:
         btnObj['bg'] = 'green'
         btnObj['fg'] = 'white'
@@ -712,6 +835,16 @@ def logMsg(msg):
     formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
     logFile.write('[' + formattedTime + '] ' + msg + '\n')
 
+def enableForm():
+    for i in range(1, totalLanes+1):
+        if i != dataLane:
+            lanes[i]['fg'] = 'white'
+            lanes[i]['bg'] = 'green'
+            lanes[i]['state'] = NORMAL
+    bWP['fg'] = 'white'
+    bWP['bg'] = 'green'
+    bWP['state'] = NORMAL
+
 ###
 #   Few Variables... also used in different functions...
 ###
@@ -745,7 +878,6 @@ gotRefPt    = False                             #got Ref. Point
 gotLCRP     = False                             #if no RP yet, set RP and LC the same data point
 gotMarker   = False                             #marker key pressed
 wpStat      = False                             #workers not present
-laneStat    = [True,True,True,True,True,True,True,True,True] #all 8 lanes are open (default), Lane 0 is not used...
                                                 #pressing the same lane # key will toggle the from close to open  
 
 #############################################################################
@@ -775,14 +907,14 @@ logMsg('*** Running Vehicle Path Data Acquisition ***')
 
 
 logMsg('Reading local config file')
-configRead()
 outDir      = './WZ_VehPathData'
-dataOutFileName = 'path-data--' + wzDesc + '--' + roadName + '.csv'
-dataOutFile = outDir + '/' + dataOutFileName
+dataOutFile = ''
+configRead()
 
 root = Tk()
 root.title('Work Zone Mapping - Vehicle Path Data Acquisition')
-root.bind_all('<Key>', keyPress)                #key press event...
+root.geometry(str(max(800, totalLanes*110+350))+'x500')
+# root.bind_all('<Key>', keyPress)                #key press event...
 
 
 #############################################################################
@@ -797,37 +929,91 @@ lbl_top.pack()
 winSize = Label(root, height=30, width=120) #width was 110
 winSize.pack()
 
+laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))
+carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))
+carlabel = Label(image = carImg)
+workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))
+laneClosedImg = ImageTk.PhotoImage(Image.open('./images/laneClosedSign_small.jpg'))
 
-msg = Button(text='Click appropriate button or press (key) to:\n'       \
-                '-- Start/Stop Data Log(s): vehicle path data logging\n'   \
-                '-- Mark Ref. Point(r):     indicate start of WZ\n'  \
-                '-- Lane number(1..8):      mark lane open/close (Green: Open, Red: Closed)\n' \
-                '-- Workers Present(w):     mark presence/absence of workers\n\t\t\t   (Green: Absence, Red: Present)',  \
-                font='Courier 10', bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=20)
+marginLeft = 100
 
-msg.place(x=50, y=50)
+# def setLaneClosed(i):
+#     laneSymbols[i] = Label(image = laneClosedImg)
+#     laneSymbols[i].place(x=marginLeft+13 + (i-1)*110, y=120)
+# def setWorkersPresent():
+#     worksersPresentLabel = Label(image = workersPresentImg)
+#     worksersPresentLabel.place(x=marginLeft+60 + (totalLanes)*110, y=100)
+laneBoxes = [0]*(totalLanes+1)
+laneLabels = [0]*(totalLanes+1)
+laneSymbols = [0]*(totalLanes+1)
+laneLines = [0]*(totalLanes+1)
+for i in range(totalLanes):
+    laneLines[i] = Label(image = laneLine)
+    laneLines[i].place(x=marginLeft + i*110, y=50)
+    if i+1 == dataLane:
+        carlabel.place(x=marginLeft+10 + i*110, y=50)
+    else:
+        laneBoxes[i+1] = Label(justify=LEFT,anchor=W,padx=50,pady=90)
+        laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
+        laneLabels[i+1] = Label(text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
+        laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
+    if i == totalLanes-1:
+        laneLines[i+1] = Label(image = laneLine)
+        laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
+# lane1Line = Label(image = laneLine)
+# lane1Line.place(x=40, y=50)
+# lane1Box = Label(bg='#FF7163',justify=LEFT,anchor=W,padx=50,pady=90)
+# lane1Box.place(x=50, y=50)
+# lane2Line = Label(image = laneLine)
+# lane2Line.place(x=150, y=50)
+# lane2Box = Label(bg='#80FF5C',justify=LEFT,anchor=W,padx=50,pady=90)
+# lane2Box.place(x=160, y=50)
+# lane2Line = Label(image = laneLine)
+# lane2Line.place(x=260, y=50)
+
+
+# panel.place(x=270, y=50)
+
+# lane2Line = Label(image = laneLine)
+# lane2Line.place(x=370, y=50)
+
+
+
+# msg = Button(text='Click appropriate button or press (key) to:\n'       \
+#                 '-- Lane number:      mark lane open/close (Green: Open, Red: Closed)\n' \
+#                 '-- Workers Present:     mark presence/absence of workers\n\t\t\t   (Green: Absence, Red: Present)',  \
+#                 font='Courier 10', bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=20)
+
+# msg.place(x=50, y=50)
+
+
+# msgLanes = Label(text='Lane Status',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
+# msgLanes.place(x=50, y=50)
+
+# msgWorkers = Label(text='Presence of Workers',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
+# msgWorkers.place(x=200, y=50)
 
 ###
 #   Start/Stop Data Logging...
 ###
 
-bDL = Button(text='Manually Start\nData Log (s)', font='Helvetica 10', fg = 'white', bg='green',padx=5,command=lambda:gotBtnPress('s'))
-bDL.place(x=50, y=300)
+# bDL = Button(text='Manually Start\nData Log (s)', font='Helvetica 10', state=DISABLED,padx=5,command=lambda:gotBtnPress('s')) #fg = 'white', bg='green'
+# bDL.place(x=50, y=300)
 
 ###
 #   WZ Reference Point...
 ###
 
-bR = Button(text='Mark Ref.\nPoint (r)', font='Helvetica 10', fg = 'white', bg='green',padx=5, command=lambda:gotBtnPress('r'))
-bR.place(x=180, y=300)
+# bR = Button(text='Mark Ref.\nPoint (r)', font='Helvetica 10', state=DISABLED,padx=5, command=lambda:gotBtnPress('r'))
+# bR.place(x=180, y=300)
 
 ###
 #   Click on Lane number to mark lane closed/open status
 #   Lane button color will change from Green (open) to Red (Closed)
 ###
 
-Text = Label(text='Select Lane to Mark as Closed/Open (Toggle)\n(Lane #1 is Leftmost Lane)', font='Arial 11', fg='royalblue')
-Text.place(x=300, y=240)
+# Text = Label(text='Select Lane to Mark as Closed/Open (Toggle)\n(Lane #1 is Leftmost Lane)', font='Arial 11', fg='royalblue')
+# Text.place(x=300, y=240)
 
 ###
 #   Total 8 lanes (in the array, 0 to 9, 0 location in array is not used...)
@@ -835,7 +1021,8 @@ Text.place(x=300, y=240)
 #   for some reason, the loop in the following creates only the last value of x when any button is pressed...
 ###
 
-lanes = [0]*totalLanes
+lanes = [0]*(totalLanes+1)
+laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
 #kt = 1
 #while kt < 10:
 #    lanes[kt] = Button(text=kt, font='Helvetica 10 bold', fg = 'white', bg='red3', padx=5, command=lambda: gotLane(kt))
@@ -846,58 +1033,22 @@ lanes = [0]*totalLanes
 #   The following in a above loop DOESN'T WORK...     Callback routine gotLane does not pass correct button lane number...
 ### 
 for i in range(1, totalLanes+1):
-    lanes[i] = Button(text=i, font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress(str(i)))
-    lanes[i].place(x=250+50*i, y=310)
-# #lane 1
-# lanes[1] = Button(text='1', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('1'))
-# lanes[1].place(x=300, y=310)
-# #lanes[1].pack(side=LEFT, padx=10)
-
-# #lane 2
-# lanes[2] = Button(text='2', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('2'))
-# lanes[2].place(x=350, y=310)
-
-# #lane 3
-# lanes[3] = Button(text='3', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('3'))
-# lanes[3].place(x=400, y=310)
-
-# #lane 4
-# lanes[4] = Button(text='4', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('4'))
-# lanes[4].place(x=450, y=310)
-
-# #lane 5
-# lanes[5] = Button(text='5', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('5'))
-# lanes[5].place(x=500, y=310)
-
-# #lane 6
-# lanes[6] = Button(text='6', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('6'))
-# lanes[6].place(x=550, y=310)
-
-# #lane 7
-# lanes[7] = Button(text='7', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('7'))
-# lanes[7].place(x=600, y=310)
-
-# #lane 8
-# lanes[8] = Button(text='8', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('8'))
-# lanes[8].place(x=650, y=310)
-
-#lane 9   --- Modified to 8 lanes Aug. 30, 2019 ---
-#lanes[9] = Button(text='9', font='Helvetica 10', fg = 'white', bg='green', padx=5, command=lambda:gotBtnPress('9'))
-#lanes[9].place(x=650, y=310)
+    lanes[i] = Button(text='Lane '+str(i), font='Helvetica 10', state=DISABLED, padx=5, command=lambda:laneClicked(i))
+    lanes[i].place(x=marginLeft+30 + (i-1)*110, y=300)
 
 ###
 #   Mark Workers Present...
 ###
 
-bWP = Button(text='Workers Not\nPresent (w)', font='Helvetica 10', fg = 'white', bg='green',padx=5, command=lambda:gotBtnPress('w'))
-bWP.place(x=710, y=300)
+bWP = Button(text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, padx=5, command=lambda:workersPresentClicked('w'))
+bWP.place(x=marginLeft+80 + (totalLanes)*110, y=290)
 
 ###
 #   Quit...
 ###
 
-bQuit = Button(text='Quit (Esc)', font='Helvetica 10', fg = 'white', bg='red3',padx=5, command=gotQuit)
-bQuit.place(x=400,y=380)
+# bQuit = Button(text='Quit (Esc)', font='Helvetica 10', fg = 'white', bg='red3',padx=5, command=gotQuit)
+# bQuit.place(x=400,y=380)
 
 ###
 #   Application Message Window...
@@ -905,7 +1056,7 @@ bQuit.place(x=400,y=380)
 
 appMsgWin = Button(text='Application Message Window...                                             ',      \
                 font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
-appMsgWin.place(x=50, y=440)
+appMsgWin.place(x=marginLeft+10, y=390)
 
 ##############################################################
 #   ------------------ END of LAYOUT -------------------------
@@ -932,8 +1083,8 @@ while not gps_found:
         portNum = checkForGPS(root, portNum, first)
         first = False
         ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
-        msgStr      = 'Vehicle Path Data Acquisition is Ready - You May Start Data Logging'
-        displayStatusMsg(xPos, yPos, msgStr)                                                        #system ready
+        msgStr      = 'Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
+        displayStatusMsg(msgStr)                                                        #system ready
         gps_found = True
 
     except SerialException as e:
