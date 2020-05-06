@@ -332,20 +332,19 @@ def getNMEA_String():
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
             if distanceToEndPt < 20: #Leaving Workzone
                 logMsg('-------- Exiting Work Zone (by location, distance=' + distanceToEndPt.round(2) + ') -------')
-                gotBtnPress('s')
+                stopDataLog()
                 #appRunning = False
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
             if not gotRefPt and distanceToStartPt > prevDistance: #Auto mark reference point
                 logMsg('-------- Auto Marking Reference Point (by location, distance=' + distanceToStartPt.round(2) + ') -------')
-                gotBtnPress('r')
+                markRefPt()
             prevDistance = distanceToStartPt
 
         else:
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
             if distanceToStartPt < 100: #Entering Workzone
                 logMsg('-------- Entering Work Zone (by location, distance=' + distanceToStartPt.round(2) + ') -------')
-                gotBtnPress('s')
-                enableForm()
+                startDataLog()
                 #dataLog = True
 
 ###
@@ -463,6 +462,10 @@ def workersPresentClicked():
         gotRefPt = True                         #gotRefPT True    
     keyMarker[1] = wpStat
     displayStatusMsg(markerStr)
+
+def startApplication():
+    startDataLog()
+    markRefPt()
 
 def startDataLog():
     global dataLog
@@ -1046,6 +1049,13 @@ bWP.place(x=marginLeft+80 + (totalLanes)*110, y=290)
 ###
 #   Quit...
 ###
+
+
+bStart = Button(text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startApplication)
+bStart.place(x=150, y=510)
+
+bEnd = Button(text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
+bEnd.place(x=400, y=510)
 
 # bQuit = Button(text='Quit (Esc)', font='Helvetica 10', fg = 'white', bg='red3',padx=5, command=gotQuit)
 # bQuit.place(x=400,y=380)
