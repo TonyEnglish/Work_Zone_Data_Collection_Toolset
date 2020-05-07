@@ -22,6 +22,7 @@ import      time                                    #system time
 import      datetime                                #current system date and time
 import      serial                                  #serial communication
 import      sys                                     #system functions
+import      subprocess
 import      io                                      #serial i/o function
 import      string                                  #string functions
 import      csv                                     #CSV file read/write
@@ -331,20 +332,21 @@ def getNMEA_String():
         if dataLog:
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
             if distanceToEndPt < 20: #Leaving Workzone
-                logMsg('-------- Exiting Work Zone (by location, distance=' + distanceToEndPt.round(2) + ') -------')
+                logMsg('-------- Exiting Work Zone (by location, distance=' + str(distanceToEndPt) + ') -------')
                 stopDataLog()
                 #appRunning = False
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
             if not gotRefPt and distanceToStartPt > prevDistance: #Auto mark reference point
-                logMsg('-------- Auto Marking Reference Point (by location, distance=' + distanceToStartPt.round(2) + ') -------')
+                logMsg('-------- Auto Marking Reference Point (by location, distance=' + str(distanceToStartPt) + ') -------')
                 markRefPt()
             prevDistance = distanceToStartPt
 
         else:
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
             if distanceToStartPt < 100: #Entering Workzone
-                logMsg('-------- Entering Work Zone (by location, distance=' + distanceToStartPt.round(2) + ') -------')
+                logMsg('-------- Entering Work Zone (by location, distance=' + str(distanceToStartPt) + ') -------')
                 startDataLog()
+                prevDistance = distanceToStartPt
                 #dataLog = True
 
 ###
@@ -428,9 +430,9 @@ def laneClicked(lane):
     lStat = 'Closed'
     if lc == 'LO': lStat = 'Open'
         
-    markerStr = '   *** Lane '+str(i)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
-    logMsg('*** Lane '+str(i)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
-    keyMarker = [lc, str(i)]
+    markerStr = '   *** Lane '+str(lane)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
+    logMsg('*** Lane '+str(lane)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
+    keyMarker = [lc, str(lane)]
     displayStatusMsg(markerStr)
 
 def workersPresentClicked():
@@ -443,14 +445,14 @@ def workersPresentClicked():
 
     if wpStat:
         bWP['text'] = 'Workers No\nLonger Present (w)'
-        bWP['bg']   = 'green'
-        bWP['fg']   = 'white'
+        bWP['bg']   = 'gray92'
+        bWP['fg']   = 'red3'
         worksersPresentLabel = Label(image = workersPresentImg)
         worksersPresentLabel.place(x=marginLeft+60 + (totalLanes)*110, y=100)
     else:
         bWP['text'] = 'Workers are\nPresent (w)'
-        bWP['bg']   = 'gray92'
-        bWP['fg']   = 'red3'
+        bWP['bg']   = 'green'
+        bWP['fg']   = 'white'
         worksersPresentLabel.destroy()
 
     markerStr = '   *** Workers Presence Marked: '+str(wpStat)+' ***'
@@ -463,10 +465,6 @@ def workersPresentClicked():
     keyMarker[1] = wpStat
     displayStatusMsg(markerStr)
 
-def startApplication():
-    startDataLog()
-    markRefPt()
-
 def startDataLog():
     global dataLog
     global keyMarker
@@ -478,6 +476,7 @@ def startDataLog():
 
     keyMarker = ['Data Log', dataLog]
 
+    overlay.destroy()
     enableForm()
 
     displayStatusMsg(markerStr)
@@ -506,18 +505,6 @@ def markRefPt():
     ##T.insert (END, markerStr)
     keyMarker = ['RP','']                       #reference point
     gotRefPt = True                             #got the reference point
-
-def processEvent(key):
-    if key in range(1, totalLanes+1):
-        print('lane pressed')
-    elif key == 'w':
-        print('workers pressed')
-    elif key == 'start':
-        print('start data logging')
-    elif key == 'end':
-        print('end data logging')
-    elif key == 'refPt':
-        print('reference PointMarked')
 
 
 def processKeyPress(key):
@@ -847,7 +834,6 @@ def enableForm():
     bWP['fg'] = 'white'
     bWP['bg'] = 'green'
     bWP['state'] = NORMAL
-
 ###
 #   Few Variables... also used in different functions...
 ###
@@ -908,7 +894,6 @@ logFile = ''
 openLog()
 logMsg('*** Running Vehicle Path Data Acquisition ***')
 
-
 logMsg('Reading local config file')
 outDir      = './WZ_VehPathData'
 dataOutFile = ''
@@ -917,6 +902,7 @@ configRead()
 root = Tk()
 root.title('Work Zone Mapping - Vehicle Path Data Acquisition')
 root.geometry(str(max(800, totalLanes*110+350))+'x500')
+
 # root.bind_all('<Key>', keyPress)                #key press event...
 
 
@@ -926,7 +912,7 @@ root.geometry(str(max(800, totalLanes*110+350))+'x500')
 #
 #############################################################################
 
-lbl_top = Label(text='Vehivle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
+lbl_top = Label(text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.pack()
 
 winSize = Label(root, height=30, width=120) #width was 110
@@ -958,104 +944,44 @@ for i in range(totalLanes):
     else:
         laneBoxes[i+1] = Label(justify=LEFT,anchor=W,padx=50,pady=90)
         laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
-        laneLabels[i+1] = Label(text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
-        laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
+        laneLabels[i] = Label(text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
+        laneLabels[i].place(x=marginLeft+22 + i*110, y=100)
     if i == totalLanes-1:
         laneLines[i+1] = Label(image = laneLine)
         laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
-# lane1Line = Label(image = laneLine)
-# lane1Line.place(x=40, y=50)
-# lane1Box = Label(bg='#FF7163',justify=LEFT,anchor=W,padx=50,pady=90)
-# lane1Box.place(x=50, y=50)
-# lane2Line = Label(image = laneLine)
-# lane2Line.place(x=150, y=50)
-# lane2Box = Label(bg='#80FF5C',justify=LEFT,anchor=W,padx=50,pady=90)
-# lane2Box.place(x=160, y=50)
-# lane2Line = Label(image = laneLine)
-# lane2Line.place(x=260, y=50)
-
-
-# panel.place(x=270, y=50)
-
-# lane2Line = Label(image = laneLine)
-# lane2Line.place(x=370, y=50)
-
-
-
-# msg = Button(text='Click appropriate button or press (key) to:\n'       \
-#                 '-- Lane number:      mark lane open/close (Green: Open, Red: Closed)\n' \
-#                 '-- Workers Present:     mark presence/absence of workers\n\t\t\t   (Green: Absence, Red: Present)',  \
-#                 font='Courier 10', bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=20)
-
-# msg.place(x=50, y=50)
-
-
-# msgLanes = Label(text='Lane Status',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
-# msgLanes.place(x=50, y=50)
-
-# msgWorkers = Label(text='Presence of Workers',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
-# msgWorkers.place(x=200, y=50)
-
-###
-#   Start/Stop Data Logging...
-###
-
-# bDL = Button(text='Manually Start\nData Log (s)', font='Helvetica 10', state=DISABLED,padx=5,command=lambda:gotBtnPress('s')) #fg = 'white', bg='green'
-# bDL.place(x=50, y=300)
-
-###
-#   WZ Reference Point...
-###
-
-# bR = Button(text='Mark Ref.\nPoint (r)', font='Helvetica 10', state=DISABLED,padx=5, command=lambda:gotBtnPress('r'))
-# bR.place(x=180, y=300)
-
-###
-#   Click on Lane number to mark lane closed/open status
-#   Lane button color will change from Green (open) to Red (Closed)
-###
-
-# Text = Label(text='Select Lane to Mark as Closed/Open (Toggle)\n(Lane #1 is Leftmost Lane)', font='Arial 11', fg='royalblue')
-# Text.place(x=300, y=240)
-
-###
-#   Total 8 lanes (in the array, 0 to 9, 0 location in array is not used...)
-#   Following does not work
-#   for some reason, the loop in the following creates only the last value of x when any button is pressed...
-###
 
 lanes = [0]*(totalLanes+1)
 laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
-#kt = 1
-#while kt < 10:
-#    lanes[kt] = Button(text=kt, font='Helvetica 10 bold', fg = 'white', bg='red3', padx=5, command=lambda: gotLane(kt))
-#    lanes[kt].pack(side=LEFT, padx=5)    
-#    kt += 1
 
-###
-#   The following in a above loop DOESN'T WORK...     Callback routine gotLane does not pass correct button lane number...
-### 
+
+def createButton(id):
+    global lanes
+    lanes[id] = Button(text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
+    lanes[id].place(x=marginLeft+10 + (id-1)*110, y=300)
+
 for i in range(1, totalLanes+1):
-    lanes[i] = Button(text='Lane '+str(i), font='Helvetica 10', state=DISABLED, padx=5, command=lambda:laneClicked(i))
-    lanes[i].place(x=marginLeft+30 + (i-1)*110, y=300)
+    createButton(i)
 
 ###
 #   Mark Workers Present...
 ###
 
-bWP = Button(text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, padx=5, command=lambda:workersPresentClicked('w'))
-bWP.place(x=marginLeft+80 + (totalLanes)*110, y=290)
+bWP = Button(text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked('w'))
+bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
 ###
 #   Quit...
 ###
 
 
-bStart = Button(text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startApplication)
-bStart.place(x=150, y=510)
+bStart = Button(text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
+bStart.place(x=100, y=510)
+
+bRef = Button(text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
+bRef.place(x=250, y=510)
 
 bEnd = Button(text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
-bEnd.place(x=400, y=510)
+bEnd.place(x=500, y=510)
 
 # bQuit = Button(text='Quit (Esc)', font='Helvetica 10', fg = 'white', bg='red3',padx=5, command=gotQuit)
 # bQuit.place(x=400,y=380)
@@ -1066,8 +992,11 @@ bEnd.place(x=400, y=510)
 
 appMsgWin = Button(text='Application Message Window...                                             ',      \
                 font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
-appMsgWin.place(x=marginLeft+10, y=390)
+appMsgWin.place(x=50, y=390)
 
+
+overlay = Label(text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
+overlay.place(x=(marginLeft+80 + (totalLanes)*110)/2-160, y=200)
 ##############################################################
 #   ------------------ END of LAYOUT -------------------------
 ##############################################################
@@ -1085,8 +1014,6 @@ first = True
 while not gps_found:
     logMsg('Searching for GPS device')
     try:
-        xPos = 50
-        yPos = 450
         portNum     = 'COM4'
         baudRate    = 115200
         timeOut     = 1
@@ -1166,12 +1093,13 @@ outFile.close()                                         #end of data acquisition
 # zip_name = 'wzdc-exports--' + name_id + '.zip'
 # export_files()
 # messagebox.showinfo('Veh Path Data Acq. Ended', 'Vehicle Path Data Acq Ended\nCollecting and zipping files\nOutput location: \n' + zip_name)
-build_export_file = './WZ_BuildMsgs_and_Export.pyw'
+build_export_file = './WZ_BuildMsgs_and_Export.py'
 logMsg('Opening export script: ' + build_export_file + ', and closing data acquisition')
 logMsg('Closing log file from data acquisition')
 logFile.close()
 root.destroy()
-os.system(build_export_file)
+subprocess.call([sys.executable, build_export_file], shell=True) #, shell=True
+# os.system(build_export_file) #_------------------------------------------------------------ FAILED
 #os.remove(local_config_path)
 sys.exit(0)
 root.mainloop()

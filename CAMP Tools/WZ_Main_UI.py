@@ -284,12 +284,13 @@ def launch_WZ_veh_path_data_acq():
     if os.path.exists(local_config_path):
         os.remove(local_config_path)
     shutil.copy(config_file, local_config_path)
-    data_acq_file = 'WZ_VehPathDataAcq_automated.pyw'
+    data_acq_file = 'WZ_VehPathDataAcq_automated.py'
     logMsg('Opening data acquisition file: ' + data_acq_file + ', and closing main ui')
     logMsg('Closing log file in Main UI')
     logFile.close()
     root.destroy()
-    os.system(data_acq_file)
+    subprocess.call([sys.executable, data_acq_file]) #, shell=True
+    # os.system(data_acq_file)
     sys.exit(0)
 
 def downloadBlob(local_blob_path, blobName):
@@ -303,6 +304,26 @@ def downloadConfig():
     logMsg('Blob selected to download: ' + blobName)
 
     blob_full_name = blob_names_dict[blobName]
+
+    #Check if unpublished work zone already exists, ask user if they want to overwrite
+    file_found = False
+    unapprovedContainer = 'unapprovedworkzones'
+    unpublished_config_name = 'configurationfiles/' + blob_full_name
+    try:
+        temp_container_client = blob_service_client.get_container_client(unapprovedContainer)
+        temp_blob_client = temp_container_client.get_blob_client(unpublished_config_name)
+        props = temp_blob_client.get_blob_properties()
+        logMsg('Blob: ' + unpublished_config_name + ', found in container: ' + unapprovedContainer)
+        file_found = True
+    except:
+        logMsg('Blob: ' + unpublished_config_name + ', not found in container: ' + unapprovedContainer)
+        pass
+    if file_found:
+        MsgBox = messagebox.askquestion('Work zone already exists','This Work zone already exists\nIf you continue you will overwrite the unpublished work zone data. Would you like to continue?',icon = 'warning')
+        if MsgBox == 'no':
+            logMsg('User denied overwrite of unapproved work zone data')
+            return
+        logMsg('User accepted overwrite of unapproved work zone data')
     # blob_blob_service = BlockBlobService(account_name="{Storage Account Name}", account_key="{Storage Account Key}")
     # if blob_blob_service.exists(container_name, blob_full_name.replace('json', 'zip')):
     #     messagebox.showwarning('Work zone already exists', 'If you continue you will overwrite the unpublished work zone data')
@@ -333,6 +354,10 @@ def internet_on():
 def logMsg(msg):
     formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
     logFile.write('[' + formattedTime + '] ' + msg + '\n')
+
+def laneClicked(i):
+    print(i)
+
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
 ##
@@ -526,14 +551,15 @@ for blob in blobListSorted:
 logMsg('Blobs sorted, filtered and inserted into listbox')
 load_config = Button(text='Load Configuration File', font='Helvetica 10', padx=5, command=downloadConfig)
 load_config.place(x=100, y=320)
-instructions = '''This is the configuration file selection component of the 
+instructions = '''This component requires a good internet connection.
+This is the configuration file selection component of the 
 Work Zone Data Collection tool. To use the tool,
 select a file from the list of punlished configuration files and
 select 'Download Config'. When the correct configuration file
 is selected and shown in the description box, select the
 'Begin Data Collection' button to start data acquisition.
 The data acquisition component will not record data until the set
-starting location is reached, or data collection is manually started'''
+starting location is reached.'''
 instr_label = Label(text=instructions,justify=CENTER, bg='slategray1',anchor=W,padx=10,pady=10, font=('Calibri', 12))
 instr_label.place(x=700, y=100)
 
