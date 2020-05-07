@@ -274,7 +274,7 @@ def getNMEA_String():
     GSAValid    = False                             #Init value
     prevDistance = 0
     pi = 3.14159
-   
+    isFirstTime = True
 
     while (appRunning):                             #continue reading and processing NMEA string while TRUE
         NMEAData = sio.readline()                   #Read NMEA string from serial port COM7
@@ -336,10 +336,11 @@ def getNMEA_String():
                 stopDataLog()
                 #appRunning = False
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if not gotRefPt and distanceToStartPt > prevDistance: #Auto mark reference point
+            if not gotRefPt and distanceToStartPt > prevDistance and not isFirstTime: #Auto mark reference point
                 logMsg('-------- Auto Marking Reference Point (by location, distance=' + str(distanceToStartPt) + ') -------')
                 markRefPt()
             prevDistance = distanceToStartPt
+            isFirstTime = False
 
         else:
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
@@ -789,7 +790,8 @@ def checkForGPS(root, portNum, first):
     if len(ports)==0:
         logMsg('No serial ports open')
         messagebox.showwarning('GPS Receiver Missing', '*** GPS Receiver missing ***\n\n')
-    if (len(ports)>=1):
+        # TODO: Make this not break
+    else:
         for port in ports:
             if ('1546:01A6' in port.hwid):
                 portNum = port.device
@@ -944,8 +946,8 @@ for i in range(totalLanes):
     else:
         laneBoxes[i+1] = Label(justify=LEFT,anchor=W,padx=50,pady=90)
         laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
-        laneLabels[i] = Label(text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
-        laneLabels[i].place(x=marginLeft+22 + i*110, y=100)
+        laneLabels[i+1] = Label(text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
+        laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
     if i == totalLanes-1:
         laneLines[i+1] = Label(image = laneLine)
         laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
@@ -966,7 +968,7 @@ for i in range(1, totalLanes+1):
 #   Mark Workers Present...
 ###
 
-bWP = Button(text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked('w'))
+bWP = Button(text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
 bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
 ###
