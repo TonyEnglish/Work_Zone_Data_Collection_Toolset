@@ -1069,10 +1069,7 @@ writeCSVFile(titleLine)
 #
 ###
 
-def on_closing():
-    sys.exit(0)
-
-#root.protocol("WM_DELETE_WINDOW", on_closing)
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 logMsg('Starting main loop')
 
@@ -1628,9 +1625,6 @@ def do_stuff():
     loading_label.destroy()
 
 root.after(500, do_stuff)
-
-def on_closing():
-    sys.exit(0)
 
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
