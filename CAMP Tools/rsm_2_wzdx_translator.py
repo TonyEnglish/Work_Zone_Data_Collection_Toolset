@@ -12,7 +12,7 @@ def wzdx_creator(messages, dataLane, info):
     # if ids:
     #     wzd['road_event_feed_info']['feed_info_id'] = str(uuid.uuid4())
     wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    #wzd['road_event_feed_info']['metadata'] = 'https://fake-site.ltd/dummy-metadata.txt'
+    # wzd['road_event_feed_info']['metadata'] = info['metadata']
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
     nodes = []
@@ -211,6 +211,18 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
         # direction
         lanes_obj['direction'] = 'unknown'
 
+        # # beginning_cross_street
+        # lanes_obj['beginning_cross_street'] = info['beginning_cross_street']
+
+        # # beginning_cross_street
+        # lanes_obj['beginning_cross_street'] = info['beginning_cross_street']
+
+        # # beginning_milepost
+        # lanes_obj['beginning_milepost'] = info['beginning_milepost']
+
+        # # ending_milepost
+        # lanes_obj['ending_milepost'] = info['ending_milepost']
+
         # beginning_accuracy
         lanes_obj['beginning_accuracy'] = 'estimated'
 
@@ -263,10 +275,26 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
         #     types_of_work['types_of_work_id'] = str(uuid.uuid4())
         #     types_of_work['road_event_id'] = road_event_id
         types_of_work['type_name'] = 'roadside-work'
-        types_of_work['is_architectual_change'] = False
+        types_of_work['is_architectural_change'] = False # info['is_architectural_change']
         lanes_obj['types_of_work'].append(types_of_work)
 
+        # restrictions
+        # lanes_obj['restrictions'] = 'restrictions'
+
         lanes_obj['lanes'] = lanes_wzdx
+
+
+        # # description
+        # lanes_obj['description'] = info['description']
+
+        # # issuing_organization
+        # lanes_obj['issuing_organization'] = info['issuing_organization']
+        
+        # # creation_date
+        # lanes_obj['creation_date'] = info['creation_date']
+        
+        # # update_date
+        # lanes_obj['update_date'] = info['update_date']
 
         # properties
         lanes_obj_properties = {}

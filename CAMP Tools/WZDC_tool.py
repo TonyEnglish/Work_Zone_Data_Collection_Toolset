@@ -89,8 +89,6 @@ def getConfigVars():
     # global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
-    global  roadName
-
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
     global  lanePadApp                                      #approach lane padding in meters
@@ -112,12 +110,21 @@ def getConfigVars():
     global  wzEndLat                                       #wz end date
     global  wzEndLon                                       #wz end time
 
+    global  roadName
+    # global  roadNumber
+    # global  beginningCrossStreet
+    # global  endingCrossStreet
+    # global  beginningMilepost
+    # global  endingMilepost
+    # global  issuingOrganization
+    # global  creationDate
+    # global  updateDate
+    # global  isArchitecturalChange
+
     dirName     = wzConfig['FILES']['VehiclePathDataDir']   #veh path data file directory
     fileName    = wzConfig['FILES']['VehiclePathDataFile']  #veh path data file name
 
     sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
-
-    roadName        = wzConfig['INFO']['RoadName']
 
     totalLanes      = int(wzConfig['LANES']['NumberOfLanes'])           #total number of lanes in wz
     laneWidth       = float(wzConfig['LANES']['AverageLaneWidth'])      #average lane width in meters
@@ -146,6 +153,17 @@ def getConfigVars():
         wzStartDate = datetime.datetime.now().strftime('%Y-%m-%d')
         wzStartTime = time.strftime('%H:%M')
     pass
+
+    roadName        = wzConfig['INFO']['RoadName']
+    # roadNumber      = wzConfig['INFO']['RoadNumber']
+    # beginningCrossStreet  = wzConfig['INFO']['beginningCrossStreet']
+    # endingCrossStreet = wzConfig['INFO']['endingCrossStreet']
+    # beginningMilepost = wzConfig['INFO']['beginningMilepost']
+    # endingMilepost = wzConfig['INFO']['endingMilepost']
+    # issuingOrganization = wzConfig['INFO']['issuingOrganization']
+    # creationDate = wzConfig['INFO']['creationDate']
+    # updateDate = wzConfig['INFO']['updateDate']
+    # isArchitecturalChange = wzConfig['INFO']['isArchitecturalChange']
 
 def set_config_description(config_file):
     if config_file:
@@ -1313,6 +1331,15 @@ def build_messages():
     pass
     info = {}
     info['road_name'] = roadName
+    # info['road_number'] = roadNumber
+    # info['beginning-cross_street'] = beginningCrossStreet
+    # info['ending_cross_street'] = endingCrossStreet
+    # info['beginning_milepost'] = beginningMilepost
+    # info['ending_milepost'] = endingMilepost
+    # info['issuing_organization'] = issuingOrganization
+    # info['creation_date'] = creationDate
+    # info['update_date'] = updateDate
+    # info['is_architectural_change'] = isArchitecturalChange
     logMsg('Converting RSM XMl to WZDx message')
     wzdx = wzdx_creator(rsmSegments, dataLane, info)
     wzdxFile.write(json.dumps(wzdx, indent=2))
@@ -1608,5 +1635,3 @@ def on_closing():
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
 window.mainloop()
-
-
