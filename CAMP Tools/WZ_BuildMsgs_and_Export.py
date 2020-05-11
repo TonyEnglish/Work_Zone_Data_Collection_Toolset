@@ -513,8 +513,8 @@ def build_messages():
 ###   
 
         xmlFile.close()
-        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper_v8.jar', str(xml_outFile), str(uper_outFile)])
-        if os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
+        subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper_v8.jar', str(xml_outFile), str(uper_outFile)],stdout=devnull)
+        if not os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
             logMsg('ERROR: RSM UPER conversion FAILED, ensure that you have java installed (>=1.8 or jdk>=8) and added to your system path')
             messagebox.showerror('RSM Binary conversion FAILED', 'RSM Binary (UPER) conversion failed\nEnsure that you have java installed (version>=1.8 or jdk>=8) and added to your system path\nThen run WZ_BuildMsgs_and_Export.pyw')
             logMsg('Exiting Application')

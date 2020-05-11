@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import  os.path
-import sys
-import subprocess
+import  sys
+import  subprocess
 
 import  csv                                             #csv file processor
 import  datetime                                        #Date and Time methods...
@@ -22,40 +22,33 @@ from    serial import SerialException           #serial port exception
 import  zipfile
 import  xmltodict                                       #dict to xml converter
 
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from    azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
-from tkinter                import *   
-from tkinter                import messagebox
-from tkinter                import filedialog
-from PIL import ImageTk, Image
-
-
-from parseNMEA      import parseGxGGA           #parse GGA for Time, Alt, #of Satellites
-from parseNMEA      import parseGxRMC           #parse RMC for Date, Lat, Lon, Speed, Heading
-from parseNMEA      import parseGxGSA           #parse GSA for Hdop
+from    tkinter         import *   
+from    tkinter         import messagebox
+from    tkinter         import filedialog
+from    PIL             import ImageTk, Image
 
 
-from  wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
+from    parseNMEA       import parseGxGGA           #parse GGA for Time, Alt, #of Satellites
+from    parseNMEA       import parseGxRMC           #parse RMC for Date, Lat, Lon, Speed, Heading
+from    parseNMEA       import parseGxGSA           #parse GSA for Hdop
 
-from  wz_map_constructor  import getLanePt            #get lat/lon points for lanes 
-from  wz_map_constructor  import getEndPoint          #calculates lat/lon for an end point from distance and heading (bearing)
+
+from    wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
+
+from    wz_map_constructor  import getLanePt            #get lat/lon points for lanes 
+from    wz_map_constructor  import getEndPoint          #calculates lat/lon for an end point from distance and heading (bearing)
                                                         #   called from getLanePt
-from  wz_map_constructor  import getDist              #get distance in meters between pair of lat/lon points
+from    wz_map_constructor  import getDist              #get distance in meters between pair of lat/lon points
                                                         #   called from getLanePt
 
+from    wz_xml_builder         import build_xml_CC         #common container
+from    wz_xml_builder         import build_xml_WZC        #WZ container
+from    rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
 
-# def configRead(file):
-#     global wzConfig
-#     if os.path.exists(file):
-#         try:
-#             cfg = open(file)
-#             wzConfig = json.loads(cfg.read())
-#             cfg.close()
-#             getConfigVars()
-#         except Exception as e:
-#             messagebox.showinfo('Read Config File', 'Configuration file read failed: ' + file + '\n' + str(e))
-#     else:
-#         messagebox.showinfo('Read Config', 'Configuration file NOT FOUND: ' + file + '\n' + str(e))
+from    wz_msg_segmentation    import buildMsgSegNodeList  #msg segmentation node list builder
+
 
 def inputFileDialog():
     global local_config_path
@@ -63,14 +56,18 @@ def inputFileDialog():
     if len(filename): 
         local_config_path = filename
         logMsg('Reading configuration file')
-        configRead()
+        try:
+            configRead()
 
-        logMsg('Setting configuration path: ' + local_config_path)
-        # local_config_file = abs_path
-        set_config_description(local_config_path)
-        wzConfig_file.set(local_config_path)
-        btnBegin['state']   = 'normal'                    #enable the start button for map building...
-        btnBegin['bg']      = 'green'
+            logMsg('Setting configuration path: ' + local_config_path)
+            # local_config_file = abs_path
+            set_config_description(local_config_path)
+            wzConfig_file.set(local_config_path)
+            btnBegin['state']   = 'normal'                    #enable the start button for map building...
+            btnBegin['bg']      = 'green'
+        except Exception as e:
+            logMsg('ERROR: Config read failed, ' + str(e))
+            messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
     pass
 
 def configRead():
@@ -164,19 +161,8 @@ def set_config_description(config_file):
         msg['text'] = 'No config file found, please select a config file below'
 
 def launch_WZ_veh_path_data_acq():
-    # logMsg('Copying config file to ' + local_config_path)
-    # config_file = wzConfig_file.get()
-    # if os.path.exists(local_config_path):
-    #     os.remove(local_config_path)
-    # shutil.copy(config_file, local_config_path)
-    # data_acq_file = 'WZ_VehPathDataAcq_automated.py'
-    # logMsg('Opening data acquisition file: ' + data_acq_file + ', and closing main ui')
-    # logMsg('Closing log file in Main UI')
-    # logFile.close()
     root.destroy()
-    # subprocess.call([sys.executable, data_acq_file]) #, shell=True
-    # os.system(data_acq_file)
-    # sys.exit(0)
+    window.quit()
 
 def downloadBlob(local_blob_path, blobName):
     logMsg('Downloading blob: ' + blobName + ', from container: ' + container_name + ', to local path: ' + local_blob_path)
@@ -217,15 +203,19 @@ def downloadConfig():
     downloadBlob(local_blob_path, blob_full_name)
 
     logMsg('Reading configuration file')
-    configRead()
+    try:
+        configRead()
 
-    abs_path = os.path.abspath(local_blob_path)
-    logMsg('Setting configuration path: ' + abs_path)
-    # local_config_file = abs_path
-    set_config_description(local_blob_path)
-    wzConfig_file.set(local_config_path)
-    btnBegin['state']   = 'normal'                    #enable the start button for map building...
-    btnBegin['bg']      = 'green'
+        abs_path = os.path.abspath(local_blob_path)
+        logMsg('Setting configuration path: ' + abs_path)
+        # local_config_file = abs_path
+        set_config_description(local_blob_path)
+        wzConfig_file.set(local_config_path)
+        btnBegin['state']   = 'normal'                    #enable the start button for map building...
+        btnBegin['bg']      = 'green'
+    except Exception as e:
+        logMsg('ERROR: Config read failed, ' + str(e))
+        messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
 
 def internet_on():
     url='http://www.google.com/'
@@ -240,16 +230,6 @@ def logMsg(msg):
     formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
     logFile.write('[' + formattedTime + '] ' + msg + '\n')
 
-# ------------------------------------------- WZ_VehPathDataAcq_automated ------------------------------------------------------
-
-
-
-
-
-# ------------------------------------------------------- WZ_BuildMsgs_and_Export -------------------------------------------------
-
-
-
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
 ##
@@ -258,9 +238,11 @@ def logMsg(msg):
 #   tkinter root window...
 ###
 
-root = Tk()
-root.title('Work Zone Data Collection')
-root.geometry('1300x500')
+window = Tk()
+window.title('Work Zone Data Collection')
+window.geometry('1300x500')
+root = Frame(width=1300, height=500)
+root.place(x=0, y=0)
 # root = Frame(window)
 # root.place(x=0, y=0)
 # root.configure(bg='white')
@@ -290,8 +272,6 @@ else:
 logFile = open(logFileName, append_write)         #log file
 ##logMsg ('\n *** - '+wzDesc+' - ***\n')
 logMsg('*** Running Main UI ***')
-
-
 
 if not internet_on():
     logMsg('Internet connectivity test failed, application exiting')
@@ -330,12 +310,12 @@ configDirectory = './Config Files'
 local_config_path = ''
 
 lbl_top = Label(root, text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
-lbl_top.pack()
+lbl_top.place(x=300, y=20)
 
-winSize = Label(root, height=15, width=100)
-winSize.pack()
+# winSize = Label(root, height=15, width=100)
+# winSize.place()
 
-msg = Label(text='No config file found, please select a config file below',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
+msg = Label(root, text='No config file found, please select a config file below',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
 msg.place(x=100, y=80)
 
 
@@ -421,11 +401,12 @@ btnBegin = Button(root, text='Begin Data\nCollection', font='Helvetica 14',borde
 btnBegin.place(x=570,y=350)
 
 def on_closing():
+    logFile.close()
     sys.exit(0)
 
-root.protocol("WM_DELETE_WINDOW", on_closing)
+window.protocol("WM_DELETE_WINDOW", on_closing)
 
-root.mainloop()
+window.mainloop()
 
 
 ################################################################################################################
@@ -628,7 +609,7 @@ def laneClicked(lane):
         lanes[lane]['fg']   = 'red3'
         laneLabels[lane]['fg'] = 'red3'
         laneLabels[lane]['text'] = 'CLOSED'
-        laneLabels[lane].place(x=marginLeft+18 + (lane-1)*110, y=100)
+        laneLabels[lane].place(x=marginLeft+10 + (lane-1)*110, y=100)
         # laneSymbols[lane].destroy()
 
     if not gotRefPt:                       #if ref pt has not been marked yet
@@ -653,13 +634,13 @@ def workersPresentClicked():
     wpStat = not wpStat                         #Toggle wp/np
 
     if wpStat:
-        bWP['text'] = 'Workers No\nLonger Present (w)'
+        bWP['text'] = 'Workers No\nLonger Present'
         bWP['bg']   = 'gray92'
         bWP['fg']   = 'red3'
-        worksersPresentLabel = Label(image = workersPresentImg)
+        worksersPresentLabel = Label(root, image = workersPresentImg)
         worksersPresentLabel.place(x=marginLeft+60 + (totalLanes)*110, y=100)
     else:
-        bWP['text'] = 'Workers are\nPresent (w)'
+        bWP['text'] = 'Workers are\nPresent'
         bWP['bg']   = 'green'
         bWP['fg']   = 'white'
         worksersPresentLabel.destroy()
@@ -754,9 +735,7 @@ def checkForGPS(root, portNum, first):
     ports = serial.tools.list_ports.comports(include_links=False)
     gpsFound = False
     if len(ports)==0:
-        logMsg('No serial ports open')
-        messagebox.showwarning('GPS Receiver Missing', '*** GPS Receiver missing ***\n\n')
-        # TODO: Make this not break
+        raise SerialException('No open COM ports detected')
     else:
         for port in ports:
             if ('1546:01A6' in port.hwid):
@@ -765,12 +744,12 @@ def checkForGPS(root, portNum, first):
                 logMsg('GPS device found at port number: ' + portNum)
         if (not gpsFound) and first:
             logMsg('GPS device not directly found')
-            mainframe = Frame(root)
+            mainframe = Frame(root, pady=100, padx=100)
             # Add a grid
-            mainframe.pack()
+            mainframe.place(x=300, y=600)
             mainframe.columnconfigure(0, weight=1)
             mainframe.rowconfigure(0, weight=1)
-            mainframe.pack(pady=100, padx=100)
+            mainframe.place(x=300, y=600)
             # Create a Tkinter variable
             tkvar = StringVar(root)
             tkvar.set(ports[0].device) #default is first comm port
@@ -787,6 +766,8 @@ def enableForm():
             lanes[i]['fg'] = 'white'
             lanes[i]['bg'] = 'green'
             lanes[i]['state'] = NORMAL
+        else:
+            lanes[i]['text'] = 'Lane ' + str(i) + '\n(Vehicle Lane)'
     bWP['fg'] = 'white'
     bWP['bg'] = 'green'
     bWP['state'] = NORMAL
@@ -896,12 +877,14 @@ vehPathDataFile = outDir + '/' + vehPathDataFileName
 # wzConfig['FILES']['VehiclePathDataDir'] = os.path.abspath(outDir).replace('\\', '/')
 # wzConfig['FILES']['VehiclePathDataFile'] = dataOutFileName
 
-root = Tk()
-root.title('Work Zone Data Collection - Vehicle Path Data Acquisition')
-root.geometry(str(max(800, totalLanes*110+350))+'x500')
+# root = Tk()
+# root.title('Work Zone Data Collection - Vehicle Path Data Acquisition')
+# root.geometry(str(max(800, totalLanes*110+350))+'x500')
 # root = Frame(window)
 # root.place(x=0, y=0)
-# window.geometry(str(max(800, totalLanes*110+350))+'x500')
+window.geometry(str(max(800, totalLanes*110+350))+'x500')
+root = Frame(width=max(800, totalLanes*110+350), height=500)
+root.place(x=0, y=0)
 
 # root.bind_all('<Key>', keyPress)                #key press event...
 
@@ -913,14 +896,14 @@ root.geometry(str(max(800, totalLanes*110+350))+'x500')
 #############################################################################
 
 lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
-lbl_top.pack()
+lbl_top.place(x=300, y=20)
 
-winSize = Label(root, height=30, width=120) #width was 110
-winSize.pack()
+# winSize = Label(root, height=30, width=120) #width was 110
+# winSize.pack()
 
 laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))
 carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))
-carlabel = Label(image = carImg)
+carlabel = Label(root, image = carImg)
 workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))
 laneClosedImg = ImageTk.PhotoImage(Image.open('./images/laneClosedSign_small.jpg'))
 
@@ -934,7 +917,7 @@ for i in range(totalLanes):
     laneLines[i] = Label(root, image = laneLine)
     laneLines[i].place(x=marginLeft + i*110, y=50)
     if i+1 == dataLane:
-        carlabel.place(x=marginLeft+10 + i*110, y=50)
+        carlabel.place(x=marginLeft+8 + i*110, y=50)
     else:
         laneBoxes[i+1] = Label(root, justify=LEFT,anchor=W,padx=50,pady=90)
         laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
@@ -956,13 +939,13 @@ def createButton(id):
 for i in range(1, totalLanes+1):
     createButton(i)
 
+
 ###
 #   Mark Workers Present...
 ###
 
 bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
 bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
-
 ###
 #   Quit...
 ###
@@ -1023,10 +1006,9 @@ while not gps_found:
         MsgBox = messagebox.askquestion ('GPS Receiver NOT Found','*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n'   \
                     '   --- Press Yes to try again, No to exit the application ---',icon = 'warning')
         if MsgBox == 'no':
-            gps_found = True
-            # logMsg('User exited application')
-            # logFile.close()
-            # sys.exit(0)
+            logMsg('User exited application')
+            logFile.close()
+            sys.exit(0)
         #if MsgBox == 'no':
             #sys.exit(0)
         
@@ -1072,7 +1054,7 @@ writeCSVFile(titleLine)
 def on_closing():
     sys.exit(0)
 
-root.protocol("WM_DELETE_WINDOW", on_closing)
+#root.protocol("WM_DELETE_WINDOW", on_closing)
 
 logMsg('Starting main loop')
 
@@ -1099,6 +1081,7 @@ outFile.close()                                         #end of data acquisition
 logMsg('Ending data acquisition')
 # logFile.close()
 root.destroy()
+window.quit()
 # subprocess.call([sys.executable, build_export_file], shell=True) #, shell=True
 # os.system(build_export_file) #_------------------------------------------------------------ FAILED
 # os.remove(local_config_path)
@@ -1110,6 +1093,8 @@ root.destroy()
 
 
 # ------------------------------------------------------- WZ_BuildMsgs_and_Export --------------------------------------------------------
+laneStat = []
+wpStat = []
 
 def inputFileDialog(filename):
 
@@ -1534,9 +1519,12 @@ def uploadArchive():
         messagebox.showerror('No Internet Cnnection', 'No internet connection detected\nConnect and try again')
 
 
-root = Tk()
-root.title('Work Zone Data Export and Upload')
-root.geometry('400x300')
+# root = Tk()
+# root.title('Work Zone Data Export and Upload')
+# root.geometry('400x300')
+window.geometry('400x300')
+root = Frame(width=400, height=300)
+root.place(x=0, y=0)
 
 load_config = Button(root, text='Upload Data\nFiles', state=DISABLED, font='Helvetica 20', padx=5,command=uploadArchive)
 load_config.place(x=100, y=100)
@@ -1557,6 +1545,10 @@ logMsg('*** Running Message Builder and Export ***')
 # configRead()
 
 def do_stuff():
+    global zip_name
+    global name_id
+    global blob_service_client
+    global container_name
     startMainProcess()
     files_list.append(vehPathDataFile)
     files_list.append(local_config_path)
@@ -1615,6 +1607,6 @@ def on_closing():
 
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
-root.mainloop()
+window.mainloop()
 
 

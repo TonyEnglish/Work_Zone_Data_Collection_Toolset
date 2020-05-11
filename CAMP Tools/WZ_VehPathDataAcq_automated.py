@@ -507,6 +507,7 @@ def markRefPt():
     keyMarker = ['RP','']                       #reference point
     gotRefPt = True                             #got the reference point
 
+    displayStatusMsg(markerStr)
 
 def processKeyPress(key):
     logMsg('Key pressed: ' + key)
