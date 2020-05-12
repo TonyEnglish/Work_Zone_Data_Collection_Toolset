@@ -1,0 +1,51 @@
+{
+  "DateCreated": "5/11/2020",
+  "SERIALPORT": {
+    "SerialBaudrate": 115200,
+    "DataRate": 10,
+    "SerialPort": "COM3",
+    "SerialTimeout": 1
+  },
+  "FILES": {
+    "CfgInputFile": "config--wz-test-5-11-20--highland-hills-cir.json",
+    "CfgOutputFile": "config--wz-test-5-11-20--highland-hills-cir.json",
+    "VehiclePathDataDir": "",
+    "VehiclePathDataFile": ""
+  },
+  "LANES": {
+    "Description": "WZ Test 5-11-20",
+    "NumberOfLanes": 2,
+    "AverageLaneWidth": 3.6,
+    "ApproachLanePadding": 0.0,
+    "WorkzoneLanePadding": 0.0,
+    "VehiclePathDataLane": 2
+  },
+  "SPEED": {
+    "NormalSpeed": 30,
+    "ReferencePointSpeed": 20,
+    "WorkersPresentSpeed": 10
+  },
+  "CAUSE": {
+    "CauseCode": 3,
+    "SubCauseCode": 0
+  },
+  "SCHEDULE": {
+    "WZStartDate": "5/11/2020",
+    "WZStartTime": "00:00",
+    "WZEndDate": "5/18/2020",
+    "WZEndTime": "23:59",
+    "WZDaysOfWeek": [
+      "Mon"
+    ]
+  },
+  "LOCATION": {
+    "WZStartLat": 40.4727224065725,
+    "WZStartLon": -104.965486240182,
+    "WZEndLat": 40.4714165399093,
+    "WZEndLon": -104.970357131754
+  },
+  "INFO": {
+    "RoadName": "Highland Hills Cir",
+    "RoadNumber": ""
+  }
+}

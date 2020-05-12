@@ -6,20 +6,29 @@ Tasks 6-7
 
 ![Tasks 6-7 Diagram](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/task_6_7_diagram_screenshot.jpg)
 
-# CAMP Tool
+# Work Zone Data Collection Tool
 
-The CAMP tool is an open source work zone capturing tool. Using a gps and a computer, a user can drive through a work zone and mark important elements of the work zone, including lane closures, speed limits, and the resence of workers. This data is captured and output as an RSM message in xml format. 
-
-# Translators
-
-A proof of concept RSM to WZDx translator has been developed. 
+The WZDC tool is an open source work zone capturing tool. Using a gps and a computer, a user can drive through a work zone and mark important elements of the work zone, including lane closures, speed limits, and the presence of workers. This data is captured and output as RSM messages in xml and binary (uper) formats and a WZDx message. 
 
 # Requirements
 
-Python
-Java
+Python 3.0
+- esptool
+- azure-storage-blob
+- image
+
+Java 1.8 or JDK 8
 
 # Updates
+5/11/2020
+- Integrated Azure cloud connection
+  - Downloading of published configuration files
+  - Uploading of completed data files
+- Improved path data collection UI
+- Added logging
+- Combined components into a single program
+- Increased compatibility by lowering Java version of Binary (uper) converter
+
 4/27/2020
 - Made edits from end-to-end testing
   - Updated time/date formatting to match configuration files generated from TMC

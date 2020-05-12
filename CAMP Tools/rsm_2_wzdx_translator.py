@@ -1,25 +1,24 @@
 import xml.etree.ElementTree as ET 
 import json
-import xmltodict
 from datetime import datetime
 import uuid
 #with open('rsm.json', 'r') as f:
 
 
-def wzdx_creator(messages, dataLane):
+def wzdx_creator(messages, dataLane, info):
     wzd = {}
     ids = False # Enables ids linking tables together within file
     wzd['road_event_feed_info'] = {}
     # if ids:
     #     wzd['road_event_feed_info']['feed_info_id'] = str(uuid.uuid4())
     wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    #wzd['road_event_feed_info']['metadata'] = 'https://fake-site.ltd/dummy-metadata.txt'
+    # wzd['road_event_feed_info']['metadata'] = info['metadata']
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
     nodes = []
     for message in messages:
         RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
-        node_list = extract_nodes(RSM, wzd, ids, int(dataLane))
+        node_list = extract_nodes(RSM, wzd, ids, int(dataLane), info)
         for node in node_list:
             nodes.append(node)
     wzd['features'] = wzdx_collapser(nodes)
@@ -90,21 +89,23 @@ def form_len(string):
     num = int(string)
     return format(num, '02d')
 
-def extract_nodes(RSM, wzd, ids, dataLane):
+def extract_nodes(RSM, wzd, ids, dataLane, info):
     lanes = RSM['rszContainer']['rszRegion']['roadwayGeometry']['rsmLanes']['RSMLane']
     num_lanes = len(lanes)
     nodes = lanes[0]['laneGeometry']['nodeSet']['NodeLLE']
     nodes_wzdx = []
     prev_attr_list = []
+    reduced_speed_limit = int(RSM['rszContainer'].get('speedLimit').get('speed', 0))
+    if RSM['rszContainer']['speedLimit'].get('kph', {}) == None: #If kph, convert to mph
+        reduced_speed_limit = round(reduced_speed_limit*0.6214)
+    prev_attributes_general = {'peoplePresent': False, 'reducedSpeedLimit': reduced_speed_limit}
     for k in range(len(lanes)):
-        prev_attributes = {'laneClosed': False, 'peoplePresent': False}
-        prev_attr_list.append(prev_attributes)
+        prev_attributes_lane = {'laneClosed': False}
+        prev_attr_list.append(prev_attributes_lane)
     for i in range(len(nodes)):
         lanes_obj = {}
         lanes_wzdx = []
-        reduced_speed_limit = int(RSM['rszContainer'].get('speedLimit').get('speed', 0))
-        if RSM['rszContainer']['speedLimit'].get('kph', {}) == None: #If kph, convert to mph
-            reduced_speed_limit = round(reduced_speed_limit*0.6214)
+        
         people_present = False #initialization
         geometry = {}
         geometry['type'] = 'LineString'
@@ -183,14 +184,17 @@ def extract_nodes(RSM, wzd, ids, dataLane):
                 units = node_contents['nodeAttributes']['speedLimit']['speedUnits']
                 if units.get('kph', {}) == None:
                     reduced_speed_limit = round(reduced_speed_limit*0.6214)
+            else:
+                reduced_speed_limit = prev_attributes_general['reducedSpeedLimit']
+            prev_attributes_general['reducedSpeedLimit'] = reduced_speed_limit
 
             if node_contents.get('nodeAttributes', {}).get('peoplePresent', {}).get('true', {}) == None: #People present
                 people_present = True
             elif node_contents.get('nodeAttributes', {}).get('peoplePresent', {}).get('false', {}) == None: #No people present
                 people_present = False
             else:
-                people_present = prev_attr_list[j]['peoplePresent']
-            prev_attr_list[j]['peoplePresent'] = people_present #Set previous value
+                people_present = prev_attributes_general['peoplePresent']
+            prev_attributes_general['peoplePresent'] = people_present #Set previous value
 
             lanes_wzdx.append(lane)
 
@@ -202,10 +206,22 @@ def extract_nodes(RSM, wzd, ids, dataLane):
         #     lanes_obj['feed_info_id'] = wzd['road_event_feed_info']['feed_info_id']
 
         # road_name
-        lanes_obj['road_name'] = 'unknown'
+        lanes_obj['road_name'] = info['road_name']
 
         # direction
         lanes_obj['direction'] = 'unknown'
+
+        # # beginning_cross_street
+        # lanes_obj['beginning_cross_street'] = info['beginning_cross_street']
+
+        # # beginning_cross_street
+        # lanes_obj['beginning_cross_street'] = info['beginning_cross_street']
+
+        # # beginning_milepost
+        # lanes_obj['beginning_milepost'] = info['beginning_milepost']
+
+        # # ending_milepost
+        # lanes_obj['ending_milepost'] = info['ending_milepost']
 
         # beginning_accuracy
         lanes_obj['beginning_accuracy'] = 'estimated'
@@ -259,10 +275,26 @@ def extract_nodes(RSM, wzd, ids, dataLane):
         #     types_of_work['types_of_work_id'] = str(uuid.uuid4())
         #     types_of_work['road_event_id'] = road_event_id
         types_of_work['type_name'] = 'roadside-work'
-        types_of_work['is_architectual_change'] = False
+        types_of_work['is_architectural_change'] = False # info['is_architectural_change']
         lanes_obj['types_of_work'].append(types_of_work)
 
+        # restrictions
+        # lanes_obj['restrictions'] = 'restrictions'
+
         lanes_obj['lanes'] = lanes_wzdx
+
+
+        # # description
+        # lanes_obj['description'] = info['description']
+
+        # # issuing_organization
+        # lanes_obj['issuing_organization'] = info['issuing_organization']
+        
+        # # creation_date
+        # lanes_obj['creation_date'] = info['creation_date']
+        
+        # # update_date
+        # lanes_obj['update_date'] = info['update_date']
 
         # properties
         lanes_obj_properties = {}
