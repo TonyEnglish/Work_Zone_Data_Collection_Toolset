@@ -609,6 +609,7 @@ def gps_distance(lat1, lon1, lat2, lon2):
 def laneClicked(lane):
     global gotRefPt
     global laneStat
+    global keyMarker
     global laneSymbols
 
     laneStat[lane] = not laneStat[lane]         #Lane open status (T or F)
