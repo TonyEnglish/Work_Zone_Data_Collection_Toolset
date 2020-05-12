@@ -299,7 +299,7 @@ logMsg('Internet connectivity test succeeded')
 
 try:
     java_version = subprocess.check_output(['java', '-version'], stderr=subprocess.STDOUT).decode('utf-8')
-    version_number = java_version.splitlines()[0].split()[-1].strip('"')
+    version_number = java_version.splitlines()[0].split()[2].strip('"')
     major, minor, _ = version_number.split('.')
     if (int(major) == 1 and int(minor) >= 8) or int(major) >= 1:
         logMsg('Java version check successful. Java version detected was ' + major + '.' + minor)
@@ -1069,7 +1069,7 @@ writeCSVFile(titleLine)
 #
 ###
 
-root.protocol("WM_DELETE_WINDOW", on_closing)
+window.protocol("WM_DELETE_WINDOW", on_closing)
 
 logMsg('Starting main loop')
 
@@ -1626,6 +1626,6 @@ def do_stuff():
 
 root.after(500, do_stuff)
 
-root.protocol("WM_DELETE_WINDOW", on_closing)
+# root.protocol("WM_DELETE_WINDOW", on_closing)
 
 window.mainloop()
