@@ -248,8 +248,8 @@ def getConfigVars():
 ###
 #   vehPathDataFile - input data file
 ###
-
     vehPathDataFile = dirName + '/' + fileName                          #complete file name with directory
+    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--Jacob-test-1--63rd-st_orig.csv'
            
     # if os.path.exists(dirName) == False:
     #     error = True
@@ -273,6 +273,7 @@ def getConfigVars():
 ###
 
     sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
+    sampleFreq = 1
 
 ###
 #   Get INFO...
@@ -384,7 +385,7 @@ def build_messages():
 #   Set speed limits in WZ as vehicle max speed..from user input saved in config file...
 ###
 
-    speedLimit  = ['<vehicleMaxSpeed/>',speedList[0],speedList[1],speedList[2],'<mph/>']#NEW Version of XER... Nov. 2017
+    speedLimit  = ['vehicleMaxSpeed',speedList[0],speedList[1],speedList[2],'mph']#NEW Version of XER... Nov. 2017
 
 ### -------------------------------------------------
 #

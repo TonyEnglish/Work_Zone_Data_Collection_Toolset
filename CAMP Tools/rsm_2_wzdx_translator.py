@@ -114,12 +114,17 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
             lane = {}
             # if ids:
             #     lane['lane_id'] = str(uuid.uuid4())
-
             #     lane['road_event_id'] = road_event_id
 
+            # Lane Number
             lane['lane_number'] = int(lanes[j]['lanePosition'])
 
+            # Lane Edge Reference
             lane['lane_edge_reference'] = 'left' #This is an assumed value
+
+            # for lane_type in info['lane_type']:
+            #     if lane['lane_number'] == lane_type['lane_number']:
+            #         lane['lane_type'] == lane_type['lane_type']
 
             lane_type = 'middle-lane' #left-lane, right-lane, middle-lane, right-exit-lane, left-exit-lane, ... (exit lanes, merging lanes, turning lanes)
             if lane['lane_edge_reference'] == 'left':
@@ -137,6 +142,7 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
             node_contents = lanes[j]['laneGeometry']['nodeSet']['NodeLLE'][i]
             lane_status = 'open' #Can be open, closed, shift-left, shift-right, merge-right, merge-left, alternating-one-way
 
+            # Lane Status
             if node_contents.get('nodeAttributes', {}).get('taperLeft', {}).get('true', {}) == None:
                 lane_status = 'merge-left'
             elif node_contents.get('nodeAttributes', {}).get('taperRight', {}).get('true', {}) == None:
@@ -149,9 +155,8 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
                 prev_attr_list[j]['laneClosed'] = False
             elif prev_attr_list[j]['laneClosed']: #No info in current node, use previous value
                 lane_status = 'closed'
-
-
             lane['lane_status'] = lane_status
+
             point = lanes[j]['laneGeometry']['nodeSet']['NodeLLE'][i]['nodePoint']
             if lane['lane_number'] == dataLane:
                 lane_coordinate = []
@@ -163,20 +168,22 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
                     lane_coordinate.append(0)
                 geometry['coordinates'] = []
                 geometry['coordinates'].append(lane_coordinate)
-            
-            #lane['lane_restrictions'] = []#no-trucks, travel-peak-hours-only, hov-3, hov-2, no-parking
+
+            # Lane Restrictions
+            lane['lane_restrictions'] = []#no-trucks, travel-peak-hours-only, hov-3, hov-2, no-parking
                 #reduced-width, reduced-height, reduced-length, reduced-weight, axle-load-limit, gross-weight-limit, towing-prohibited, permitted-oversize-loads-prohibited
             # Restrictions will be added later
-            # for lane_restriction in lane_restrictions
-                # if restr['restriction_type'] in ['reduced-width', 'reduced-height', 'reduced-length', 'reduced-weight', 'axle-load-limit', 'gross-weight-limit']:
-                    # lane_restriction = {}
-                    # if ids:
-                        # lane_restriction['lane_restriction_id'] = str(uuid.uuid4())
-                        # lane_restriction['lane_id'] = lane['lane_id']
-                    # lane_restriction['restriction_type'] = 
-                    # lane_restriction['restriction_value'] = 
-                    # lane_restriction['restriction_units'] = 
-                    # lane['lane_restrictions'].append(lane_restriction)
+            # for lane_restriction_info in info['laneRestrictions']:
+            #     if lane['lane_number'] == lane_restriction_info['lane']:
+            #         lane_restriction = {}
+            #         # if ids:
+            #             # lane_restriction['lane_restriction_id'] = str(uuid.uuid4())
+            #             # lane_restriction['lane_id'] = lane['lane_id']
+            #         lane_restriction['restriction_type'] = lane_restriction_info['restrictionType']
+            #         if lane_restriction['restriction_type'] in ['reduced-width', 'reduced-height', 'reduced-length', 'reduced-weight', 'axle-load-limit', 'gross-weight-limit']:
+            #             lane_restriction['restriction_value'] = lane_restriction_info['restrictionValue']
+            #             lane_restriction['restriction_units'] = lane_restriction_info['restrictionUnits']
+            #         lane['lane_restrictions'].append(lane_restriction)
 
             # Reduced Speed Limit
             if node_contents.get('nodeAttributes', {}).get('speedLimit', {}).get('type', {}).get('vehicleMaxSpeed', {}) == None:
@@ -269,14 +276,21 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
         #maintenance, minor-road-defect-repair, roadside-work, overhead-work, below-road-work, barrier-work, surface-work, painting, roadway-relocation, roadway-creation
         #Maybe use cause code??
         lanes_obj['types_of_work'] = []
-        #if cause_code == 3: #No other options are available
-        types_of_work = {}
-        # if ids:
-        #     types_of_work['types_of_work_id'] = str(uuid.uuid4())
-        #     types_of_work['road_event_id'] = road_event_id
-        types_of_work['type_name'] = 'roadside-work'
-        types_of_work['is_architectural_change'] = False # info['is_architectural_change']
-        lanes_obj['types_of_work'].append(types_of_work)
+        
+        # for types_of_work in info['types_of_work']:
+        #     if lane['lane_number'] == types_of_work['lane_number']:
+        #         type_of_work = {}
+        #         type_of_work['lane_type'] = types_of_work['type_of_work']
+        #         if types_of_work.get('is_architectural_change'): type_of_work['is_architectural_change'] = types_of_work['is_architectural_change']
+        #         lanes_obj['types_of_work'].append(type_of_work)
+        # #if cause_code == 3: #No other options are available
+        # types_of_work = {}
+        # # if ids:
+        # #     types_of_work['types_of_work_id'] = str(uuid.uuid4())
+        # #     types_of_work['road_event_id'] = road_event_id
+        # types_of_work['type_name'] = 'roadside-work'
+        # types_of_work['is_architectural_change'] = False # info['is_architectural_change']
+        # lanes_obj['types_of_work'].append(types_of_work)
 
         # restrictions
         # lanes_obj['restrictions'] = 'restrictions'

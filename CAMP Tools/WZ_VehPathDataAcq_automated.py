@@ -393,12 +393,14 @@ def getNMEA_String():
 #
 ###
 
+# Calculate distance between 2 gps corordinates
 def gps_distance(lat1, lon1, lat2, lon2):
     R = 6371000
     avg_lat = (lat1+lat2)/2
     distance = R*math.sqrt((lat1-lat2)**2+math.cos(avg_lat)**2*(lon1-lon2)**2)
     return distance
 
+# Lane closure toggled
 def laneClicked(lane):
     global gotRefPt
     global laneStat
@@ -413,15 +415,12 @@ def laneClicked(lane):
         laneLabels[lane]['fg'] = 'green'
         laneLabels[lane]['text'] = 'OPEN'
         laneLabels[lane].place(x=marginLeft+22 + (lane-1)*110, y=100)
-        # laneSymbols[lane] = Label(image = laneClosedImg)
-        # laneSymbols[lane].place(x=marginLeft+13 + (lane-1)*110, y=120)
     else:
         lanes[lane]['bg']   = 'gray92'
         lanes[lane]['fg']   = 'red3'
         laneLabels[lane]['fg'] = 'red3'
         laneLabels[lane]['text'] = 'CLOSED'
-        laneLabels[lane].place(x=marginLeft+18 + (lane-1)*110, y=100)
-        # laneSymbols[lane].destroy()
+        laneLabels[lane].place(x=marginLeft+10 + (lane-1)*110, y=100)
 
     if not gotRefPt:                       #if ref pt has not been marked yet
         lc = lc + '+RP'                         #lc + ref. pt
@@ -436,6 +435,7 @@ def laneClicked(lane):
     keyMarker = [lc, str(lane)]
     displayStatusMsg(markerStr)
 
+# Workers present toggled
 def workersPresentClicked():
     global gotRefPt
     global wpStat
@@ -445,13 +445,13 @@ def workersPresentClicked():
     wpStat = not wpStat                         #Toggle wp/np
 
     if wpStat:
-        bWP['text'] = 'Workers No\nLonger Present (w)'
+        bWP['text'] = 'Workers No\nLonger Present'
         bWP['bg']   = 'gray92'
         bWP['fg']   = 'red3'
         worksersPresentLabel = Label(image = workersPresentImg)
         worksersPresentLabel.place(x=marginLeft+60 + (totalLanes)*110, y=100)
     else:
-        bWP['text'] = 'Workers are\nPresent (w)'
+        bWP['text'] = 'Workers are\nPresent'
         bWP['bg']   = 'green'
         bWP['fg']   = 'white'
         worksersPresentLabel.destroy()
@@ -466,6 +466,7 @@ def workersPresentClicked():
     keyMarker[1] = wpStat
     displayStatusMsg(markerStr)
 
+# Initiating data logging
 def startDataLog():
     global dataLog
     global keyMarker
@@ -482,6 +483,7 @@ def startDataLog():
 
     displayStatusMsg(markerStr)
 
+# Ending data logging (and application)
 def stopDataLog():
     global dataLog
     global keyMarker
@@ -497,6 +499,7 @@ def stopDataLog():
     displayStatusMsg(markerStr)
     appRunning = False
 
+# Marking reference point
 def markRefPt():
     global gotRefPt
     global keyMarker
@@ -509,140 +512,6 @@ def markRefPt():
 
     displayStatusMsg(markerStr)
 
-def processKeyPress(key):
-    logMsg('Key pressed: ' + key)
-
-###
-#   Few Globals...
-###
-
-    global  GPSDate, GPSTime, prevGPSTime           # 
-    global  GPSLat, GPSLon, GPSAlt                  #from NMEA Parser
-    
-    global  gotRefPt, gotLCRP, keyMarker, dataLog   #
-    global  laneStat, wpStat                        #for lane status - up to 8 lanes (1 to 9 in laneStat array)
-    global  appRunning                              #boolean
-    
-###
-#   few local inits
-###
-
-    outStr      = ''                                #output string
-    keyMarker   = ['',0]                            #marker from key press
-    gotMarker   = False                             #marker key pressed
-                                                    #pressing the same lane # key will toggle the from close to open  
-###
-#   Data logging toggle
-###    
-
-    if key == 's' or key == 'S':                    #start/stop data logging
-        dataLog = not dataLog                       #toggle logging
-        if dataLog == True:
-            markerStr = '   *** Data Logging Started ***'
-            logMsg('*** Data Logging Started ***')
-        else:
-            markerStr = '   *** Data Logging Stopped ***'
-            logMsg('*** Data Logging Stopped ***')
-        keyMarker = ['Data Log', dataLog]
-        gotMarker = True
-    pass                                            #end of data log start/stop
-
-###
-#   Ref. point
-###    
-
-    if (key == 'r' or key == 'R') and gotRefPt == False and dataLog == True: #Mark reference point
-        markerStr = '   *** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
-        logMsg('*** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
-        ##T.insert (END, markerStr)
-        keyMarker = ['RP','']                       #reference point
-        gotRefPt = True                             #got the reference point
-        gotMarker = True                            #got the marker
-    pass                                            #end of ref point
-
-###
-#   Workers present
-###
-
-    if key == 'w' or key == 'W':                    #workers present/not present
-        wpStat = not wpStat                         #Toggle wp/np
-        markerStr = '   *** Workers Presence Marked: '+str(wpStat)+' ***'
-        logMsg('*** Workers Presence Marked: '+str(wpStat)+' ***')
-        ##print (markerStr)
-        ##T.insert (END, markerStr)
-        keyMarker[0] = 'WP'                         #WP marker
-        if gotRefPt == False:
-            keyMarker[0]='WP+RP'                    #WP+ref pt
-            gotRefPt = True                         #gotRefPT True    
-        keyMarker[1] = wpStat
-
-        gotMarker = True                            #got marker
-    pass                                            #end of data log start/stop
-
-###
-#   lane number input for LC/LO...
-###
-
-    if key > '0' and key <= '8':                    #Mark lane# closed point
-        lane = int(key)                             #lane number
-        laneStat[lane] = not laneStat[lane]         #Lane open status (T or F)
-        lc = 'LC'                                   #set lc to 'LC' - Lane Closed
-        if laneStat[lane] == True:
-            lc = 'LO'                               #toggle lane status to Lane Open
-        if gotRefPt == False:                       #if ref pt has not been marked yet
-            lc = lc + '+RP'                         #lc + ref. pt
-            gotRefPt = True                         #set to true
-        pass
-
-        lStat = 'Closed'
-        if lc == 'LO':       lStat = 'Open'
-            
-        markerStr = '   *** Lane '+str(key)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
-        logMsg('*** Lane '+str(key)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
-        ##print (markerStr)
-        ##T.insert (END, markerStr)
-        keyMarker = [lc, key]                 
-        gotMarker = True
-        ##writeData.writerow (markerStr)            #write complete outStr with marker at the end of kbhit check
-    pass                                            #end of LC marker
-
-###
-#   Esc key...
-###
-
-    if key == '\x1b':                               #Esc key pressed... Quit the logging routine...
-        markerStr = '   *** Application Ended ***'
-        logMsg('*** Application Ended ***')
-        ##print (markerStr)
-        ##T.insert (END, markerStr)
-        keyMarker = ['App Ended', '']
-        gotMarker = True
-        appRunning = not appRunning
-    pass                                            #end of Esc key
-
-###
-#   Got marker...
-#
-#   output of this method is ONLY the updated keyMarker (global)...
-#
-#   concstructed output string is saved in getNMEA_String method...
-###
-
-    if gotMarker == True:
-        xPos = 50
-        yPos = 450
-        displayStatusMsg(markerStr)
-    pass                                            #end of marker tag
-
-###
-#   
-#   -------------------  END OF processKeyPress...  ---------------------------------------------------------------------
-#
-#   
-#   -------------------  writeCSVFile...  ---------------------------------------------------------------------
-#
-###
-
 def writeCSVFile (write_str):
     global writeData                            #file handle
     
@@ -654,7 +523,6 @@ def writeCSVFile (write_str):
 #
 ###
 
-
 def displayStatusMsg(msgStr):
 
     xPos = 45
@@ -664,117 +532,7 @@ def displayStatusMsg(msgStr):
     Text.place(x=xPos,y=yPos)    
 
     Text = Label(root,anchor='w', justify=LEFT, text=msgStr)
-    Text.place(x=xPos,y=yPos)    
-
-###
-#   Following functions added on Sept. 2018...
-###
-
-###
-#   process button pressed...
-###
-
-def gotBtnPress(gotKey):
-    #processKeyPress(gotKey)
-
-    if gotKey == 'r' or gotKey == 's' or gotKey == 'w':     #start/stop data log, ref. pt and WP
-        toggle_btn_text(gotKey)
-
-    if gotKey >= '1' and gotKey <= '9':
-        if gotRefPt == False:        
-            toggle_btn_text(gotKey)                         #Toggle ref. pt. marker button text
-        pass
-        toggle_lane_color(gotKey)
-
-    processKeyPress(gotKey)                                 #process key press
-
-###
-#   ----------------  End of gotBtnPress  ---------------------------        
-###
-
-###
-#   toggle selected lane color
-###
-
-
-def toggle_lane_color(laneNum):
-
-    global  lanes                                   #list to hold all button objects for lanes
-   
-    btnObj = lanes[int(laneNum)]
-    if btnObj['bg'] == 'green':
-        btnObj['bg'] = 'gray92'
-        btnObj['fg'] = 'red3'
-    else:
-        btnObj['bg'] = 'green'
-        btnObj['fg'] = 'white'
-              
-###
-#   ----------------  End of toggle_lane_text  ---------------------------        
-###
-
-###
-#  Alter button text
-###
-
-def toggle_btn_text(gotKey):
-
-    global  gotReflanes
-    
-    if gotKey == 's':                                   #Start/Stop data log    
-        if bDL['text'] == 'Manually Start\nData Log (s)':
-            bDL['text'] = 'Manually Stop\nData Log (s)'
-            bDL['bg'] = 'gray92'
-            bDL['fg'] = 'red3'
-        else:
-            if bDL['text'] == 'Manually Stop\nData Log (s)':
-                gotKey = '\x1b'
-                processKeyPress(gotKey)
-                # bDL['text'] = 'Start Data\nLog (s)'
-                # bDL['bg']   = 'green'
-                # bDL['fg']   = 'white'
-        pass   
-    pass
-
-
-    #if gotKey == 'r':                                   #Ref point
-    if (gotKey == 'r' or gotKey == 'w' or (gotKey >= '1' and gotKey <= '9')) and gotRefPt == False and dataLog == True:
-    
-        if bR['text'] == 'Mark Ref.\nPoint (r)':
-            bR['text'] = 'Ref.Point\nMarked'
-            bR['bg'] = 'gray92'
-            bR['fg'] = 'red3'
-        pass
-    pass
-
-    if gotKey == 'w':                                   #workers present toggle
-        if bWP['text'] == 'Workers Not\nPresent (w)':
-            bWP['text'] = 'Workers are\nPresent (w)'
-            bWP['bg']   = 'gray92'
-            bWP['fg']   = 'red3'
-            
-        else:
-            if bWP['text'] == 'Workers are\nPresent (w)':
-                bWP['text'] = 'Workers Not\nPresent (w)'
-                bWP['bg']   = 'green'
-                bWP['fg']   = 'white'
-              
-###
-#   ----------------  End of toggle_btn_text  ---------------------------        
-###
-
-###
-#  Quit Application....
-###
-
-def gotQuit():
-    gotKey = '\x1b'
-    processKeyPress(gotKey)
-    if messagebox.askyesno('Quit', 'Sure you want to quit?') == True:
-        sys.exit(0)
-
-#---------------------------------------------------------------------
-
+    Text.place(x=xPos,y=yPos)
 
 ###
 #  Update GPS comm port
@@ -816,6 +574,7 @@ def checkForGPS(root, portNum, first):
             tkvar.trace('w', commSelect)
         return portNum
         
+# Open log file
 def openLog():
     global logFile
     if os.path.exists(logFileName):
@@ -824,10 +583,12 @@ def openLog():
         append_write = 'w' # make a new file if not
     logFile = open(logFileName, append_write)
 
+# Format and write message to log file
 def logMsg(msg):
     formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
     logFile.write('[' + formattedTime + '] ' + msg + '\n')
 
+# Remove overlay and enable buttons
 def enableForm():
     for i in range(1, totalLanes+1):
         if i != dataLane:
@@ -837,9 +598,6 @@ def enableForm():
     bWP['fg'] = 'white'
     bWP['bg'] = 'green'
     bWP['state'] = NORMAL
-###
-#   Few Variables... also used in different functions...
-###
 
 GPSRate     = 10                                #GPS data rate in Hz
 GPSDate     = ''                                #GPS Date
@@ -929,12 +687,6 @@ laneClosedImg = ImageTk.PhotoImage(Image.open('./images/laneClosedSign_small.jpg
 
 marginLeft = 100
 
-# def setLaneClosed(i):
-#     laneSymbols[i] = Label(image = laneClosedImg)
-#     laneSymbols[i].place(x=marginLeft+13 + (i-1)*110, y=120)
-# def setWorkersPresent():
-#     worksersPresentLabel = Label(image = workersPresentImg)
-#     worksersPresentLabel.place(x=marginLeft+60 + (totalLanes)*110, y=100)
 laneBoxes = [0]*(totalLanes+1)
 laneLabels = [0]*(totalLanes+1)
 laneSymbols = [0]*(totalLanes+1)
@@ -959,7 +711,10 @@ laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not 
 
 def createButton(id):
     global lanes
-    lanes[id] = Button(text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
+    if id == dataLane:
+        lanes[id] = Button(text='Lane '+str(id) + '\n(Vehicle Lane)', font='Helvetica 10', width=11, height=4, command=lambda:laneClicked(id))
+    else:
+        lanes[id] = Button(text='Lane '+str(id), bg='green', fg='white', font='Helvetica 10', width=11, height=4, command=lambda:laneClicked(id))
     lanes[id].place(x=marginLeft+10 + (id-1)*110, y=300)
 
 for i in range(1, totalLanes+1):
@@ -969,8 +724,10 @@ for i in range(1, totalLanes+1):
 #   Mark Workers Present...
 ###
 
-bWP = Button(text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
+bWP = Button(text='Mark Workers\nPresent', font='Helvetica 10', width=11, height=4, command=lambda:workersPresentClicked())
 bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
+
+workersPresentClicked()
 
 ###
 #   Quit...
@@ -998,8 +755,8 @@ appMsgWin = Button(text='Application Message Window...                          
 appMsgWin.place(x=50, y=390)
 
 
-overlay = Label(text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
-overlay.place(x=(marginLeft+80 + (totalLanes)*110)/2-160, y=200)
+# overlay = Label(text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
+# overlay.place(x=(marginLeft+80 + (totalLanes)*110)/2-160, y=200)
 ##############################################################
 #   ------------------ END of LAYOUT -------------------------
 ##############################################################

@@ -43,12 +43,13 @@ from    wz_map_constructor  import getEndPoint          #calculates lat/lon for 
 from    wz_map_constructor  import getDist              #get distance in meters between pair of lat/lon points
                                                         #   called from getLanePt
 
-from    wz_xml_builder         import build_xml_CC         #common container
-from    wz_xml_builder         import build_xml_WZC        #WZ container
-from    rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
+from    wz_xml_builder          import build_xml_CC         #common container
+from    wz_xml_builder          import build_xml_WZC        #WZ container
+from    rsm_2_wzdx_translator   import wzdx_creator         #WZDx Translator
 
-from    wz_msg_segmentation    import buildMsgSegNodeList  #msg segmentation node list builder
+from    wz_msg_segmentation     import buildMsgSegNodeList  #msg segmentation node list builder
 
+# from    WZDC_tool_helper        import setupVehPathDataAcqUI
 
 def inputFileDialog():
     global local_config_path
@@ -156,14 +157,22 @@ def getConfigVars():
 
     roadName        = wzConfig['INFO']['RoadName']
     # roadNumber      = wzConfig['INFO']['RoadNumber']
-    # beginningCrossStreet  = wzConfig['INFO']['beginningCrossStreet']
-    # endingCrossStreet = wzConfig['INFO']['endingCrossStreet']
-    # beginningMilepost = wzConfig['INFO']['beginningMilepost']
-    # endingMilepost = wzConfig['INFO']['endingMilepost']
-    # issuingOrganization = wzConfig['INFO']['issuingOrganization']
-    # creationDate = wzConfig['INFO']['creationDate']
-    # updateDate = wzConfig['INFO']['updateDate']
-    # isArchitecturalChange = wzConfig['INFO']['isArchitecturalChange']
+    # beginningCrossStreet  = wzConfig['INFO']['BeginningCrossStreet']
+    # endingCrossStreet = wzConfig['INFO']['EndingCrossStreet']
+    # beginningMilepost = wzConfig['INFO']['BeginningMilepost']
+    # endingMilepost = wzConfig['INFO']['EndingMilepost']
+    # issuingOrganization = wzConfig['INFO']['IssuingOrganization']
+    # creationDate = wzConfig['INFO']['CreationDate']
+    # updateDate = wzConfig['INFO']['UpdateDate']
+
+    # eventStatus = wzConfig['INFO']['EventStatus']
+    # beginingAccuracy = wzConfig['INFO']['BeginingAccuracy']
+    # endingAccuracy = wzConfig['INFO']['EndingAccuracy']
+    # startDateAccuracy = wzConfig['INFO']['StartDateAccuracy']
+    # endDateAccuracy = wzConfig['INFO']['EndDateAccuracy']
+    # typeOfWork = wzConfig['INFO']['TypeOfWork']
+    # laneRestrictions = wzConfig['INFO']['LaneRestrictions']
+    # laneType = wzConfig['INFO']['LaneType']
 
 def set_config_description(config_file):
     if config_file:
@@ -761,6 +770,7 @@ def checkForGPS(root, portNum, first):
                 portNum = port.device
                 gpsFound = True
                 logMsg('GPS device found at port number: ' + portNum)
+        return 'COM3'
         if (not gpsFound) and first:
             logMsg('GPS device not directly found')
             mainframe = Frame(root, pady=100, padx=100)
@@ -768,7 +778,7 @@ def checkForGPS(root, portNum, first):
             mainframe.place(x=300, y=600)
             mainframe.columnconfigure(0, weight=1)
             mainframe.rowconfigure(0, weight=1)
-            mainframe.place(x=300, y=600)
+            # mainframe.place(x=300, y=600)
             # Create a Tkinter variable
             tkvar = StringVar(root)
             tkvar.set(ports[0].device) #default is first comm port
@@ -779,6 +789,7 @@ def checkForGPS(root, portNum, first):
             tkvar.trace('w', commSelect)
         return portNum
 
+# Format and write message to file
 def enableForm():
     for i in range(1, totalLanes+1):
         if i != dataLane:
@@ -901,12 +912,22 @@ vehPathDataFile = outDir + '/' + vehPathDataFileName
 # root.geometry(str(max(800, totalLanes*110+350))+'x500')
 # root = Frame(window)
 # root.place(x=0, y=0)
-window.geometry(str(max(800, totalLanes*110+350))+'x500')
-root = Frame(width=max(800, totalLanes*110+350), height=500)
+# totalLanes = 8
+# dataLane = 7
+window_width = max(800, totalLanes*110+350)
+window.geometry(str(max(800, window_width))+'x700')
+root = Frame(width=max(800, window_width), height=700)
 root.place(x=0, y=0)
-
 # root.bind_all('<Key>', keyPress)                #key press event...
 
+
+laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
+marginLeft = 100
+
+laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))                             # Lane Line
+carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))                                         # Car image
+carlabel = Label(root, image = carImg)                                                                  # Label with car image
+workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))             # Workers present image
 
 #############################################################################
 #
@@ -914,85 +935,76 @@ root.place(x=0, y=0)
 #
 #############################################################################
 
-lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
-lbl_top.place(x=300, y=20)
+def setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked):
+    lanes = [0]*(totalLanes+1)
+    laneBoxes = [0]*(totalLanes+1)
+    laneLabels = [0]*(totalLanes+1)
+    laneSymbols = [0]*(totalLanes+1)
+    laneLines = [0]*(totalLanes+1)
 
-# winSize = Label(root, height=30, width=120) #width was 110
-# winSize.pack()
-
-laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))
-carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))
-carlabel = Label(root, image = carImg)
-workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))
-laneClosedImg = ImageTk.PhotoImage(Image.open('./images/laneClosedSign_small.jpg'))
-
-marginLeft = 100
-
-laneBoxes = [0]*(totalLanes+1)
-laneLabels = [0]*(totalLanes+1)
-laneSymbols = [0]*(totalLanes+1)
-laneLines = [0]*(totalLanes+1)
-for i in range(totalLanes):
-    laneLines[i] = Label(root, image = laneLine)
-    laneLines[i].place(x=marginLeft + i*110, y=50)
-    if i+1 == dataLane:
-        carlabel.place(x=marginLeft+8 + i*110, y=50)
-    else:
-        laneBoxes[i+1] = Label(root, justify=LEFT,anchor=W,padx=50,pady=90)
-        laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
-        laneLabels[i+1] = Label(root, text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
-        laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
-    if i == totalLanes-1:
-        laneLines[i+1] = Label(root, image = laneLine)
-        laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
-
-lanes = [0]*(totalLanes+1)
-laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
+    lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
+    lbl_top.place(x=window_width/2-250/2, y=10)
 
 
-def createButton(id):
-    global lanes
-    lanes[id] = Button(root, text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
-    lanes[id].place(x=marginLeft+10 + (id-1)*110, y=300)
 
-for i in range(1, totalLanes+1):
-    createButton(i)
-
-
-###
-#   Mark Workers Present...
-###
-
-bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
-bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
-###
-#   Quit...
-###
+    # Initialize lane images
+    for i in range(totalLanes):
+        laneLines[i] = Label(root, image = laneLine)
+        laneLines[i].place(x=marginLeft + i*110, y=50)
+        if i+1 == dataLane:
+            carlabel.place(x=marginLeft+8 + i*110, y=50)
+        else:
+            laneBoxes[i+1] = Label(root, justify=LEFT,anchor=W,padx=50,pady=90)
+            laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
+            laneLabels[i+1] = Label(root, text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
+            laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
+        if i == totalLanes-1:
+            laneLines[i+1] = Label(root, image = laneLine)
+            laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
 
 
-bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
-bStart.place(x=100, y=510)
+    # This is required because otherwise the lane command laneClicked(lane #) cannot be set in a for loop
+    def createButton(id):
+        laneBtn = Button(root, text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
+        laneBtn.place(x=marginLeft+10 + (id-1)*110, y=300)
+        return laneBtn
 
-bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
-bRef.place(x=250, y=510)
+    # Create lane buttons dynamically to number of lanes
+    for i in range(1, totalLanes+1):
+        lanes[i] = createButton(i)
 
-bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
-bEnd.place(x=500, y=510)
+    # Toggle workers present button
+    bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
+    bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
-# bQuit = Button(text='Quit (Esc)', font='Helvetica 10', fg = 'white', bg='red3',padx=5, command=gotQuit)
-# bQuit.place(x=400,y=380)
+    # Debug buttons, hidden by small frame
+    bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
+    bStart.place(x=100, y=510)
+    bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
+    bRef.place(x=250, y=510)
+    bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
+    bEnd.place(x=500, y=510)
 
-###
-#   Application Message Window...
-###
+    ###
+    #   Application Message Window...
+    ###
 
-appMsgWin = Button(root, text='Application Message Window...                                             ',      \
-                font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
-appMsgWin.place(x=50, y=390)
+    appMsgWin = Button(root, text='Application Message Window...                                             ',      \
+                    font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
+    appMsgWin.place(x=50, y=390)
 
+    overlayWidth = 710
+    overlayx = window_width/2 - overlayWidth/2
+    overlay = Label(root, text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
+    overlay.place(x=overlayx, y=200)
 
-overlay = Label(root, text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
-overlay.place(x=(marginLeft+80 + (totalLanes)*110)/2-160, y=200)
+    return overlay, bWP, lanes, laneLabels
+
+overlay, bWP, lanes, laneLabels = setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked)
+
+# laneClicked(3)
+# workersPresentClicked()
+
 ##############################################################
 #   ------------------ END of LAYOUT -------------------------
 ##############################################################
@@ -1010,10 +1022,12 @@ first = True
 while not gps_found:
     logMsg('Searching for GPS device')
     try:
-        portNum     = 'COM4'
+        portNum     = 'COM3'
         baudRate    = 115200
         timeOut     = 1
         portNum = checkForGPS(root, portNum, first)
+        portNum     = 'COM3'
+        baudRate    = 115200
         first = False
         ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
         msgStr      = 'Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
@@ -1028,39 +1042,21 @@ while not gps_found:
             logMsg('User exited application')
             logFile.close()
             sys.exit(0)
-        #if MsgBox == 'no':
-            #sys.exit(0)
-        
 
-    
 ###
 #   EOL is not supported in PySerial for readline() in Python 3.6.
 #   must use sio
 ###
 
 logMsg('Creating serial IO connection')
-sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))             
+sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
 
-###
-#   Get current date and time...
-###
-
-###
 #   Open outFile for csv write...
-#   make sure newline is set to null, otherwise will get extra cr.. 
-###
-
-#configRead(local_config_path)
-
-
 logMsg('Opening path data output file: ' + vehPathDataFile)
 outFile     = open(vehPathDataFile,'w',newline='')
 writeData   = csv.writer(outFile)
 
-###
-#   Write Title in the data logging file...
-###
-
+# Write heading to file
 titleLine = 'GPS Date & Time','# of Sats','HDOP','Latitude','Longitude','Altitude(m)','Speed(m/s)','Heading(Deg)','Marker','Value'
 writeCSVFile(titleLine)
 
@@ -1098,52 +1094,14 @@ logMsg('Ending data acquisition')
 # logFile.close()
 root.destroy()
 window.quit()
-# subprocess.call([sys.executable, build_export_file], shell=True) #, shell=True
-# os.system(build_export_file) #_------------------------------------------------------------ FAILED
-# os.remove(local_config_path)
-# sys.exit(0)
-# root.mainloop()
-
-
-
 
 
 # ------------------------------------------------------- WZ_BuildMsgs_and_Export --------------------------------------------------------
 laneStat = []
 wpStat = []
 
-def inputFileDialog(filename):
-
-    if len(filename):
-        configRead(filename)
-    pass
-
-##
-#   -------------- End of input_file_dialog ------------------
-##
-
-def buildWZMap(filename):
-    global uper_failed
-    global error
-    global error_message
-    
-    startMainProcess()
-
-    if msgSegList[0][0] == -1:                          #Segmentation failed...
-        error = True
-        error_message = 'Failed to build message segmentation'
-        logMsg('Error in building message segmentation')
-    elif uper_failed:   
-        error = True
-        error_message = 'Failed to run message builder UPER conversion'
-        logMsg('UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH')
-    else:
-        logMsg('WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...')
-    pass
-
 def build_messages():
-    global uper_failed
-    global files_list
+    global files_list               # List of files to include in exported archive
     
 ###
 #   Data elements for 'common' container...
@@ -1164,20 +1122,10 @@ def build_messages():
 
     idList      = [msgID,eventID]                           #msgID and eventID only. No stationId        
 
-
-###
-#   Set
-#       WZ start date and time and end date and time in yyyy,mm,dd,hh,mm
-#       UTC time offset
-#       headway tolerance
-#       road width - NOT used any more...
-#       event length same as workzone length
-###
-
     wzStart     = wzStartDate.split('/') + wzStartTime.split(':')
     wzEnd       = wzEndDate.split('/')   + wzEndTime.split(':')
 
-    timeOffset  = -300                                      #UTC time offset in minutes for Eastern Time Zone
+    timeOffset  = 0                                         #UTC time offset
     hTolerance  = 20                                        #applicable heading tolerance set to 20 degrees (+/- 20deg?)
 
     roadWidth   = totalLanes*laneWidth*100                  #roadWidth in cm
@@ -1188,7 +1136,7 @@ def build_messages():
 #   Set speed limits in WZ as vehicle max speed..from user input saved in config file...
 ###
 
-    speedLimit  = ['<vehicleMaxSpeed/>',speedList[0],speedList[1],speedList[2],'<mph/>']#NEW Version of XER... Nov. 2017
+    speedLimit  = ['vehicleMaxSpeed',speedList[0],speedList[1],speedList[2],'mph'] #NEW Version of XER... Nov. 2017
 
 ### -------------------------------------------------
 #
@@ -1272,8 +1220,6 @@ def build_messages():
 ###
 #   Build xml for common container...
 ###
-        # build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
-        #               speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
         commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,wzDaysOfWeek,c_sc_codes,newRefPt,appHeading,hTolerance, \
                       speedLimit,laneWidth,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
 
@@ -1282,7 +1228,7 @@ def build_messages():
             #logMsg('\n ---Message Segmentation for Work Zone Lanes')        
         #pass
 
-        #logMsg('\t ---Segment#: '+str(currSeg)+'Start Node#: '+str(startNode)+'\n\t\t New Ref. Pt: '+str(newRefPt))
+        logMsg('Segment#: '+str(currSeg)+'Start Node#: '+str(startNode)+'\n\t\t New Ref. Pt: '+str(newRefPt))
 
 ###
 #       WZ length, LC characteristic, workers present, etc. 
@@ -1311,12 +1257,9 @@ def build_messages():
         rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent='  ')
         xmlFile.write(rsm_xml)
 
-    
-###
-#   Done, finito, close files
-###   
-
         xmlFile.close()
+
+        # Execute xml to binary conversion with java app
         subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper_v8.jar', str(xml_outFile), str(uper_outFile)],stdout=devnull)
         if not os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
             logMsg('ERROR: RSM UPER conversion FAILED, ensure that you have java installed (>=1.8 or jdk>=8) and added to your system path')
@@ -1326,10 +1269,11 @@ def build_messages():
             sys.exit(0)
 
         currSeg = currSeg+1
-    pass
+
     info = {}
     info['road_name'] = roadName
     # info['road_number'] = roadNumber
+    # info['direction] = direction
     # info['beginning-cross_street'] = beginningCrossStreet
     # info['ending_cross_street'] = endingCrossStreet
     # info['beginning_milepost'] = beginningMilepost
@@ -1337,7 +1281,15 @@ def build_messages():
     # info['issuing_organization'] = issuingOrganization
     # info['creation_date'] = creationDate
     # info['update_date'] = updateDate
-    # info['is_architectural_change'] = isArchitecturalChange
+    # info['event_status'] = EventStatus
+    # info['beginning_accuracy'] = beginingAccuracy
+    # info['ending_accuracy'] = endingAccuracy
+    # info['start_date_accuracy'] = startDateAccuracy
+    # info['end_date_accuracy'] = endDateAccuracy
+
+    # info['type_of_work'] = typeOfWork
+    # info['lane_restrictions'] = laneRestrictions
+    # info['lane_type'] = laneType
     logMsg('Converting RSM XMl to WZDx message')
     wzdx = wzdx_creator(rsmSegments, dataLane, info)
     wzdxFile.write(json.dumps(wzdx, indent=2))
