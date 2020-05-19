@@ -28,7 +28,7 @@ from    tkinter         import *
 from    tkinter         import messagebox
 from    tkinter         import filedialog
 from    PIL             import ImageTk, Image
-
+import re
 
 from    parseNMEA       import parseGxGGA           #parse GGA for Time, Alt, #of Satellites
 from    parseNMEA       import parseGxRMC           #parse RMC for Date, Lat, Lon, Speed, Heading
@@ -64,8 +64,6 @@ def inputFileDialog():
             # local_config_file = abs_path
             set_config_description(local_config_path)
             wzConfig_file.set(local_config_path)
-            btnBegin['state']   = 'normal'                    #enable the start button for map building...
-            btnBegin['bg']      = 'green'
         except Exception as e:
             logMsg('ERROR: Config read failed, ' + str(e))
             messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
@@ -175,6 +173,7 @@ def getConfigVars():
     # laneType = wzConfig['INFO']['LaneType']
 
 def set_config_description(config_file):
+    global isConfigReady
     if config_file:
         startDate_split = wzStartDate.split('/')
         start_date = startDate_split[0] + '/' + startDate_split[1] + '/' + startDate_split[2]
@@ -184,6 +183,8 @@ def set_config_description(config_file):
             '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
         logMsg('Configuration File Summary: \n' + config_description)
         msg['text'] = config_description
+        isConfigReady = True
+        updateMainButton()
     else:
         msg['text'] = 'No config file found, please select a config file below'
 
@@ -253,7 +254,20 @@ def internet_on():
 
 def logMsg(msg):
     formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
-    logFile.write('[' + formattedTime + '] ' + msg + '\n')
+    try:
+        logFile.write('[' + formattedTime + '] ' + msg + '\n')
+    except:
+        pass
+
+def updateMainButton():
+    if isConfigReady and isGPSReady:
+        print('all ready!')
+        btnBegin['state']   = 'normal'
+        btnBegin['bg']      = 'green'
+    else:
+        print('Not Quite Ready')
+        btnBegin['state']   = 'disabled'
+        btnBegin['bg']     = '#F0F0F0'
 
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
@@ -298,11 +312,11 @@ logFile = open(logFileName, append_write)         #log file
 ##logMsg ('\n *** - '+wzDesc+' - ***\n')
 logMsg('*** Running Main UI ***')
 
-if not internet_on():
-    logMsg('Internet connectivity test failed, application exiting')
-    messagebox.showerror('No internet connection was detected', 'The first component of this application requires an internet connection to function. Please reconnect and restart this application')
-    sys.exit(0)
-logMsg('Internet connectivity test succeeded')
+# if not internet_on():
+#     logMsg('Internet connectivity test failed, application exiting')
+#     messagebox.showerror('No internet connection was detected', 'The first component of this application requires an internet connection to function. Please reconnect and restart this application')
+#     sys.exit(0)
+# logMsg('Internet connectivity test succeeded')
 
 try:
     java_version = subprocess.check_output(['java', '-version'], stderr=subprocess.STDOUT).decode('utf-8')
@@ -333,6 +347,7 @@ except Exception as e:
 # wzConfig_file = StringVar()
 configDirectory = './Config Files'
 local_config_path = ''
+isConfigReady = False
 
 lbl_top = Label(root, text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.place(x=300, y=20)
@@ -358,98 +373,68 @@ else:
 download_file_path = './Config Files/local_config.json'
 #print('\nDownloading blob to \n\t' + download_file_path)
 
-blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-container_name = 'publishedconfigfiles'
-container_client = blob_service_client.get_container_client(container_name)
-#blob_client = blob_service_client.get_blob_client(container='', blob='')
+if internet_on():
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+    container_name = 'publishedconfigfiles'
+    container_client = blob_service_client.get_container_client(container_name)
+    #blob_client = blob_service_client.get_blob_client(container='', blob='')
 
 
-logMsg('Listing blobs in container:' + container_name)
-blob_list = container_client.list_blobs()
+    logMsg('Listing blobs in container:' + container_name)
+    blob_list = container_client.list_blobs()
 
-frame = Frame(root)
-frame.place(x=100, y=200)
+    frame = Frame(root)
+    frame.place(x=100, y=200)
 
-listbox = Listbox(frame, width=50, height=6, font=('Helvetica', 12), bg='white')
-listbox.pack(side='left', fill='y')
+    listbox = Listbox(frame, width=50, height=6, font=('Helvetica', 12), bg='white')
+    listbox.pack(side='left', fill='y')
 
-scrollbar = Scrollbar(frame, orient='vertical')
-scrollbar.config(command=listbox.yview)
-scrollbar.pack(side='right', fill='y')
+    scrollbar = Scrollbar(frame, orient='vertical')
+    scrollbar.config(command=listbox.yview)
+    scrollbar.pack(side='right', fill='y')
 
-listbox.config(yscrollcommand=scrollbar.set)
+    listbox.config(yscrollcommand=scrollbar.set)
 
-now = datetime.datetime.now()
-def getModTimeDelta(blob):
-    time_delta = now-blob.last_modified.replace(tzinfo=None)
-    return time_delta
+    now = datetime.datetime.now()
+    def getModTimeDelta(blob):
+        time_delta = now-blob.last_modified.replace(tzinfo=None)
+        return time_delta
 
-blob_names_dict = {}
-blobListSorted = []
-for blob in blob_list:
-    logMsg('Blob Name: ' + blob.name)
-    blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
-blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
-for blob in blobListSorted:
-    blob_name = blob.name.split('/')[-1]
-    if '.json' in blob_name:
-        blob_names_dict[blob_name] = blob.name
-        listbox.insert(END, blob_name)
+    blob_names_dict = {}
+    blobListSorted = []
+    for blob in blob_list:
+        logMsg('Blob Name: ' + blob.name)
+        blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
+    blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
+    for blob in blobListSorted:
+        blob_name = blob.name.split('/')[-1]
+        if '.json' in blob_name:
+            blob_names_dict[blob_name] = blob.name
+            listbox.insert(END, blob_name)
 
-logMsg('Blobs sorted, filtered and inserted into listbox')
-load_config = Button(root, text='Load Cloud Configuration File', font='Helvetica 10', padx=5, command=downloadConfig)
-load_config.place(x=100, y=320)
+    logMsg('Blobs sorted, filtered and inserted into listbox')
+    load_config = Button(root, text='Load Cloud Configuration File', font='Helvetica 10', padx=5, command=downloadConfig)
+    load_config.place(x=100, y=320)
 
-config_label_or = Label(root, text='OR', font='Helvetica 10', padx=5)
-config_label_or.place(x=150, y=352)
+    config_label_or = Label(root, text='OR', font='Helvetica 10', padx=5)
+    config_label_or.place(x=150, y=352)
 
-diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
-diag_wzConfig_file.place(x=115,y=380)
+    diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+    diag_wzConfig_file.place(x=115,y=380)
 
-wzConfig_file = StringVar()
-wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-wzConfig_file_name.place(x=220,y=390)
-
-
-ports = serial.tools.list_ports.comports(include_links=False)
-if len(ports)==0:
-    raise SerialException('No open COM ports detected')
+    wzConfig_file = StringVar()
+    wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+    wzConfig_file_name.place(x=220,y=390)
 else:
-    mainframe = Frame(root)
-    # Add a grid
-    mainframe.place(x=750, y=310)
-    mainframe.columnconfigure(0, weight=1)
-    mainframe.rowconfigure(0, weight=1)
-    # mainframe.place(x=300, y=600)
-    # Create a Tkinter variable
-    tkvar = StringVar(window)
-    tkvar.set(ports[0]) #default is first comm port
-    popupMenu = OptionMenu(mainframe, tkvar, *ports)
-    logMsg('Creating comm port popup menu')
-    commLabel = Label(mainframe, text='Choose a comm port')
-    commLabel.pack()
-    popupMenu.pack()
-    # tkvar.trace('w', commSelect)
+    diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+    diag_wzConfig_file.place(x=115,y=200)
 
-baudLabel = Label(root, text='Change Baud Rate (bps)')
-baudLabel.place(x=750, y=370)
-baudRates = ['4800', '9600', '19200', '57600', '115200']
-tkBaudVar = StringVar(window)
-tkBaudVar.set('115200') #default is first comm port
-baudPopupMenu = OptionMenu(root, tkBaudVar, *baudRates)
-baudPopupMenu.place(x=750, y=390)
+    wzConfig_file = StringVar()
+    wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+    wzConfig_file_name.place(x=220,y=210)
 
 
-def testGPSConnection():
-    btnBegin['state']   = 'normal'                    #enable the start button for map building...
-    btnBegin['bg']      = 'green'
-
-btnTestGps = Button(root, text='Test GPS\nConnection', font='Helvetica 13',border=2,command=testGPSConnection, anchor=W)
-btnTestGps.place(x=585,y=340)
-
-
-instructions = '''This component requires a good internet connection.
-This is the configuration file selection component of the 
+instructions = '''This is the configuration file selection component of the 
 Work Zone Data Collection tool. To use the tool,
 select a file from the list of punlished configuration files and
 select 'Download Config'. When the correct configuration file
@@ -463,12 +448,107 @@ instr_label.place(x=700, y=100)
 btnBegin = Button(root, text='Begin Data\nCollection', font='Helvetica 14',border=2,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
 btnBegin.place(x=570,y=390)
 
+isGPSReady = False
+
+def testGPSConnection(*args):
+    global isGPSReady
+    ser = serial.Serial(port=tkPortVar.get()[0:4], baudrate=tkBaudVar.get(), timeout=1.1)
+    sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
+    NMEAData = sio.readline()
+    ser.close()
+    print(NMEAData)
+    # pattern = re.compile('\$?GP[a-zA-Z]{3,},([a-zA-Z0-9\.]*,)+([a-zA-Z0-9]{1,2}\*[a-zA-Z0-9]{1,2})')
+    if NMEAData == '':
+        btnBegin['state']   = 'disabled'                    #enable the start button for map building...
+        btnBegin['bg']     = '#F0F0F0'
+        commLabel['text']   = 'GPS DEVICE NOT FOUND'
+        commLabel['fg']     = 'red'
+        isGPSReady = False
+        return False
+    elif NMEAData[0:3] == '$GP': # Beginning of NMEA String
+        print('Matched!')
+        # btnBegin['state']   = 'normal'                    #enable the start button for map building...
+        # btnBegin['bg']      = 'green'
+        commLabel['text']   = 'GPS DEVICE FOUND'
+        commLabel['fg']     = 'green'
+        isGPSReady = True
+        updateMainButton()
+        return True
+    else:
+        print('Not NMEA')
+        btnBegin['state']   = 'disabled'                    #enable the start button for map building...
+        btnBegin['bg']     = '#F0F0F0'
+        commLabel['text']   = 'GPS DEVICE NOT FOUND'
+        commLabel['fg']     = 'red'
+        isGPSReady = False
+        return False
+
+
+baudLabel = Label(root, text='Baud Rate (bps)')
+baudLabel.place(x=850, y=370)
+baudRates = ['4800', '9600', '19200', '57600', '115200']
+tkBaudVar = StringVar(window)
+tkBaudVar.set('115200') #default is first comm port
+baudPopupMenu = OptionMenu(root, tkBaudVar, *baudRates)
+baudPopupMenu.place(x=850, y=390)
+
+baudLabel = Label(root, text='Data Rate (Hz)')
+baudLabel.place(x=950, y=370)
+dataRates = ['1', '2', '5', '10']
+tkDataVar = StringVar(window)
+tkDataVar.set('10') #default is first comm port
+baudPopupMenu = OptionMenu(root, tkDataVar, *dataRates)
+baudPopupMenu.place(x=950, y=390)
+
+ports = serial.tools.list_ports.comports(include_links=False)
+# if len(ports)==0:
+#     raise SerialException('No open COM ports detected')
+# else:
+mainframe = Frame(root)
+# Add a grid
+mainframe.place(x=850, y=310)
+mainframe.columnconfigure(0, weight=1)
+mainframe.rowconfigure(0, weight=1)
+# mainframe.place(x=300, y=600)
+# Create a Tkinter variable
+logMsg('Creating comm port popup menu')
+commLabel = Label(mainframe, text='GPS DEVICE NOT FOUND', font='Helvetica 13 bold', fg='red')
+tkPortVar = StringVar(window)
+
+popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
+commLabel.pack()
+popupMenu.pack()
+# tkvar.trace('w', commSelect)
+
+def updatePortsDropdown():
+    global popupMenu
+    ports = serial.tools.list_ports.comports(include_links=False)
+    currentValue = tkPortVar.get()
+    popupMenu.destroy()
+    popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
+    popupMenu.pack()
+    for port in ports:
+        if currentValue == str(port):
+            tkPortVar.set(port)
+            return
+    tkPortVar.set(ports[0])
+
+def searchPorts():
+    for port in ports:
+        tkPortVar.set(port)
+        if (testGPSConnection()):
+            break
+    tkPortVar.trace("w", testGPSConnection)
+
+btnTestGps = Button(root, text='Refresh', font='Helvetica 13',border=2,command=updatePortsDropdown, anchor=W)
+btnTestGps.place(x=750,y=340)
+
 def on_closing():
     logFile.close()
     sys.exit(0)
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
-
+window.after(500, searchPorts)
 window.mainloop()
 
 
@@ -970,6 +1050,9 @@ msgSegList      = []                    #WZ message node segmentation list
 files_list      = []
 
 
+commPort = tkPortVar.get()[0:4]
+baudRate = int(tkBaudVar.get())
+dataRate = int(tkDataVar.get())
 
 ###
 #   Open output file for data logging...
@@ -991,11 +1074,10 @@ vehPathDataFile = outDir + '/' + vehPathDataFileName
 # totalLanes = 8
 # dataLane = 7
 window_width = max(800, totalLanes*110+350)
-window.geometry(str(max(800, window_width))+'x700')
+window.geometry(str(max(800, window_width))+'x500')
 root = Frame(width=max(800, window_width), height=700)
 root.place(x=0, y=0)
 # root.bind_all('<Key>', keyPress)                #key press event...
-
 
 laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
 marginLeft = 100
@@ -1011,6 +1093,12 @@ workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_s
 #
 #############################################################################
 
+def end_application():
+    global appRunning
+    appRunning = False
+    logFile.close()
+    sys.exit(0)
+
 def setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked):
     lanes = [0]*(totalLanes+1)
     laneBoxes = [0]*(totalLanes+1)
@@ -1020,8 +1108,6 @@ def setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, 
 
     lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
     lbl_top.place(x=window_width/2-250/2, y=10)
-
-
 
     # Initialize lane images
     for i in range(totalLanes):
@@ -1098,14 +1184,14 @@ first = True
 while not gps_found:
     logMsg('Searching for GPS device')
     try:
-        portNum     = 'COM3'
-        baudRate    = 115200
-        timeOut     = 1
-        portNum = checkForGPS(root, portNum, first)
-        portNum     = 'COM4'
-        baudRate    = 115200
-        first = False
-        ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
+        # portNum     = 'COM3'
+        # baudRate    = 115200
+        # timeOut     = 1
+        # portNum = checkForGPS(root, portNum, first)
+        # portNum     = 'COM4'
+        # baudRate    = 115200
+        # first = False
+        ser         = serial.Serial(port=commPort, baudrate=baudRate, timeout=1.1)               #open serial port
         msgStr      = 'Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
         displayStatusMsg(msgStr)                                                        #system ready
         gps_found = True
@@ -1117,7 +1203,7 @@ while not gps_found:
         if MsgBox == 'no':
             logMsg('User exited application')
             logFile.close()
-            sys.exit(0)
+            sys.exit(0)                                                 #system ready
 
 ###
 #   EOL is not supported in PySerial for readline() in Python 3.6.
@@ -1142,10 +1228,9 @@ writeCSVFile(titleLine)
 #
 ###
 
-window.protocol("WM_DELETE_WINDOW", on_closing)
-
 logMsg('Starting main loop')
 
+window.protocol("WM_DELETE_WINDOW", end_application)
 startMainFunc()                                         #main function, starts NMEA processing 
 
 logMsg('Main loop ended, closing streams/files')

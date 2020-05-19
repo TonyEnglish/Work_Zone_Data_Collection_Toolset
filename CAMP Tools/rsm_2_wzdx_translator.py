@@ -163,6 +163,7 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
                 if point.get('node-3Dabsolute') is not None: #Store coordinates of node for use later
                     lane_coordinate.append(int(point['node-3Dabsolute']['long'])/10000000)
                     lane_coordinate.append(int(point['node-3Dabsolute']['lat'])/10000000)
+                    lane_coordinate.append(int(point['node-3Dabsolute']['elev']))
                 else: #Node is defined as offset (node-3Doffset), this is not yet supported
                     lane_coordinate.append(0)
                     lane_coordinate.append(0)
