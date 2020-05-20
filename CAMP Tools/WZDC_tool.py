@@ -110,15 +110,23 @@ def getConfigVars():
     global  wzEndLon                                       #wz end time
 
     global  roadName
-    # global  roadNumber
-    # global  beginningCrossStreet
-    # global  endingCrossStreet
-    # global  beginningMilepost
-    # global  endingMilepost
-    # global  issuingOrganization
-    # global  creationDate
-    # global  updateDate
-    # global  isArchitecturalChange
+    global  roadNumber
+    global  beginningCrossStreet
+    global  endingCrossStreet
+    global  beginningMilepost
+    global  endingMilepost
+    global  issuingOrganization
+    global  creationDate
+    global  updateDate
+
+    global  eventStatus
+    global  beginingAccuracy
+    global  endingAccuracy
+    global  startDateAccuracy
+    global  endDateAccuracy
+    global  typeOfWork
+    global  laneRestrictions
+    global  laneType
 
     dirName     = wzConfig['FILES']['VehiclePathDataDir']   #veh path data file directory
     fileName    = wzConfig['FILES']['VehiclePathDataFile']  #veh path data file name
@@ -154,23 +162,26 @@ def getConfigVars():
     pass
 
     roadName        = wzConfig['INFO']['RoadName']
-    # roadNumber      = wzConfig['INFO']['RoadNumber']
-    # beginningCrossStreet  = wzConfig['INFO']['BeginningCrossStreet']
-    # endingCrossStreet = wzConfig['INFO']['EndingCrossStreet']
-    # beginningMilepost = wzConfig['INFO']['BeginningMilepost']
-    # endingMilepost = wzConfig['INFO']['EndingMilepost']
-    # issuingOrganization = wzConfig['INFO']['IssuingOrganization']
-    # creationDate = wzConfig['INFO']['CreationDate']
-    # updateDate = wzConfig['INFO']['UpdateDate']
+    roadNumber      = wzConfig['INFO'].get('RoadNumber', '')
+    beginningCrossStreet  = wzConfig['INFO'].get('BeginningCrossStreet', '')
+    endingCrossStreet = wzConfig['INFO'].get('EndingCrossStreet', '')
+    beginningMilepost = wzConfig['INFO'].get('BeginningMilepost', '')
+    endingMilepost = wzConfig['INFO'].get('EndingMilepost', '')
+    issuingOrganization = wzConfig['INFO'].get('IssuingOrganization', '')
+    creationDate = wzConfig['INFO'].get('CreationDate', '')
+    updateDate = wzConfig['INFO'].get('UpdateDate', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
-    # eventStatus = wzConfig['INFO']['EventStatus']
-    # beginingAccuracy = wzConfig['INFO']['BeginingAccuracy']
-    # endingAccuracy = wzConfig['INFO']['EndingAccuracy']
-    # startDateAccuracy = wzConfig['INFO']['StartDateAccuracy']
-    # endDateAccuracy = wzConfig['INFO']['EndDateAccuracy']
-    # typeOfWork = wzConfig['INFO']['TypeOfWork']
-    # laneRestrictions = wzConfig['INFO']['LaneRestrictions']
-    # laneType = wzConfig['INFO']['LaneType']
+    eventStatus = wzConfig['INFO'].get('EventStatus', '')
+    beginingAccuracy = wzConfig['INFO'].get('BeginingAccuracy', 'estimated')
+    endingAccuracy = wzConfig['INFO'].get('EndingAccuracy', 'estimated')
+    startDateAccuracy = wzConfig['INFO'].get('StartDateAccuracy', 'estimated')
+    endDateAccuracy = wzConfig['INFO'].get('EndDateAccuracy', 'estimated')
+    typeOfWork = wzConfig['INFO'].get('TypeOfWork', [])
+    if not typeOfWork: typeOfWork = []
+    laneRestrictions = wzConfig['INFO'].get('LaneRestrictions', [])
+    if not laneRestrictions: laneRestrictions = []
+    laneType = wzConfig['INFO'].get('RoadNumbeLaneTyper', [])
+    if not laneType: laneType = []
 
 def set_config_description(config_file):
     global isConfigReady
@@ -261,11 +272,9 @@ def logMsg(msg):
 
 def updateMainButton():
     if isConfigReady and isGPSReady:
-        print('all ready!')
         btnBegin['state']   = 'normal'
         btnBegin['bg']      = 'green'
     else:
-        print('Not Quite Ready')
         btnBegin['state']   = 'disabled'
         btnBegin['bg']     = '#F0F0F0'
 
@@ -426,12 +435,15 @@ if internet_on():
     wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
     wzConfig_file_name.place(x=220,y=390)
 else:
+    config_label_or = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
+    config_label_or.place(x=150, y=200)
+
     diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
-    diag_wzConfig_file.place(x=115,y=200)
+    diag_wzConfig_file.place(x=115,y=280)
 
     wzConfig_file = StringVar()
     wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-    wzConfig_file_name.place(x=220,y=210)
+    wzConfig_file_name.place(x=220,y=290)
 
 
 instructions = '''This is the configuration file selection component of the 
@@ -450,7 +462,7 @@ btnBegin.place(x=570,y=390)
 
 isGPSReady = False
 
-def testGPSConnection(*args):
+def testGPSConnection(retry=False, *args):
     global isGPSReady
     ser = serial.Serial(port=tkPortVar.get()[0:4], baudrate=tkBaudVar.get(), timeout=1.1)
     sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
@@ -466,7 +478,7 @@ def testGPSConnection(*args):
         isGPSReady = False
         return False
     elif NMEAData[0:3] == '$GP': # Beginning of NMEA String
-        print('Matched!')
+        # print('Matched!')
         # btnBegin['state']   = 'normal'                    #enable the start button for map building...
         # btnBegin['bg']      = 'green'
         commLabel['text']   = 'GPS DEVICE FOUND'
@@ -475,13 +487,17 @@ def testGPSConnection(*args):
         updateMainButton()
         return True
     else:
-        print('Not NMEA')
-        btnBegin['state']   = 'disabled'                    #enable the start button for map building...
-        btnBegin['bg']     = '#F0F0F0'
-        commLabel['text']   = 'GPS DEVICE NOT FOUND'
-        commLabel['fg']     = 'red'
-        isGPSReady = False
-        return False
+        if retry:
+            isGPSReady = testGPSConnection()
+            return isGPSReady
+        else:
+            # print('Not NMEA')
+            btnBegin['state']   = 'disabled'                    #enable the start button for map building...
+            btnBegin['bg']     = '#F0F0F0'
+            commLabel['text']   = 'GPS DEVICE NOT FOUND'
+            commLabel['fg']     = 'red'
+            isGPSReady = False
+            return False
 
 
 baudLabel = Label(root, text='Baud Rate (bps)')
@@ -522,23 +538,24 @@ popupMenu.pack()
 
 def updatePortsDropdown():
     global popupMenu
+    global ports
     ports = serial.tools.list_ports.comports(include_links=False)
     currentValue = tkPortVar.get()
     popupMenu.destroy()
     popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
     popupMenu.pack()
-    for port in ports:
-        if currentValue == str(port):
-            tkPortVar.set(port)
-            return
-    tkPortVar.set(ports[0])
+    searchPorts()
 
 def searchPorts():
+    try:
+        tkPortVar.trace_vdelete("w", tkPortVar.trace_id)
+    except:
+        pass
     for port in ports:
         tkPortVar.set(port)
-        if (testGPSConnection()):
+        if (testGPSConnection(True)):
             break
-    tkPortVar.trace("w", testGPSConnection)
+    tkPortVar.trace_id = tkPortVar.trace("w", testGPSConnection)
 
 btnTestGps = Button(root, text='Refresh', font='Helvetica 13',border=2,command=updatePortsDropdown, anchor=W)
 btnTestGps.place(x=750,y=340)
@@ -1082,6 +1099,9 @@ root.place(x=0, y=0)
 laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
 marginLeft = 100
 
+lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
+lbl_top.place(x=window_width/2-250/2, y=10)
+
 laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))                             # Lane Line
 carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))                                         # Car image
 carlabel = Label(root, image = carImg)                                                                  # Label with car image
@@ -1106,8 +1126,6 @@ def setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, 
     laneSymbols = [0]*(totalLanes+1)
     laneLines = [0]*(totalLanes+1)
 
-    lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
-    lbl_top.place(x=window_width/2-250/2, y=10)
 
     # Initialize lane images
     for i in range(totalLanes):
@@ -1433,24 +1451,24 @@ def build_messages():
 
     info = {}
     info['road_name'] = roadName
-    # info['road_number'] = roadNumber
-    # info['direction] = direction
-    # info['beginning-cross_street'] = beginningCrossStreet
-    # info['ending_cross_street'] = endingCrossStreet
-    # info['beginning_milepost'] = beginningMilepost
-    # info['ending_milepost'] = endingMilepost
-    # info['issuing_organization'] = issuingOrganization
-    # info['creation_date'] = creationDate
-    # info['update_date'] = updateDate
-    # info['event_status'] = EventStatus
-    # info['beginning_accuracy'] = beginingAccuracy
-    # info['ending_accuracy'] = endingAccuracy
-    # info['start_date_accuracy'] = startDateAccuracy
-    # info['end_date_accuracy'] = endDateAccuracy
+    info['road_number'] = roadNumber
+    info['description'] = wzDesc
+    info['beginning_cross_street'] = beginningCrossStreet
+    info['ending_cross_street'] = endingCrossStreet
+    info['beginning_milepost'] = beginningMilepost
+    info['ending_milepost'] = endingMilepost
+    info['issuing_organization'] = issuingOrganization
+    info['creation_date'] = creationDate
+    info['update_date'] = updateDate
+    info['event_status'] = eventStatus
+    info['beginning_accuracy'] = beginingAccuracy
+    info['ending_accuracy'] = endingAccuracy
+    info['start_date_accuracy'] = startDateAccuracy
+    info['end_date_accuracy'] = endDateAccuracy
 
-    # info['type_of_work'] = typeOfWork
-    # info['lane_restrictions'] = laneRestrictions
-    # info['lane_type'] = laneType
+    info['types_of_work'] = typeOfWork
+    info['lane_restrictions'] = laneRestrictions
+    info['lane_type'] = laneType
     logMsg('Converting RSM XMl to WZDx message')
     wzdx = wzdx_creator(rsmSegments, dataLane, info)
     wzdxFile.write(json.dumps(wzdx, indent=2))
@@ -1503,7 +1521,12 @@ def startMainProcess():
     appHeading  = atRefPoint[2]
 
     logMsg(' --- Start of Work Zone at Data Point: '+str(refPtIdx))
-    logMsg('Reference Point @ '+refPoint[0]+', '+refPoint[1]+', '+refPoint[2])
+    try:
+        logMsg('Reference Point @ '+refPoint[0]+', '+refPoint[1]+', '+refPoint[2])
+    except:
+        messagebox.showerror('Invalid Work Zone Created', 'No reference point was detected, a reference point must be marked to create a valid workzone')
+        logFile.close()
+        sys.exit(0)
 
     
 

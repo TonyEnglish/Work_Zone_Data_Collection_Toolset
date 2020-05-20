@@ -71,14 +71,24 @@ def getDist(origin, destination):
     return d
 
 def getChordLength(pt1, pt2):
-    lat1 = math.radians(pt1[1] % 360)
-    lon1 = math.radians(pt1[2] % 360)
-    lat2 = math.radians(pt2[1] % 360)
-    lon2 = math.radians(pt2[2] % 360)
+    lat1 = math.radians(pt1[1])
+    lon1 = math.radians(pt1[2])
+    lat2 = math.radians(pt2[1])
+    lon2 = math.radians(pt2[2])
     # lat1, lon1 = origin                     #lat/lon of origin
     # lat2, lon2 = destination                #lat/lon of dest    
     radius = 6371.0*1000                    #meters
-    d = radius*math.acos( math.cos(lat1)*math.cos(lat2)*math.cos(lon1-lon2) + math.sin(lat1)*math.sin(lat2) )
+    try:
+        # This line very occasionally fails, out of range exception for math.acos
+        d = radius*math.acos( math.cos(lat1)*math.cos(lat2)*math.cos(lon1-lon2) + math.sin(lat1)*math.sin(lat2) )
+    except:
+        dlat = lat2-lat1          #in radians
+        dlon = lon2-lon1
+        
+        a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+            * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        d = radius * c
 
     return d
 
