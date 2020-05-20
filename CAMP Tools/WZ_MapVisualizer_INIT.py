@@ -171,6 +171,7 @@ def getConfigVars():
 ###
 
     vehPathDataFile = dirName + "/" + fileName                          #complete file name with directory
+    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--Jacob-test-1--63rd-st.csv'
 
 ###
 #   Convert str from the config file to proper data types... VERY Important...
@@ -217,7 +218,7 @@ def getConfigVars():
     wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
     wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
 
-    wzStartLat      = wzConfig['LOCATION']['WSStartLat']
+    wzStartLat      = wzConfig['LOCATION']['WZStartLat']
     wzStartLon      = wzConfig['LOCATION']['WZStartLon']
     wzEndLat        = wzConfig['LOCATION']['WZEndLat']
     wzEndLon        = wzConfig['LOCATION']['WZEndLon']
@@ -413,7 +414,6 @@ def startMainProcess():
     wzMapLen = [0,0]                                    #both approach and wz mapped length
     laneType = 1                                        #approach lanes
     getLanePt(laneType,pathPt,appMapPt,laneWidth,lanePadApp,refPtIdx,appMapPtDist,laneStat,wpStat,dataLane,wzMapLen)
-
     logFile.write (" --- Mapped Approach Lanes: "+str(int(wzMapLen[0]))+" meters\n\n")
 
     
@@ -612,4 +612,4 @@ def initialize_map_visualizer(config_path):
     inputFileDialog(config_path)
     buildWZMap()
 
-initialize_map_visualizer('C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/Config Files/wz_default_config.wzc')
+initialize_map_visualizer('./Config Files/ACTIVE_CONFIG.json')

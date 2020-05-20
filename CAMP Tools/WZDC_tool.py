@@ -28,7 +28,7 @@ from    tkinter         import *
 from    tkinter         import messagebox
 from    tkinter         import filedialog
 from    PIL             import ImageTk, Image
-
+import re
 
 from    parseNMEA       import parseGxGGA           #parse GGA for Time, Alt, #of Satellites
 from    parseNMEA       import parseGxRMC           #parse RMC for Date, Lat, Lon, Speed, Heading
@@ -43,12 +43,13 @@ from    wz_map_constructor  import getEndPoint          #calculates lat/lon for 
 from    wz_map_constructor  import getDist              #get distance in meters between pair of lat/lon points
                                                         #   called from getLanePt
 
-from    wz_xml_builder         import build_xml_CC         #common container
-from    wz_xml_builder         import build_xml_WZC        #WZ container
-from    rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
+from    wz_xml_builder          import build_xml_CC         #common container
+from    wz_xml_builder          import build_xml_WZC        #WZ container
+from    rsm_2_wzdx_translator   import wzdx_creator         #WZDx Translator
 
-from    wz_msg_segmentation    import buildMsgSegNodeList  #msg segmentation node list builder
+from    wz_msg_segmentation     import buildMsgSegNodeList  #msg segmentation node list builder
 
+# from    WZDC_tool_helper        import setupVehPathDataAcqUI
 
 def inputFileDialog():
     global local_config_path
@@ -63,8 +64,6 @@ def inputFileDialog():
             # local_config_file = abs_path
             set_config_description(local_config_path)
             wzConfig_file.set(local_config_path)
-            btnBegin['state']   = 'normal'                    #enable the start button for map building...
-            btnBegin['bg']      = 'green'
         except Exception as e:
             logMsg('ERROR: Config read failed, ' + str(e))
             messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
@@ -111,15 +110,23 @@ def getConfigVars():
     global  wzEndLon                                       #wz end time
 
     global  roadName
-    # global  roadNumber
-    # global  beginningCrossStreet
-    # global  endingCrossStreet
-    # global  beginningMilepost
-    # global  endingMilepost
-    # global  issuingOrganization
-    # global  creationDate
-    # global  updateDate
-    # global  isArchitecturalChange
+    global  roadNumber
+    global  beginningCrossStreet
+    global  endingCrossStreet
+    global  beginningMilepost
+    global  endingMilepost
+    global  issuingOrganization
+    global  creationDate
+    global  updateDate
+
+    global  eventStatus
+    global  beginingAccuracy
+    global  endingAccuracy
+    global  startDateAccuracy
+    global  endDateAccuracy
+    global  typeOfWork
+    global  laneRestrictions
+    global  laneType
 
     dirName     = wzConfig['FILES']['VehiclePathDataDir']   #veh path data file directory
     fileName    = wzConfig['FILES']['VehiclePathDataFile']  #veh path data file name
@@ -155,17 +162,29 @@ def getConfigVars():
     pass
 
     roadName        = wzConfig['INFO']['RoadName']
-    # roadNumber      = wzConfig['INFO']['RoadNumber']
-    # beginningCrossStreet  = wzConfig['INFO']['beginningCrossStreet']
-    # endingCrossStreet = wzConfig['INFO']['endingCrossStreet']
-    # beginningMilepost = wzConfig['INFO']['beginningMilepost']
-    # endingMilepost = wzConfig['INFO']['endingMilepost']
-    # issuingOrganization = wzConfig['INFO']['issuingOrganization']
-    # creationDate = wzConfig['INFO']['creationDate']
-    # updateDate = wzConfig['INFO']['updateDate']
-    # isArchitecturalChange = wzConfig['INFO']['isArchitecturalChange']
+    roadNumber      = wzConfig['INFO'].get('RoadNumber', '')
+    beginningCrossStreet  = wzConfig['INFO'].get('BeginningCrossStreet', '')
+    endingCrossStreet = wzConfig['INFO'].get('EndingCrossStreet', '')
+    beginningMilepost = wzConfig['INFO'].get('BeginningMilepost', '')
+    endingMilepost = wzConfig['INFO'].get('EndingMilepost', '')
+    issuingOrganization = wzConfig['INFO'].get('IssuingOrganization', '')
+    creationDate = wzConfig['INFO'].get('CreationDate', '')
+    updateDate = wzConfig['INFO'].get('UpdateDate', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+
+    eventStatus = wzConfig['INFO'].get('EventStatus', '')
+    beginingAccuracy = wzConfig['INFO'].get('BeginingAccuracy', 'estimated')
+    endingAccuracy = wzConfig['INFO'].get('EndingAccuracy', 'estimated')
+    startDateAccuracy = wzConfig['INFO'].get('StartDateAccuracy', 'estimated')
+    endDateAccuracy = wzConfig['INFO'].get('EndDateAccuracy', 'estimated')
+    typeOfWork = wzConfig['INFO'].get('TypeOfWork', [])
+    if not typeOfWork: typeOfWork = []
+    laneRestrictions = wzConfig['INFO'].get('LaneRestrictions', [])
+    if not laneRestrictions: laneRestrictions = []
+    laneType = wzConfig['INFO'].get('RoadNumbeLaneTyper', [])
+    if not laneType: laneType = []
 
 def set_config_description(config_file):
+    global isConfigReady
     if config_file:
         startDate_split = wzStartDate.split('/')
         start_date = startDate_split[0] + '/' + startDate_split[1] + '/' + startDate_split[2]
@@ -175,6 +194,8 @@ def set_config_description(config_file):
             '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
         logMsg('Configuration File Summary: \n' + config_description)
         msg['text'] = config_description
+        isConfigReady = True
+        updateMainButton()
     else:
         msg['text'] = 'No config file found, please select a config file below'
 
@@ -229,8 +250,6 @@ def downloadConfig():
         # local_config_file = abs_path
         set_config_description(local_blob_path)
         wzConfig_file.set(local_config_path)
-        btnBegin['state']   = 'normal'                    #enable the start button for map building...
-        btnBegin['bg']      = 'green'
     except Exception as e:
         logMsg('ERROR: Config read failed, ' + str(e))
         messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
@@ -246,7 +265,18 @@ def internet_on():
 
 def logMsg(msg):
     formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
-    logFile.write('[' + formattedTime + '] ' + msg + '\n')
+    try:
+        logFile.write('[' + formattedTime + '] ' + msg + '\n')
+    except:
+        pass
+
+def updateMainButton():
+    if isConfigReady and isGPSReady:
+        btnBegin['state']   = 'normal'
+        btnBegin['bg']      = 'green'
+    else:
+        btnBegin['state']   = 'disabled'
+        btnBegin['bg']     = '#F0F0F0'
 
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
@@ -291,11 +321,11 @@ logFile = open(logFileName, append_write)         #log file
 ##logMsg ('\n *** - '+wzDesc+' - ***\n')
 logMsg('*** Running Main UI ***')
 
-if not internet_on():
-    logMsg('Internet connectivity test failed, application exiting')
-    messagebox.showerror('No internet connection was detected', 'The first component of this application requires an internet connection to function. Please reconnect and restart this application')
-    sys.exit(0)
-logMsg('Internet connectivity test succeeded')
+# if not internet_on():
+#     logMsg('Internet connectivity test failed, application exiting')
+#     messagebox.showerror('No internet connection was detected', 'The first component of this application requires an internet connection to function. Please reconnect and restart this application')
+#     sys.exit(0)
+# logMsg('Internet connectivity test succeeded')
 
 try:
     java_version = subprocess.check_output(['java', '-version'], stderr=subprocess.STDOUT).decode('utf-8')
@@ -326,6 +356,7 @@ except Exception as e:
 # wzConfig_file = StringVar()
 configDirectory = './Config Files'
 local_config_path = ''
+isConfigReady = False
 
 lbl_top = Label(root, text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.place(x=300, y=20)
@@ -351,60 +382,71 @@ else:
 download_file_path = './Config Files/local_config.json'
 #print('\nDownloading blob to \n\t' + download_file_path)
 
-blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-container_name = 'publishedconfigfiles'
-container_client = blob_service_client.get_container_client(container_name)
-#blob_client = blob_service_client.get_blob_client(container='', blob='')
+if internet_on():
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+    container_name = 'publishedconfigfiles'
+    container_client = blob_service_client.get_container_client(container_name)
+    #blob_client = blob_service_client.get_blob_client(container='', blob='')
 
 
-logMsg('Listing blobs in container:' + container_name)
-blob_list = container_client.list_blobs()
+    logMsg('Listing blobs in container:' + container_name)
+    blob_list = container_client.list_blobs()
 
-frame = Frame(root)
-frame.place(x=100, y=200)
+    frame = Frame(root)
+    frame.place(x=100, y=200)
 
-listbox = Listbox(frame, width=50, height=6, font=('Helvetica', 12), bg='white')
-listbox.pack(side='left', fill='y')
+    listbox = Listbox(frame, width=50, height=6, font=('Helvetica', 12), bg='white')
+    listbox.pack(side='left', fill='y')
 
-scrollbar = Scrollbar(frame, orient='vertical')
-scrollbar.config(command=listbox.yview)
-scrollbar.pack(side='right', fill='y')
+    scrollbar = Scrollbar(frame, orient='vertical')
+    scrollbar.config(command=listbox.yview)
+    scrollbar.pack(side='right', fill='y')
 
-listbox.config(yscrollcommand=scrollbar.set)
+    listbox.config(yscrollcommand=scrollbar.set)
 
-now = datetime.datetime.now()
-def getModTimeDelta(blob):
-    time_delta = now-blob.last_modified.replace(tzinfo=None)
-    return time_delta
+    now = datetime.datetime.now()
+    def getModTimeDelta(blob):
+        time_delta = now-blob.last_modified.replace(tzinfo=None)
+        return time_delta
 
-blob_names_dict = {}
-blobListSorted = []
-for blob in blob_list:
-    logMsg('Blob Name: ' + blob.name)
-    blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
-blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
-for blob in blobListSorted:
-    blob_name = blob.name.split('/')[-1]
-    if '.json' in blob_name:
-        blob_names_dict[blob_name] = blob.name
-        listbox.insert(END, blob_name)
+    blob_names_dict = {}
+    blobListSorted = []
+    for blob in blob_list:
+        logMsg('Blob Name: ' + blob.name)
+        blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
+    blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
+    for blob in blobListSorted:
+        blob_name = blob.name.split('/')[-1]
+        if '.json' in blob_name:
+            blob_names_dict[blob_name] = blob.name
+            listbox.insert(END, blob_name)
 
-logMsg('Blobs sorted, filtered and inserted into listbox')
-load_config = Button(root, text='Load Cloud Configuration File', font='Helvetica 10', padx=5, command=downloadConfig)
-load_config.place(x=100, y=320)
+    logMsg('Blobs sorted, filtered and inserted into listbox')
+    load_config = Button(root, text='Load Cloud Configuration File', font='Helvetica 10', padx=5, command=downloadConfig)
+    load_config.place(x=100, y=320)
 
-config_label_or = Label(root, text='OR', font='Helvetica 10', padx=5)
-config_label_or.place(x=150, y=352)
+    config_label_or = Label(root, text='OR', font='Helvetica 10', padx=5)
+    config_label_or.place(x=150, y=352)
 
-diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
-diag_wzConfig_file.place(x=115,y=380)
+    diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+    diag_wzConfig_file.place(x=115,y=380)
 
-wzConfig_file = StringVar()
-wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-wzConfig_file_name.place(x=220,y=390)
+    wzConfig_file = StringVar()
+    wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+    wzConfig_file_name.place(x=220,y=390)
+else:
+    config_label_or = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
+    config_label_or.place(x=150, y=200)
 
-instructions = '''This component requires a good internet connection.
-This is the configuration file selection component of the 
+    diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+    diag_wzConfig_file.place(x=115,y=280)
+
+    wzConfig_file = StringVar()
+    wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+    wzConfig_file_name.place(x=220,y=290)
+
+
+instructions = '''This is the configuration file selection component of the 
 Work Zone Data Collection tool. To use the tool,
 select a file from the list of punlished configuration files and
 select 'Download Config'. When the correct configuration file
@@ -416,15 +458,155 @@ instr_label = Label(root, text=instructions,justify=CENTER, bg='slategray1',anch
 instr_label.place(x=700, y=100)
 
 btnBegin = Button(root, text='Begin Data\nCollection', font='Helvetica 14',border=2,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
-btnBegin.place(x=570,y=350)
+btnBegin.place(x=570,y=390)
+
+isGPSReady = False
+
+def testGPSConnection(retry=False, *args):
+    global isGPSReady
+    ser = serial.Serial(port=tkPortVar.get()[0:4], baudrate=tkBaudVar.get(), timeout=1.1)
+    sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
+    NMEAData = sio.readline()
+    ser.close()
+    print(NMEAData)
+    # pattern = re.compile('\$?GP[a-zA-Z]{3,},([a-zA-Z0-9\.]*,)+([a-zA-Z0-9]{1,2}\*[a-zA-Z0-9]{1,2})')
+    if NMEAData == '':
+        btnBegin['state']   = 'disabled'                    #enable the start button for map building...
+        btnBegin['bg']     = '#F0F0F0'
+        commLabel['text']   = 'GPS DEVICE NOT FOUND'
+        commLabel['fg']     = 'red'
+        isGPSReady = False
+        return False
+    elif NMEAData[0:3] == '$GP': # Beginning of NMEA String
+        # print('Matched!')
+        # btnBegin['state']   = 'normal'                    #enable the start button for map building...
+        # btnBegin['bg']      = 'green'
+        commLabel['text']   = 'GPS DEVICE FOUND'
+        commLabel['fg']     = 'green'
+        isGPSReady = True
+        updateMainButton()
+        return True
+    else:
+        if retry:
+            isGPSReady = testGPSConnection()
+            return isGPSReady
+        else:
+            # print('Not NMEA')
+            btnBegin['state']   = 'disabled'                    #enable the start button for map building...
+            btnBegin['bg']     = '#F0F0F0'
+            commLabel['text']   = 'GPS DEVICE NOT FOUND'
+            commLabel['fg']     = 'red'
+            isGPSReady = False
+            return False
+
+
+baudLabel = Label(root, text='Baud Rate (bps)')
+baudLabel.place(x=850, y=370)
+baudRates = ['4800', '9600', '19200', '57600', '115200']
+tkBaudVar = StringVar(window)
+tkBaudVar.set('115200') #default is first comm port
+baudPopupMenu = OptionMenu(root, tkBaudVar, *baudRates)
+baudPopupMenu.place(x=850, y=390)
+
+baudLabel = Label(root, text='Data Rate (Hz)')
+baudLabel.place(x=950, y=370)
+dataRates = ['1', '2', '5', '10']
+tkDataVar = StringVar(window)
+tkDataVar.set('10') #default is first comm port
+baudPopupMenu = OptionMenu(root, tkDataVar, *dataRates)
+baudPopupMenu.place(x=950, y=390)
+
+ports = serial.tools.list_ports.comports(include_links=False)
+# if len(ports)==0:
+#     raise SerialException('No open COM ports detected')
+# else:
+mainframe = Frame(root)
+# Add a grid
+mainframe.place(x=850, y=310)
+mainframe.columnconfigure(0, weight=1)
+mainframe.rowconfigure(0, weight=1)
+# mainframe.place(x=300, y=600)
+# Create a Tkinter variable
+logMsg('Creating comm port popup menu')
+commLabel = Label(mainframe, text='GPS DEVICE NOT FOUND', font='Helvetica 13 bold', fg='red')
+tkPortVar = StringVar(window)
+
+popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
+commLabel.pack()
+popupMenu.pack()
+# tkvar.trace('w', commSelect)
+
+def updatePortsDropdown():
+    global popupMenu
+    global ports
+    ports = serial.tools.list_ports.comports(include_links=False)
+    currentValue = tkPortVar.get()
+    popupMenu.destroy()
+    popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
+    popupMenu.pack()
+    searchPorts()
+
+def searchPorts():
+    try:
+        tkPortVar.trace_vdelete("w", tkPortVar.trace_id)
+    except:
+        pass
+    for port in ports:
+        tkPortVar.set(port)
+        if (testGPSConnection(True)):
+            break
+    tkPortVar.trace_id = tkPortVar.trace("w", testGPSConnection)
+
+btnTestGps = Button(root, text='Refresh', font='Helvetica 13',border=2,command=updatePortsDropdown, anchor=W)
+btnTestGps.place(x=750,y=340)
 
 def on_closing():
     logFile.close()
     sys.exit(0)
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
-
+window.after(500, searchPorts)
 window.mainloop()
+
+
+# gps_found = False
+# first = True
+# while not gps_found:
+#     logMsg('Searching for GPS device')
+#     try:
+#         portNum     = 'COM3'
+#         baudRate    = 115200
+#         timeOut     = 1
+#         portNum = checkForGPS(root, portNum, first)
+#         # portNum     = 'COM4'
+#         # baudRate    = 115200
+#         first = False
+#         ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
+#         msgStr      = 'Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
+#         displayStatusMsg(msgStr)                                                        #system ready
+#         gps_found = True
+
+#     except SerialException as e:
+#         logMsg('Failed to find GPS device, SerialException: ' + str(e))
+#         MsgBox = messagebox.askquestion ('GPS Receiver NOT Found','*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n'   \
+#                     '   --- Press Yes to try again, No to exit the application ---',icon = 'warning')
+#         if MsgBox == 'no':
+#             logMsg('User exited application')
+#             logFile.close()
+#             sys.exit(0)
+
+# ###
+# #   EOL is not supported in PySerial for readline() in Python 3.6.
+# #   must use sio
+# ###
+
+# logMsg('Creating serial IO connection')
+# sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
+
+
+
+
+
 
 
 ################################################################################################################
@@ -765,20 +947,22 @@ def checkForGPS(root, portNum, first):
             logMsg('GPS device not directly found')
             mainframe = Frame(root, pady=100, padx=100)
             # Add a grid
-            mainframe.place(x=300, y=600)
+            mainframe.place(x=100, y=100)
             mainframe.columnconfigure(0, weight=1)
             mainframe.rowconfigure(0, weight=1)
-            mainframe.place(x=300, y=600)
+            # mainframe.place(x=300, y=600)
             # Create a Tkinter variable
             tkvar = StringVar(root)
             tkvar.set(ports[0].device) #default is first comm port
             popupMenu = OptionMenu(mainframe, tkvar, *ports)
             logMsg('Creating comm port popup menu')
-            Label(mainframe, text='Choose a comm port').pack()
-            popupMenu.pack()
-            tkvar.trace('w', commSelect)
+            # commLabel = Label(mainframe, text='Choose a comm port')
+            # commLabel.place(x=10, y=10)
+            popupMenu.place(x=10, y=10)
+            # tkvar.trace('w', commSelect)
         return portNum
 
+# Format and write message to file
 def enableForm():
     for i in range(1, totalLanes+1):
         if i != dataLane:
@@ -883,6 +1067,9 @@ msgSegList      = []                    #WZ message node segmentation list
 files_list      = []
 
 
+commPort = tkPortVar.get()[0:4]
+baudRate = int(tkBaudVar.get())
+dataRate = int(tkDataVar.get())
 
 ###
 #   Open output file for data logging...
@@ -901,12 +1088,24 @@ vehPathDataFile = outDir + '/' + vehPathDataFileName
 # root.geometry(str(max(800, totalLanes*110+350))+'x500')
 # root = Frame(window)
 # root.place(x=0, y=0)
-window.geometry(str(max(800, totalLanes*110+350))+'x500')
-root = Frame(width=max(800, totalLanes*110+350), height=500)
+# totalLanes = 8
+# dataLane = 7
+window_width = max(800, totalLanes*110+350)
+window.geometry(str(max(800, window_width))+'x500')
+root = Frame(width=max(800, window_width), height=700)
 root.place(x=0, y=0)
-
 # root.bind_all('<Key>', keyPress)                #key press event...
 
+laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
+marginLeft = 100
+
+lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
+lbl_top.place(x=window_width/2-250/2, y=10)
+
+laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))                             # Lane Line
+carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))                                         # Car image
+carlabel = Label(root, image = carImg)                                                                  # Label with car image
+workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))             # Workers present image
 
 #############################################################################
 #
@@ -914,85 +1113,78 @@ root.place(x=0, y=0)
 #
 #############################################################################
 
-lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
-lbl_top.place(x=300, y=20)
+def end_application():
+    global appRunning
+    appRunning = False
+    logFile.close()
+    sys.exit(0)
 
-# winSize = Label(root, height=30, width=120) #width was 110
-# winSize.pack()
-
-laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))
-carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))
-carlabel = Label(root, image = carImg)
-workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))
-laneClosedImg = ImageTk.PhotoImage(Image.open('./images/laneClosedSign_small.jpg'))
-
-marginLeft = 100
-
-laneBoxes = [0]*(totalLanes+1)
-laneLabels = [0]*(totalLanes+1)
-laneSymbols = [0]*(totalLanes+1)
-laneLines = [0]*(totalLanes+1)
-for i in range(totalLanes):
-    laneLines[i] = Label(root, image = laneLine)
-    laneLines[i].place(x=marginLeft + i*110, y=50)
-    if i+1 == dataLane:
-        carlabel.place(x=marginLeft+8 + i*110, y=50)
-    else:
-        laneBoxes[i+1] = Label(root, justify=LEFT,anchor=W,padx=50,pady=90)
-        laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
-        laneLabels[i+1] = Label(root, text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
-        laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
-    if i == totalLanes-1:
-        laneLines[i+1] = Label(root, image = laneLine)
-        laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
-
-lanes = [0]*(totalLanes+1)
-laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
+def setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked):
+    lanes = [0]*(totalLanes+1)
+    laneBoxes = [0]*(totalLanes+1)
+    laneLabels = [0]*(totalLanes+1)
+    laneSymbols = [0]*(totalLanes+1)
+    laneLines = [0]*(totalLanes+1)
 
 
-def createButton(id):
-    global lanes
-    lanes[id] = Button(root, text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
-    lanes[id].place(x=marginLeft+10 + (id-1)*110, y=300)
-
-for i in range(1, totalLanes+1):
-    createButton(i)
-
-
-###
-#   Mark Workers Present...
-###
-
-bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
-bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
-###
-#   Quit...
-###
+    # Initialize lane images
+    for i in range(totalLanes):
+        laneLines[i] = Label(root, image = laneLine)
+        laneLines[i].place(x=marginLeft + i*110, y=50)
+        if i+1 == dataLane:
+            carlabel.place(x=marginLeft+8 + i*110, y=50)
+        else:
+            laneBoxes[i+1] = Label(root, justify=LEFT,anchor=W,padx=50,pady=90)
+            laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
+            laneLabels[i+1] = Label(root, text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
+            laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
+        if i == totalLanes-1:
+            laneLines[i+1] = Label(root, image = laneLine)
+            laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
 
 
-bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
-bStart.place(x=100, y=510)
+    # This is required because otherwise the lane command laneClicked(lane #) cannot be set in a for loop
+    def createButton(id):
+        laneBtn = Button(root, text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
+        laneBtn.place(x=marginLeft+10 + (id-1)*110, y=300)
+        return laneBtn
 
-bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
-bRef.place(x=250, y=510)
+    # Create lane buttons dynamically to number of lanes
+    for i in range(1, totalLanes+1):
+        lanes[i] = createButton(i)
 
-bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
-bEnd.place(x=500, y=510)
+    # Toggle workers present button
+    bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
+    bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
-# bQuit = Button(text='Quit (Esc)', font='Helvetica 10', fg = 'white', bg='red3',padx=5, command=gotQuit)
-# bQuit.place(x=400,y=380)
+    # Debug buttons, hidden by small frame
+    bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
+    bStart.place(x=100, y=510)
+    bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
+    bRef.place(x=250, y=510)
+    bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
+    bEnd.place(x=500, y=510)
 
-###
-#   Application Message Window...
-###
+    ###
+    #   Application Message Window...
+    ###
 
-appMsgWin = Button(root, text='Application Message Window...                                             ',      \
-                font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
-appMsgWin.place(x=50, y=390)
+    appMsgWin = Button(root, text='Application Message Window...                                             ',      \
+                    font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
+    appMsgWin.place(x=50, y=390)
 
+    overlayWidth = 710
+    overlayx = window_width/2 - overlayWidth/2
+    overlay = Label(root, text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
+    overlay.place(x=overlayx, y=200)
 
-overlay = Label(root, text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
-overlay.place(x=(marginLeft+80 + (totalLanes)*110)/2-160, y=200)
+    return overlay, bWP, lanes, laneLabels
+
+overlay, bWP, lanes, laneLabels = setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked)
+
+# laneClicked(3)
+# workersPresentClicked()
+
 ##############################################################
 #   ------------------ END of LAYOUT -------------------------
 ##############################################################
@@ -1010,12 +1202,14 @@ first = True
 while not gps_found:
     logMsg('Searching for GPS device')
     try:
-        portNum     = 'COM4'
-        baudRate    = 115200
-        timeOut     = 1
-        portNum = checkForGPS(root, portNum, first)
-        first = False
-        ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
+        # portNum     = 'COM3'
+        # baudRate    = 115200
+        # timeOut     = 1
+        # portNum = checkForGPS(root, portNum, first)
+        # portNum     = 'COM4'
+        # baudRate    = 115200
+        # first = False
+        ser         = serial.Serial(port=commPort, baudrate=baudRate, timeout=1.1)               #open serial port
         msgStr      = 'Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
         displayStatusMsg(msgStr)                                                        #system ready
         gps_found = True
@@ -1027,40 +1221,22 @@ while not gps_found:
         if MsgBox == 'no':
             logMsg('User exited application')
             logFile.close()
-            sys.exit(0)
-        #if MsgBox == 'no':
-            #sys.exit(0)
-        
+            sys.exit(0)                                                 #system ready
 
-    
 ###
 #   EOL is not supported in PySerial for readline() in Python 3.6.
 #   must use sio
 ###
 
 logMsg('Creating serial IO connection')
-sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))             
+sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
 
-###
-#   Get current date and time...
-###
-
-###
 #   Open outFile for csv write...
-#   make sure newline is set to null, otherwise will get extra cr.. 
-###
-
-#configRead(local_config_path)
-
-
 logMsg('Opening path data output file: ' + vehPathDataFile)
 outFile     = open(vehPathDataFile,'w',newline='')
 writeData   = csv.writer(outFile)
 
-###
-#   Write Title in the data logging file...
-###
-
+# Write heading to file
 titleLine = 'GPS Date & Time','# of Sats','HDOP','Latitude','Longitude','Altitude(m)','Speed(m/s)','Heading(Deg)','Marker','Value'
 writeCSVFile(titleLine)
 
@@ -1070,10 +1246,9 @@ writeCSVFile(titleLine)
 #
 ###
 
-window.protocol("WM_DELETE_WINDOW", on_closing)
-
 logMsg('Starting main loop')
 
+window.protocol("WM_DELETE_WINDOW", end_application)
 startMainFunc()                                         #main function, starts NMEA processing 
 
 logMsg('Main loop ended, closing streams/files')
@@ -1098,52 +1273,14 @@ logMsg('Ending data acquisition')
 # logFile.close()
 root.destroy()
 window.quit()
-# subprocess.call([sys.executable, build_export_file], shell=True) #, shell=True
-# os.system(build_export_file) #_------------------------------------------------------------ FAILED
-# os.remove(local_config_path)
-# sys.exit(0)
-# root.mainloop()
-
-
-
 
 
 # ------------------------------------------------------- WZ_BuildMsgs_and_Export --------------------------------------------------------
 laneStat = []
 wpStat = []
 
-def inputFileDialog(filename):
-
-    if len(filename):
-        configRead(filename)
-    pass
-
-##
-#   -------------- End of input_file_dialog ------------------
-##
-
-def buildWZMap(filename):
-    global uper_failed
-    global error
-    global error_message
-    
-    startMainProcess()
-
-    if msgSegList[0][0] == -1:                          #Segmentation failed...
-        error = True
-        error_message = 'Failed to build message segmentation'
-        logMsg('Error in building message segmentation')
-    elif uper_failed:   
-        error = True
-        error_message = 'Failed to run message builder UPER conversion'
-        logMsg('UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH')
-    else:
-        logMsg('WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...')
-    pass
-
 def build_messages():
-    global uper_failed
-    global files_list
+    global files_list               # List of files to include in exported archive
     
 ###
 #   Data elements for 'common' container...
@@ -1164,20 +1301,10 @@ def build_messages():
 
     idList      = [msgID,eventID]                           #msgID and eventID only. No stationId        
 
-
-###
-#   Set
-#       WZ start date and time and end date and time in yyyy,mm,dd,hh,mm
-#       UTC time offset
-#       headway tolerance
-#       road width - NOT used any more...
-#       event length same as workzone length
-###
-
     wzStart     = wzStartDate.split('/') + wzStartTime.split(':')
     wzEnd       = wzEndDate.split('/')   + wzEndTime.split(':')
 
-    timeOffset  = -300                                      #UTC time offset in minutes for Eastern Time Zone
+    timeOffset  = 0                                         #UTC time offset
     hTolerance  = 20                                        #applicable heading tolerance set to 20 degrees (+/- 20deg?)
 
     roadWidth   = totalLanes*laneWidth*100                  #roadWidth in cm
@@ -1188,7 +1315,7 @@ def build_messages():
 #   Set speed limits in WZ as vehicle max speed..from user input saved in config file...
 ###
 
-    speedLimit  = ['<vehicleMaxSpeed/>',speedList[0],speedList[1],speedList[2],'<mph/>']#NEW Version of XER... Nov. 2017
+    speedLimit  = ['vehicleMaxSpeed',speedList[0],speedList[1],speedList[2],'mph'] #NEW Version of XER... Nov. 2017
 
 ### -------------------------------------------------
 #
@@ -1272,8 +1399,6 @@ def build_messages():
 ###
 #   Build xml for common container...
 ###
-        # build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,c_sc_codes,newRefPt,appHeading,hTolerance, \
-        #               speedLimit,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
         commonContainer = build_xml_CC (xmlFile,idList,wzStart,wzEnd,timeOffset,wzDaysOfWeek,c_sc_codes,newRefPt,appHeading,hTolerance, \
                       speedLimit,laneWidth,roadWidth,eventLength,laneStat,appMapPt,msgSegList,currSeg,wzDesc)
 
@@ -1282,7 +1407,7 @@ def build_messages():
             #logMsg('\n ---Message Segmentation for Work Zone Lanes')        
         #pass
 
-        #logMsg('\t ---Segment#: '+str(currSeg)+'Start Node#: '+str(startNode)+'\n\t\t New Ref. Pt: '+str(newRefPt))
+        logMsg('Segment#: '+str(currSeg)+'Start Node#: '+str(startNode)+'\n\t\t New Ref. Pt: '+str(newRefPt))
 
 ###
 #       WZ length, LC characteristic, workers present, etc. 
@@ -1311,12 +1436,9 @@ def build_messages():
         rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent='  ')
         xmlFile.write(rsm_xml)
 
-    
-###
-#   Done, finito, close files
-###   
-
         xmlFile.close()
+
+        # Execute xml to binary conversion with java app
         subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper_v8.jar', str(xml_outFile), str(uper_outFile)],stdout=devnull)
         if not os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
             logMsg('ERROR: RSM UPER conversion FAILED, ensure that you have java installed (>=1.8 or jdk>=8) and added to your system path')
@@ -1326,18 +1448,27 @@ def build_messages():
             sys.exit(0)
 
         currSeg = currSeg+1
-    pass
+
     info = {}
     info['road_name'] = roadName
-    # info['road_number'] = roadNumber
-    # info['beginning-cross_street'] = beginningCrossStreet
-    # info['ending_cross_street'] = endingCrossStreet
-    # info['beginning_milepost'] = beginningMilepost
-    # info['ending_milepost'] = endingMilepost
-    # info['issuing_organization'] = issuingOrganization
-    # info['creation_date'] = creationDate
-    # info['update_date'] = updateDate
-    # info['is_architectural_change'] = isArchitecturalChange
+    info['road_number'] = roadNumber
+    info['description'] = wzDesc
+    info['beginning_cross_street'] = beginningCrossStreet
+    info['ending_cross_street'] = endingCrossStreet
+    info['beginning_milepost'] = beginningMilepost
+    info['ending_milepost'] = endingMilepost
+    info['issuing_organization'] = issuingOrganization
+    info['creation_date'] = creationDate
+    info['update_date'] = updateDate
+    info['event_status'] = eventStatus
+    info['beginning_accuracy'] = beginingAccuracy
+    info['ending_accuracy'] = endingAccuracy
+    info['start_date_accuracy'] = startDateAccuracy
+    info['end_date_accuracy'] = endDateAccuracy
+
+    info['types_of_work'] = typeOfWork
+    info['lane_restrictions'] = laneRestrictions
+    info['lane_type'] = laneType
     logMsg('Converting RSM XMl to WZDx message')
     wzdx = wzdx_creator(rsmSegments, dataLane, info)
     wzdxFile.write(json.dumps(wzdx, indent=2))
@@ -1390,7 +1521,12 @@ def startMainProcess():
     appHeading  = atRefPoint[2]
 
     logMsg(' --- Start of Work Zone at Data Point: '+str(refPtIdx))
-    logMsg('Reference Point @ '+refPoint[0]+', '+refPoint[1]+', '+refPoint[2])
+    try:
+        logMsg('Reference Point @ '+refPoint[0]+', '+refPoint[1]+', '+refPoint[2])
+    except:
+        messagebox.showerror('Invalid Work Zone Created', 'No reference point was detected, a reference point must be marked to create a valid workzone')
+        logFile.close()
+        sys.exit(0)
 
     
 
