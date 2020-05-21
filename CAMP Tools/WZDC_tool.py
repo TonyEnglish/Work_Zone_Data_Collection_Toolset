@@ -530,7 +530,6 @@ mainframe.rowconfigure(0, weight=1)
 logMsg('Creating comm port popup menu')
 commLabel = Label(mainframe, text='GPS DEVICE NOT FOUND', font='Helvetica 13 bold', fg='red')
 tkPortVar = StringVar(window)
-
 popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
 commLabel.pack()
 popupMenu.pack()

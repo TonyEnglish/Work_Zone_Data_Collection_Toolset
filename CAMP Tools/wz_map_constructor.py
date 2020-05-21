@@ -89,7 +89,6 @@ def getChordLength(pt1, pt2):
             * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
         d = radius * c
-
     return d
 
 ### ------------------------------------------------------------------------------------
@@ -222,7 +221,6 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
     SMALLDELTAPHI = 0.01
     CHORDLENGTHTHRESHOLD = 500
     MAXESTIMATEDRADIUS = 8388607 #7FFFFF
-
     if laneType == 1:
         if refPtIdx < 3:
             for i in range(0, refPtIdx):
@@ -274,7 +272,6 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
 
     # Step 3
         deltaHeadings = Pnext[4] - Pstarting[4]
-        deltaHeadings = deltaHeadings % 360
         deltaHeadings = abs(math.radians(deltaHeadings))
 
     # Step 4
