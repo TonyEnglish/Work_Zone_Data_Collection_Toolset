@@ -20,6 +20,15 @@ Python 3.0
 Java 1.8 or JDK 8
 
 # Updates
+5/22/2020
+- Upgraded GPS data compression based on J2945/1
+  - Now utilizes radius of curvature error computation detailed in J2945/1 (option 1)
+- Added additional information to config file and WZDx
+  - Information previously unavailable was added to the configuration file for use in WZDx message generation
+  - This includes: lane restrictions, lane types, work type, road name, accuracy fields, and many more
+- Updated automatic GPS device search
+  - Moved GPS connection test to config loading page
+
 5/11/2020
 - Integrated Azure cloud connection
   - Downloading of published configuration files
