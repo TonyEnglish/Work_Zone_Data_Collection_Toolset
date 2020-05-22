@@ -28,12 +28,10 @@ from    tkinter         import *
 from    tkinter         import messagebox
 from    tkinter         import filedialog
 from    PIL             import ImageTk, Image
-import re
 
 from    parseNMEA       import parseGxGGA           #parse GGA for Time, Alt, #of Satellites
 from    parseNMEA       import parseGxRMC           #parse RMC for Date, Lat, Lon, Speed, Heading
 from    parseNMEA       import parseGxGSA           #parse GSA for Hdop
-
 
 from    wz_vehpath_lanestat_builder import buildVehPathData_LaneStat
 
@@ -45,12 +43,13 @@ from    wz_map_constructor  import getDist              #get distance in meters 
 
 from    wz_xml_builder          import build_xml_CC         #common container
 from    wz_xml_builder          import build_xml_WZC        #WZ container
-from    rsm_2_wzdx_translator   import wzdx_creator         #WZDx Translator
+from    rsm_2_wzdx_translator   import wzdx_creator         #RSM to WZDx Translator
 
 from    wz_msg_segmentation     import buildMsgSegNodeList  #msg segmentation node list builder
 
 # from    WZDC_tool_helper        import setupVehPathDataAcqUI
 
+# Load local configuration file
 def inputFileDialog():
     global local_config_path
     filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.json")])
@@ -69,6 +68,7 @@ def inputFileDialog():
             messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
     pass
 
+# Open and read config file
 def configRead():
     global wzConfig
     file = local_config_path
@@ -79,6 +79,7 @@ def configRead():
         # update_config(cfg)
         cfg.close()
 
+# Read configuration file
 def getConfigVars():
 
 ###
@@ -183,6 +184,7 @@ def getConfigVars():
     laneType = wzConfig['INFO'].get('RoadNumbeLaneTyper', [])
     if not laneType: laneType = []
 
+# Set description box in UI from config file
 def set_config_description(config_file):
     global isConfigReady
     if config_file:
@@ -199,16 +201,19 @@ def set_config_description(config_file):
     else:
         msg['text'] = 'No config file found, please select a config file below'
 
+# Move on to data collection/acquisition
 def launch_WZ_veh_path_data_acq():
     root.destroy()
     window.quit()
 
+# Download blobl from Azure blob storage
 def downloadBlob(local_blob_path, blobName):
     logMsg('Downloading blob: ' + blobName + ', from container: ' + container_name + ', to local path: ' + local_blob_path)
     blob_client = blob_service_client.get_blob_client(container=container_name, blob=blobName)
     with open(local_blob_path, 'wb') as download_file:
         download_file.write(blob_client.download_blob().readall())
 
+# Download configuration file from Azure blob storage and read file
 def downloadConfig():
     global local_config_path
     blobName = listbox.get(listbox.curselection())
@@ -254,6 +259,7 @@ def downloadConfig():
         logMsg('ERROR: Config read failed, ' + str(e))
         messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
 
+# Check internet connectivity by pinging google.com
 def internet_on():
     url='http://www.google.com/'
     timeout=5
@@ -263,6 +269,7 @@ def internet_on():
     except requests.ConnectionError:
         return False
 
+# Format and log emssage to file
 def logMsg(msg):
     formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
     try:
@@ -270,6 +277,7 @@ def logMsg(msg):
     except:
         pass
 
+# Enable/disable Begin Data Collection button
 def updateMainButton():
     if isConfigReady and isGPSReady:
         btnBegin['state']   = 'normal'
@@ -291,9 +299,6 @@ window.title('Work Zone Data Collection')
 window.geometry('1300x500')
 root = Frame(width=1300, height=500)
 root.place(x=0, y=0)
-# root = Frame(window)
-# root.place(x=0, y=0)
-# root.configure(bg='white')
 
 ###
 #   WZ config parser object....
@@ -301,17 +306,9 @@ root.place(x=0, y=0)
 
 wzConfig        = {}
 
-###
-#   --------------------------------------------------------------------------------------------------
-###
-#   Get current date and time...
-###
-
 cDT = datetime.datetime.now().strftime('%m/%d/%Y - ') + time.strftime('%H:%M:%S')
 
-###
-#   Map builder output log file...
-###
+# Output log file
 logFileName = './data_collection_log.txt'
 if os.path.exists(logFileName):
     append_write = 'a' # append if already exists
@@ -321,12 +318,7 @@ logFile = open(logFileName, append_write)         #log file
 ##logMsg ('\n *** - '+wzDesc+' - ***\n')
 logMsg('*** Running Main UI ***')
 
-# if not internet_on():
-#     logMsg('Internet connectivity test failed, application exiting')
-#     messagebox.showerror('No internet connection was detected', 'The first component of this application requires an internet connection to function. Please reconnect and restart this application')
-#     sys.exit(0)
-# logMsg('Internet connectivity test succeeded')
-
+# Check java version for RSM 
 try:
     java_version = subprocess.check_output(['java', '-version'], stderr=subprocess.STDOUT).decode('utf-8')
     version_number = java_version.splitlines()[0].split()[2].strip('"')
@@ -348,12 +340,7 @@ except FileNotFoundError as e:
 except Exception as e:
     logMsg('ERROR: Unable to Verify Java Version, error: ' + str(e))
     messagebox.showwarning('Unable to Verify Java Version', 'Unable to verify java version. Ensure that you have Java version >=1.8 or jdk>=8.0 installed and added to your system path')
-    
-#############################################################################
-# Tkinter LAYOUT to read user input for WZ config file name...
-#############################################################################
 
-# wzConfig_file = StringVar()
 configDirectory = './Config Files'
 local_config_path = ''
 isConfigReady = False
@@ -361,13 +348,10 @@ isConfigReady = False
 lbl_top = Label(root, text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.place(x=300, y=20)
 
-# winSize = Label(root, height=15, width=100)
-# winSize.place()
-
 msg = Label(root, text='No config file found, please select a config file below',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
 msg.place(x=100, y=80)
 
-
+# Retrieve zure cloud connection string from environment variable
 connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
 connect_str = os.getenv(connect_str_env_var)
 if not connect_str:
@@ -380,8 +364,8 @@ else:
     logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
 
 download_file_path = './Config Files/local_config.json'
-#print('\nDownloading blob to \n\t' + download_file_path)
 
+# If internet connection detected, load cloud config files
 if internet_on():
     blob_service_client = BlobServiceClient.from_connection_string(connect_str)
     container_name = 'publishedconfigfiles'
@@ -462,13 +446,17 @@ btnBegin.place(x=570,y=390)
 
 isGPSReady = False
 
+# test serial port for GPS device (check for NMEA string)
 def testGPSConnection(retry=False, *args):
     global isGPSReady
-    ser = serial.Serial(port=tkPortVar.get()[0:4], baudrate=tkBaudVar.get(), timeout=1.1)
-    sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
+    try:
+        ser = serial.Serial(port=tkPortVar.get()[0:4], baudrate=tkBaudVar.get(), timeout=1.1)
+        sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
+    except:
+        return False
     NMEAData = sio.readline()
     ser.close()
-    print(NMEAData)
+    # print(NMEAData)
     # pattern = re.compile('\$?GP[a-zA-Z]{3,},([a-zA-Z0-9\.]*,)+([a-zA-Z0-9]{1,2}\*[a-zA-Z0-9]{1,2})')
     if NMEAData == '':
         btnBegin['state']   = 'disabled'                    #enable the start button for map building...
@@ -499,7 +487,7 @@ def testGPSConnection(retry=False, *args):
             isGPSReady = False
             return False
 
-
+# Set baud rate and data rate labels
 baudLabel = Label(root, text='Baud Rate (bps)')
 baudLabel.place(x=850, y=370)
 baudRates = ['4800', '9600', '19200', '57600', '115200']
@@ -517,16 +505,15 @@ baudPopupMenu = OptionMenu(root, tkDataVar, *dataRates)
 baudPopupMenu.place(x=950, y=390)
 
 ports = serial.tools.list_ports.comports(include_links=False)
-# if len(ports)==0:
-#     raise SerialException('No open COM ports detected')
-# else:
+if not ports: ports = ['NO DEVICES FOUND']
+
+# Frame for COMM port options
 mainframe = Frame(root)
-# Add a grid
 mainframe.place(x=850, y=310)
 mainframe.columnconfigure(0, weight=1)
 mainframe.rowconfigure(0, weight=1)
-# mainframe.place(x=300, y=600)
-# Create a Tkinter variable
+
+# Create COMM port popup menu
 logMsg('Creating comm port popup menu')
 commLabel = Label(mainframe, text='GPS DEVICE NOT FOUND', font='Helvetica 13 bold', fg='red')
 tkPortVar = StringVar(window)
@@ -535,16 +522,19 @@ commLabel.pack()
 popupMenu.pack()
 # tkvar.trace('w', commSelect)
 
+# Update COMM ports popup menu and search for GPS device
 def updatePortsDropdown():
     global popupMenu
     global ports
     ports = serial.tools.list_ports.comports(include_links=False)
+    if not ports: ports = ['NO DEVICES FOUND']
     currentValue = tkPortVar.get()
     popupMenu.destroy()
     popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
     popupMenu.pack()
     searchPorts()
 
+# Search COMM ports for GPS device
 def searchPorts():
     try:
         tkPortVar.trace_vdelete("w", tkPortVar.trace_id)
@@ -568,52 +558,13 @@ window.after(500, searchPorts)
 window.mainloop()
 
 
-# gps_found = False
-# first = True
-# while not gps_found:
-#     logMsg('Searching for GPS device')
-#     try:
-#         portNum     = 'COM3'
-#         baudRate    = 115200
-#         timeOut     = 1
-#         portNum = checkForGPS(root, portNum, first)
-#         # portNum     = 'COM4'
-#         # baudRate    = 115200
-#         first = False
-#         ser         = serial.Serial(port=portNum, baudrate=baudRate, timeout=timeOut)               #open serial port
-#         msgStr      = 'Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
-#         displayStatusMsg(msgStr)                                                        #system ready
-#         gps_found = True
-
-#     except SerialException as e:
-#         logMsg('Failed to find GPS device, SerialException: ' + str(e))
-#         MsgBox = messagebox.askquestion ('GPS Receiver NOT Found','*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n'   \
-#                     '   --- Press Yes to try again, No to exit the application ---',icon = 'warning')
-#         if MsgBox == 'no':
-#             logMsg('User exited application')
-#             logFile.close()
-#             sys.exit(0)
-
-# ###
-# #   EOL is not supported in PySerial for readline() in Python 3.6.
-# #   must use sio
-# ###
-
-# logMsg('Creating serial IO connection')
-# sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
-
-
-
-
-
-
-
 ################################################################################################################
 ###
 #--------------------------------------------------- WZ_VehPathDataAcq -----------------------------------------
 ###
 ################################################################################################################
 
+# Start data collection function
 def startMainFunc():
     global  appRunning                          #boolean
     if (appRunning):
@@ -622,17 +573,7 @@ def startMainFunc():
     else:
         logMsg('App not running, exiting')
 
-# def update_config(cfg):
-#     global dataOutFile
-    
-#     dataOutFileName = 'path-data--' + wzDesc + '--' + roadName + '.csv'
-#     dataOutFile = outDir + '/' + dataOutFileName
-#     cfg.truncate(0)
-#     cfg.seek(0)
-#     wzConfig['FILES']['VehiclePathDataDir'] = os.path.abspath(outDir).replace('\\', '/')
-#     wzConfig['FILES']['VehiclePathDataFile'] = dataOutFileName
-#     cfg.write(json.dumps(wzConfig, indent='    '))
-
+# Retrieve NMEA string and GPS data from device
 def getNMEA_String():
 
 ###
@@ -780,13 +721,16 @@ def getNMEA_String():
 #   
 #   -------------------  END OF getNMEA_String...  ---------------------------------------------------------------------
 #
+##
 
+# Calculate accurate distance between GPS points
 def gps_distance(lat1, lon1, lat2, lon2):
     R = 6371000
     avg_lat = (lat1+lat2)/2
     distance = R*math.sqrt((lat1-lat2)**2+math.cos(avg_lat)**2*(lon1-lon2)**2)
     return distance
 
+# Toggle lane closures
 def laneClicked(lane):
     global gotRefPt
     global laneStat
@@ -825,6 +769,7 @@ def laneClicked(lane):
     keyMarker = [lc, str(lane)]
     displayStatusMsg(markerStr)
 
+# Toggle worker presence
 def workersPresentClicked():
     global gotRefPt
     global wpStat
@@ -855,6 +800,7 @@ def workersPresentClicked():
     keyMarker[1] = wpStat
     displayStatusMsg(markerStr)
 
+# Start data logging
 def startDataLog():
     global dataLog
     global keyMarker
@@ -871,6 +817,7 @@ def startDataLog():
 
     displayStatusMsg(markerStr)
 
+# Stop data logging and move to message building
 def stopDataLog():
     global dataLog
     global keyMarker
@@ -886,30 +833,27 @@ def stopDataLog():
     displayStatusMsg(markerStr)
     appRunning = False
 
+# Mark reference point
 def markRefPt():
     global gotRefPt
     global keyMarker
 
-    markerStr = '   *** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
-    logMsg('*** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
-    ##T.insert (END, markerStr)
-    keyMarker = ['RP','']                       #reference point
-    gotRefPt = True                             #got the reference point
+    if not gotRefPt:
+        markerStr = '   *** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
+        logMsg('*** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
+        ##T.insert (END, markerStr)
+        keyMarker = ['RP','']                       #reference point
+        gotRefPt = True                             #got the reference point
 
-    displayStatusMsg(markerStr)
+        displayStatusMsg(markerStr)
 
+# Write line to CSV data vile
 def writeCSVFile (write_str):
     global writeData                            #file handle
     
-    writeData.writerow(write_str)               #write output to csv file...                           
+    writeData.writerow(write_str)               #write output to csv file...
 
-###
-#   
-#   -------------------  END OF writeCSVFile...  ---------------------------------------------------------------------
-#
-###
-
-
+# Display message in status window
 def displayStatusMsg(msgStr):
 
     xPos = 45
@@ -922,46 +866,7 @@ def displayStatusMsg(msgStr):
     Text.place(x=xPos,y=yPos)    
 
 
-###
-#  Update GPS comm port
-###
-def commSelect(*args):
-    portNum= tkvar.get()
-
-###
-#  Check for GPS computer
-###
-def checkForGPS(root, portNum, first):
-    ports = serial.tools.list_ports.comports(include_links=False)
-    gpsFound = False
-    if len(ports)==0:
-        raise SerialException('No open COM ports detected')
-    else:
-        for port in ports:
-            if ('1546:01A6' in port.hwid):
-                portNum = port.device
-                gpsFound = True
-                logMsg('GPS device found at port number: ' + portNum)
-        if (not gpsFound) and first:
-            logMsg('GPS device not directly found')
-            mainframe = Frame(root, pady=100, padx=100)
-            # Add a grid
-            mainframe.place(x=100, y=100)
-            mainframe.columnconfigure(0, weight=1)
-            mainframe.rowconfigure(0, weight=1)
-            # mainframe.place(x=300, y=600)
-            # Create a Tkinter variable
-            tkvar = StringVar(root)
-            tkvar.set(ports[0].device) #default is first comm port
-            popupMenu = OptionMenu(mainframe, tkvar, *ports)
-            logMsg('Creating comm port popup menu')
-            # commLabel = Label(mainframe, text='Choose a comm port')
-            # commLabel.place(x=10, y=10)
-            popupMenu.place(x=10, y=10)
-            # tkvar.trace('w', commSelect)
-        return portNum
-
-# Format and write message to file
+# Enable buttons and remove overlay message
 def enableForm():
     for i in range(1, totalLanes+1):
         if i != dataLane:
@@ -1070,25 +975,18 @@ commPort = tkPortVar.get()[0:4]
 baudRate = int(tkBaudVar.get())
 dataRate = int(tkDataVar.get())
 
-###
-#   Open output file for data logging...
-###
-
 logMsg('*** Running Vehicle Path Data Acquisition ***')
 
 outDir      = './WZ_VehPathData'
 vehPathDataFileName = 'path-data--' + wzDesc + '--' + roadName + '.csv'
 vehPathDataFile = outDir + '/' + vehPathDataFileName
-# wzConfig['FILES']['VehiclePathDataDir'] = os.path.abspath(outDir).replace('\\', '/')
-# wzConfig['FILES']['VehiclePathDataFile'] = dataOutFileName
 
-# root = Tk()
-# root.title('Work Zone Data Collection - Vehicle Path Data Acquisition')
-# root.geometry(str(max(800, totalLanes*110+350))+'x500')
-# root = Frame(window)
-# root.place(x=0, y=0)
-# totalLanes = 8
-# dataLane = 7
+##########################################################################
+#
+# Setup data collection UI
+#
+############################################################################
+
 window_width = max(800, totalLanes*110+350)
 window.geometry(str(max(800, window_width))+'x500')
 root = Frame(width=max(800, window_width), height=700)
@@ -1106,83 +1004,76 @@ carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))                 
 carlabel = Label(root, image = carImg)                                                                  # Label with car image
 workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))             # Workers present image
 
-#############################################################################
-#
-# LAYOUT...
-#
-#############################################################################
-
+# Exit data collection loop and quit
 def end_application():
     global appRunning
     appRunning = False
     logFile.close()
     sys.exit(0)
 
-def setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked):
-    lanes = [0]*(totalLanes+1)
-    laneBoxes = [0]*(totalLanes+1)
-    laneLabels = [0]*(totalLanes+1)
-    laneSymbols = [0]*(totalLanes+1)
-    laneLines = [0]*(totalLanes+1)
+# def setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked):
+lanes = [0]*(totalLanes+1)
+laneBoxes = [0]*(totalLanes+1)
+laneLabels = [0]*(totalLanes+1)
+laneSymbols = [0]*(totalLanes+1)
+laneLines = [0]*(totalLanes+1)
 
 
-    # Initialize lane images
-    for i in range(totalLanes):
-        laneLines[i] = Label(root, image = laneLine)
-        laneLines[i].place(x=marginLeft + i*110, y=50)
-        if i+1 == dataLane:
-            carlabel.place(x=marginLeft+8 + i*110, y=50)
-        else:
-            laneBoxes[i+1] = Label(root, justify=LEFT,anchor=W,padx=50,pady=90)
-            laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
-            laneLabels[i+1] = Label(root, text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
-            laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
-        if i == totalLanes-1:
-            laneLines[i+1] = Label(root, image = laneLine)
-            laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
+# Initialize lane images
+for i in range(totalLanes):
+    laneLines[i] = Label(root, image = laneLine)
+    laneLines[i].place(x=marginLeft + i*110, y=50)
+    if i+1 == dataLane:
+        carlabel.place(x=marginLeft+8 + i*110, y=50)
+    else:
+        laneBoxes[i+1] = Label(root, justify=LEFT,anchor=W,padx=50,pady=90)
+        laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
+        laneLabels[i+1] = Label(root, text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
+        laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
+    if i == totalLanes-1:
+        laneLines[i+1] = Label(root, image = laneLine)
+        laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
 
 
-    # This is required because otherwise the lane command laneClicked(lane #) cannot be set in a for loop
-    def createButton(id):
-        laneBtn = Button(root, text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
-        laneBtn.place(x=marginLeft+10 + (id-1)*110, y=300)
-        return laneBtn
+# This is required because otherwise the lane command laneClicked(lane #) cannot be set in a for loop
+def createButton(id):
+    laneBtn = Button(root, text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
+    laneBtn.place(x=marginLeft+10 + (id-1)*110, y=300)
+    return laneBtn
 
-    # Create lane buttons dynamically to number of lanes
-    for i in range(1, totalLanes+1):
-        lanes[i] = createButton(i)
+# Create lane buttons dynamically to number of lanes
+for i in range(1, totalLanes+1):
+    lanes[i] = createButton(i)
 
-    # Toggle workers present button
-    bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
-    bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
+# Toggle workers present button
+bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
+bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
-    # Debug buttons, hidden by small frame
-    bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
-    bStart.place(x=100, y=510)
-    bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
-    bRef.place(x=250, y=510)
-    bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
-    bEnd.place(x=500, y=510)
+# Debug buttons, hidden by small frame
+bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
+bStart.place(x=100, y=510)
+bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
+bRef.place(x=250, y=510)
+bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
+bEnd.place(x=500, y=510)
 
-    ###
-    #   Application Message Window...
-    ###
+###
+#   Application Message Window...
+###
 
-    appMsgWin = Button(root, text='Application Message Window...                                             ',      \
-                    font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
-    appMsgWin.place(x=50, y=390)
+appMsgWin = Button(root, text='Application Message Window...                                             ',      \
+                font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
+appMsgWin.place(x=50, y=390)
 
-    overlayWidth = 710
-    overlayx = window_width/2 - overlayWidth/2
-    overlay = Label(root, text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
-    overlay.place(x=overlayx, y=200)
+overlayWidth = 710
+overlayx = window_width/2 - overlayWidth/2
+overlay = Label(root, text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
+overlay.place(x=overlayx, y=200)
 
-    return overlay, bWP, lanes, laneLabels
+return overlay, bWP, lanes, laneLabels
 
-overlay, bWP, lanes, laneLabels = setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked)
+# overlay, bWP, lanes, laneLabels = setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked)
 
-# laneClicked(3)
-# workersPresentClicked()
 
 ##############################################################
 #   ------------------ END of LAYOUT -------------------------
@@ -1194,20 +1085,11 @@ overlay, bWP, lanes, laneLabels = setupVehPathDataAcqUI(root, window_width, tota
 #
 ###
 
-#configRead()
 
 gps_found = False
 first = True
 while not gps_found:
-    logMsg('Searching for GPS device')
     try:
-        # portNum     = 'COM3'
-        # baudRate    = 115200
-        # timeOut     = 1
-        # portNum = checkForGPS(root, portNum, first)
-        # portNum     = 'COM4'
-        # baudRate    = 115200
-        # first = False
         ser         = serial.Serial(port=commPort, baudrate=baudRate, timeout=1.1)               #open serial port
         msgStr      = 'Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
         displayStatusMsg(msgStr)                                                        #system ready
@@ -1215,7 +1097,7 @@ while not gps_found:
 
     except SerialException as e:
         logMsg('Failed to find GPS device, SerialException: ' + str(e))
-        MsgBox = messagebox.askquestion ('GPS Receiver NOT Found','*** GPS Receiver NOT Found, Connect to a USB Port ***\n\n'   \
+        MsgBox = messagebox.askquestion ('GPS Receiver NOT Found','*** GPS Receiver NOT Found ***, Reconnect to USB Port ***\n\n'   \
                     '   --- Press Yes to try again, No to exit the application ---',icon = 'warning')
         if MsgBox == 'no':
             logMsg('User exited application')
@@ -1258,23 +1140,13 @@ logMsg('Main loop ended, closing streams/files')
 
 ser.close()                                             #close serial IO
 outFile.close()                                         #end of data acquisition and logging
-# road_name = roadName
-# begin_date = wzStartDate.replace('/', '-')
-# end_date = wzEndDate.replace('/', '-')
-# name_id = road_name + '--' + begin_date + '--' + end_date
-
-# zip_name = 'wzdc-exports--' + name_id + '.zip'
-# export_files()
-# messagebox.showinfo('Veh Path Data Acq. Ended', 'Vehicle Path Data Acq Ended\nCollecting and zipping files\nOutput location: \n' + zip_name)
-# build_export_file = './WZ_BuildMsgs_and_Export.py'
-# logMsg('Opening export script: ' + build_export_file + ', and closing data acquisition')
 logMsg('Ending data acquisition')
 # logFile.close()
 root.destroy()
 window.quit()
 
 
-# ------------------------------------------------------- WZ_BuildMsgs_and_Export --------------------------------------------------------
+# Start 
 laneStat = []
 wpStat = []
 
@@ -1481,10 +1353,10 @@ def build_messages():
     #logFile.close()    
 
 ###
-#   > > > > > > > > > > > START MAIN PROCESS < < < < < < < < < < < < < < <
+#   > > > > > > > > > > > START MESSAGE BUILDING PROCESS < < < < < < < < < < < < < < <
 ###
 
-def startMainProcess():
+def build_all_messages():
 
     global  vehPathDataFile                                         #collected vehicle path data file name
     global  refPtIdx                                                #data point number where reference point is set
@@ -1526,8 +1398,6 @@ def startMainProcess():
         messagebox.showerror('Invalid Work Zone Created', 'No reference point was detected, a reference point must be marked to create a valid workzone')
         logFile.close()
         sys.exit(0)
-
-    
 
 ###
 #   ====================================================================================================
@@ -1662,6 +1532,7 @@ def startMainProcess():
     logMsg('Building messages')
     build_messages()
 
+# Upload messag archive
 def uploadArchive():
     if internet_on():
         logMsg('Creating blob in azure: ' + zip_name + ', in container: ' + container_name)
@@ -1673,15 +1544,11 @@ def uploadArchive():
         logFile.close()
         messagebox.showinfo('Upload Successful', 'Data upload successful! Please navigate to\nhttp://www.neaeraconsulting.com/V2x_Verification\nto view and verify the mapped workzone.\nYou will find your data under\n' + name_id)
         sys.exit(0)
-
     else:
         logMsg('Attempted uploadArchive, no internet connection detected')
         messagebox.showerror('No Internet Cnnection', 'No internet connection detected\nConnect and try again')
 
-
-# root = Tk()
-# root.title('Work Zone Data Export and Upload')
-# root.geometry('400x300')
+# Create upload button
 window.geometry('400x300')
 root = Frame(width=400, height=300)
 root.place(x=0, y=0)
@@ -1696,20 +1563,15 @@ loading_label.place(x=60, y=120)
 # ---------------------------- Automatically Export Files ------------------------------------
 #
 ###############################################################################################
-# local_config_path = './Config Files/ACTIVE_CONFIG.json'
-
-# openLog()
 logMsg('*** Running Message Builder and Export ***')
 
-# logMsg('Loading configuration file from local path: ' + local_config_path)
-# configRead()
-
-def do_stuff():
+# Create zip archive of messages
+def create_messages_and_zip():
     global zip_name
     global name_id
     global blob_service_client
     global container_name
-    startMainProcess()
+    build_all_messages()
     files_list.append(vehPathDataFile)
     files_list.append(local_config_path)
 
@@ -1747,20 +1609,17 @@ def do_stuff():
     zipObj.close()
 
     logMsg('Removing local configuration file: ' + local_config_path)
-    # os.remove(local_config_path)
 
     connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
     connect_str = os.getenv(connect_str_env_var)
-    #print('\nDownloading blob to \n\t' + download_file_path)
     logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
     blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-    # container_client = blob_service_client.get_container_client('unzippedworkzonedatauploads')
     container_name = 'workzonedatauploads'
     load_config['bg'] = 'green'
     load_config['state']= NORMAL
     loading_label.destroy()
 
-root.after(500, do_stuff)
+root.after(500, create_messages_and_zip)
 
 # root.protocol("WM_DELETE_WINDOW", on_closing)
 
