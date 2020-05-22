@@ -203,8 +203,6 @@ def getConfigVars():
     global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
-    global roadName
-
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
     global  lanePadApp                                      #approach lane padding in meters
@@ -230,6 +228,25 @@ def getConfigVars():
     global  wzEndLat                                       #wz end date
     global  wzEndLon                                       #wz end time
 
+    global  roadName
+    global  roadNumber
+    global  beginningCrossStreet
+    global  endingCrossStreet
+    global  beginningMilepost
+    global  endingMilepost
+    global  issuingOrganization
+    global  creationDate
+    global  updateDate
+
+    global  eventStatus
+    global  beginingAccuracy
+    global  endingAccuracy
+    global  startDateAccuracy
+    global  endDateAccuracy
+    global  typeOfWork
+    global  laneRestrictions
+    global  laneType
+
 
 ###
 #   Get collected vehicle path data point .csv file name from user input saved in wz config
@@ -248,8 +265,8 @@ def getConfigVars():
 ###
 #   vehPathDataFile - input data file
 ###
-
     vehPathDataFile = dirName + '/' + fileName                          #complete file name with directory
+    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--FullTest-5212020--Highland Hills Cir.csv'
            
     # if os.path.exists(dirName) == False:
     #     error = True
@@ -273,12 +290,7 @@ def getConfigVars():
 ###
 
     sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
-
-###
-#   Get INFO...
-###
-
-    roadName        = wzConfig['INFO']['RoadName']
+    sampleFreq = 1
 
 ###
 #   Get LANE relevant information...
@@ -324,6 +336,28 @@ def getConfigVars():
         wzStartDate = datetime.datetime.now().strftime('%Y-%m-%d')
         wzStartTime = time.strftime('%H:%M')
     pass
+
+    roadName        = wzConfig['INFO']['RoadName']
+    roadNumber      = wzConfig['INFO'].get('RoadNumber', '')
+    beginningCrossStreet  = wzConfig['INFO'].get('BeginningCrossStreet', '')
+    endingCrossStreet = wzConfig['INFO'].get('EndingCrossStreet', '')
+    beginningMilepost = wzConfig['INFO'].get('BeginningMilepost', '')
+    endingMilepost = wzConfig['INFO'].get('EndingMilepost', '')
+    issuingOrganization = wzConfig['INFO'].get('IssuingOrganization', '')
+    creationDate = wzConfig['INFO'].get('CreationDate', '')
+    updateDate = wzConfig['INFO'].get('UpdateDate', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+
+    eventStatus = wzConfig['INFO'].get('EventStatus', '')
+    beginingAccuracy = wzConfig['INFO'].get('BeginingAccuracy', 'estimated')
+    endingAccuracy = wzConfig['INFO'].get('EndingAccuracy', 'estimated')
+    startDateAccuracy = wzConfig['INFO'].get('StartDateAccuracy', 'estimated')
+    endDateAccuracy = wzConfig['INFO'].get('EndDateAccuracy', 'estimated')
+    typeOfWork = wzConfig['INFO'].get('TypeOfWork', [])
+    if not typeOfWork: typeOfWork = []
+    laneRestrictions = wzConfig['INFO'].get('LaneRestrictions', [])
+    if not laneRestrictions: laneRestrictions = []
+    laneType = wzConfig['INFO'].get('RoadNumbeLaneTyper', [])
+    if not laneType: laneType = []
 
 ###
 #   ------------------------- End of getConfigVars -----------------------
@@ -384,7 +418,7 @@ def build_messages():
 #   Set speed limits in WZ as vehicle max speed..from user input saved in config file...
 ###
 
-    speedLimit  = ['<vehicleMaxSpeed/>',speedList[0],speedList[1],speedList[2],'<mph/>']#NEW Version of XER... Nov. 2017
+    speedLimit  = ['vehicleMaxSpeed',speedList[0],speedList[1],speedList[2],'mph']#NEW Version of XER... Nov. 2017
 
 ### -------------------------------------------------
 #
@@ -525,6 +559,24 @@ def build_messages():
     pass
     info = {}
     info['road_name'] = roadName
+    info['road_number'] = roadNumber
+    info['description'] = wzDesc
+    info['beginning_cross_street'] = beginningCrossStreet
+    info['ending_cross_street'] = endingCrossStreet
+    info['beginning_milepost'] = beginningMilepost
+    info['ending_milepost'] = endingMilepost
+    info['issuing_organization'] = issuingOrganization
+    info['creation_date'] = creationDate
+    info['update_date'] = updateDate
+    info['event_status'] = eventStatus
+    info['beginning_accuracy'] = beginingAccuracy
+    info['ending_accuracy'] = endingAccuracy
+    info['start_date_accuracy'] = startDateAccuracy
+    info['end_date_accuracy'] = endDateAccuracy
+
+    info['types_of_work'] = typeOfWork
+    info['lane_restrictions'] = laneRestrictions
+    info['lane_type'] = laneType
     logMsg('Converting RSM XMl to WZDx message')
     wzdx = wzdx_creator(rsmSegments, dataLane, info)
     wzdxFile.write(json.dumps(wzdx, indent=2))

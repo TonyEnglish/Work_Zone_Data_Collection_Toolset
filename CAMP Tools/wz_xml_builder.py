@@ -348,10 +348,10 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,wzDaysOfWeek,c
         # xmlFile.write ("\n<!--\n\t\t  ...Speed Limit at the Ref. Point...\n-->\n")      ###comment in XML file
         commonContainer['regionInfo']['speedLimit'] = {}
         commonContainer['regionInfo']['speedLimit']['type'] = {}
-        commonContainer['regionInfo']['speedLimit']['type'][speedLimit[0].replace('<', '').replace('/>', '')] = None
+        commonContainer['regionInfo']['speedLimit']['type'][speedLimit[0]] = None
         commonContainer['regionInfo']['speedLimit']['speed'] = speedLimit[2]
         commonContainer['regionInfo']['speedLimit']['speedUnits'] = {}
-        commonContainer['regionInfo']['speedLimit']['speedUnits'][speedLimit[4].replace('<', '').replace('/>', '')] = None
+        commonContainer['regionInfo']['speedLimit']['speedUnits'][speedLimit[4]] = None
         # xmlFile.write (5*tab+"<speedLimit>\n" + \
         #                6*tab+"<type>"+speedLimit[0]+"</type>\n" + \
         #                6*tab+"<speed>"+str(speedLimit[2])+"</speed>\n" + \
@@ -713,10 +713,10 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 
     rszContainer['speedLimit'] = {}
     rszContainer['speedLimit']['type'] = {}
-    rszContainer['speedLimit']['type'][speedLimit[0].replace('<', '').replace('/>', '')] = None
+    rszContainer['speedLimit']['type'][speedLimit[0]] = None
     rszContainer['speedLimit']['speed'] = speedLimit[2]
     rszContainer['speedLimit']['speedUnits'] = {}
-    rszContainer['speedLimit']['speedUnits'][speedLimit[4].replace('<', '').replace('/>', '')] = None
+    rszContainer['speedLimit']['speedUnits'][speedLimit[4]] = None
     # xmlFile.write (4*tab+"<speedLimit>\n" + \
     #                5*tab+"<type>"+speedLimit[0]+"</type>\n" + \
     #                5*tab+"<speed>"+str(speedLimit[2])+"</speed>\n" + \
@@ -907,10 +907,10 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
                         ###xmlFile.write (12*tab+""+pP+"\n")            #must come after node's speed attribute
                         NodeLLE['nodeAttributes']['speedLimit'] = {}
                         NodeLLE['nodeAttributes']['speedLimit']['type'] = {}
-                        NodeLLE['nodeAttributes']['speedLimit']['type'][speedLimit[0].replace('<', '').replace('/>', '')] = None
+                        NodeLLE['nodeAttributes']['speedLimit']['type'][speedLimit[0]] = None
                         NodeLLE['nodeAttributes']['speedLimit']['speed'] = speedLimit[sLoc]
                         NodeLLE['nodeAttributes']['speedLimit']['speedUnits'] = {}
-                        NodeLLE['nodeAttributes']['speedLimit']['speedUnits'][speedLimit[4].replace('<', '').replace('/>', '')] = None
+                        NodeLLE['nodeAttributes']['speedLimit']['speedUnits'][speedLimit[4]] = None
                         NodeLLE['nodeAttributes']['peoplePresent'] = pP
                         # xmlFile.write (12*tab+"<speedLimit>\n" + \
                         #                13*tab+"<type>"+speedLimit[0]+"</type>\n" + \
