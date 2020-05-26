@@ -207,6 +207,7 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
                 reduced_speed_limit = prev_attributes_general['reducedSpeedLimit']
             prev_attributes_general['reducedSpeedLimit'] = reduced_speed_limit
 
+            # Workers Present
             if node_contents.get('nodeAttributes', {}).get('peoplePresent', {}).get('true', {}) == None: #People present
                 people_present = True
             elif node_contents.get('nodeAttributes', {}).get('peoplePresent', {}).get('false', {}) == None: #No people present

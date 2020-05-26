@@ -456,7 +456,7 @@ def testGPSConnection(retry=False, *args):
         return False
     NMEAData = sio.readline()
     ser.close()
-    # print(NMEAData)
+    print(NMEAData)
     # pattern = re.compile('\$?GP[a-zA-Z]{3,},([a-zA-Z0-9\.]*,)+([a-zA-Z0-9]{1,2}\*[a-zA-Z0-9]{1,2})')
     if NMEAData == '':
         btnBegin['state']   = 'disabled'                    #enable the start button for map building...
@@ -1070,7 +1070,7 @@ overlayx = window_width/2 - overlayWidth/2
 overlay = Label(root, text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
 overlay.place(x=overlayx, y=200)
 
-return overlay, bWP, lanes, laneLabels
+# return overlay, bWP, lanes, laneLabels
 
 # overlay, bWP, lanes, laneLabels = setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked)
 
