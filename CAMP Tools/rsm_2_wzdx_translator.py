@@ -295,11 +295,11 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
             if lane['lane_status'] == 'closed':
                 num_closed_lanes = num_closed_lanes + 1
         if num_closed_lanes == 0:
-            lanes_obj['vehicle_impact'] = 'all_lanes_open'
+            lanes_obj['vehicle_impact'] = 'all-lanes-open'
         elif num_closed_lanes == num_lanes:
-            lanes_obj['vehicle_impact'] = 'all_lanes_closed'
+            lanes_obj['vehicle_impact'] = 'all-lanes-closed'
         else:
-            lanes_obj['vehicle_impact'] = 'some_lanes_closed'
+            lanes_obj['vehicle_impact'] = 'some-lanes-closed'
 
         # workser_present
         lanes_obj['workers_present'] = people_present

@@ -192,174 +192,118 @@ def configRead(file):
 #
 ### -------------------------------------------------------------------------------------------------------
 
+
+    
+# Read configuration file
 def getConfigVars():
 
 ###
 #   Following are global variables are later used by other functions/methods...
 ###
-    global error
-    global error_message
 
-    global  vehPathDataFile                                 #collected vehicle path data file
+    # global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
+    # General Information
+    global  wzDesc                                          #WZ Description
+    global  roadName
+    global  roadNumber
+    global  direction
+    global  issuingOrganization
+    global  beginningCrossStreet
+    global  endingCrossStreet
+    global  beginningMilepost
+    global  endingMilepost
+    global  eventStatus
+    global  creationDate
+    global  updateDate
+
+    # Types of Work
+    global  typeOfWork
+
+    # Lane Information
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
     global  lanePadApp                                      #approach lane padding in meters
     global  lanePadWZ                                       #WZ lane padding in meters
     global  dataLane                                        #lane used for collecting veh path data
-    global  wzDesc                                          #WZ Description
+    global  lanes_obj
 
+    # Speed Limits
     global  speedList                                       #speed limits
+
+    # Cause Codes
     global  c_sc_codes                                      #cause/subcause code
 
-##
-#   WZ schedule
-##
-
+    # Schedule
+    global  startDateTime
     global  wzStartDate                                     #wz start date
-    global  wzStartTime                                     #wz start time    
+    global  wzStartTime                                     #wz start time
+    global  startDateAccuracy
+    global  endDateTime
     global  wzEndDate                                       #wz end date
     global  wzEndTime                                       #wz end time
+    global  endDateAccuracy
     global  wzDaysOfWeek                                    #wz active days of week
 
+    # Location
     global  wzStartLat                                     #wz start date
-    global  wzStartLon                                     #wz start time    
+    global  wzStartLon                                     #wz start time
+    global  beginingAccuracy
     global  wzEndLat                                       #wz end date
     global  wzEndLon                                       #wz end time
-
-    global  roadName
-    global  roadNumber
-    global  direction
-    global  beginningCrossStreet
-    global  endingCrossStreet
-    global  beginningMilepost
-    global  endingMilepost
-    global  issuingOrganization
-    global  creationDate
-    global  updateDate
-
-    global  eventStatus
-    global  beginingAccuracy
     global  endingAccuracy
-    global  startDateAccuracy
-    global  endDateAccuracy
-    global  typeOfWork
-    global  laneRestrictions
-    global  laneType
 
+    global vehPathDataFile
 
-###
-#   Get collected vehicle path data point .csv file name from user input saved in wz config
-###
+    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--test-plan-test-1--habitat-dr.csv'
 
-    dirName     = wzConfig['FILES']['VehiclePathDataDir']   #veh path data file directory
-    fileName    = wzConfig['FILES']['VehiclePathDataFile']  #veh path data file name
+    sampleFreq              = 10
 
-###
-#   Assure that the vehicle path data file directory and file name exist.
-#   If NOT, ask user to go back to WZ Configuration Step and correct file location
-#   This can happen if the directory/file name is changed after doing the WZ configuration step...
-#
-#   Added on Nov. 6, 2018
-#
-###
-#   vehPathDataFile - input data file
-###
-    vehPathDataFile = dirName + '/' + fileName                          #complete file name with directory
-    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--test-work-zone-2--road-name.csv'
-           
-    # if os.path.exists(dirName) == False:
-    #     error = True
-    #     error_message = 'Vehicle Path Data file directory: '+dirName+' NOT found, correct directory name in WZ Configuration step'
-    #     logMsg('Vehicle Path Data file directory: '+dirName+' NOT found, correct directory name in WZ Configuration step')
-    #     sys.exit(0)
+    wzDesc                  = wzConfig['GeneralInfo']['Description']
+    roadName                = wzConfig['GeneralInfo']['RoadName']
+    roadNumber              = wzConfig['GeneralInfo']['RoadNumber']
+    direction               = wzConfig['GeneralInfo']['Direction']
+    issuingOrganization     = wzConfig['GeneralInfo']['IssuingOrganization']
+    beginningCrossStreet    = wzConfig['GeneralInfo']['BeginningCrossStreet']
+    endingCrossStreet       = wzConfig['GeneralInfo']['EndingCrossStreet']
+    beginningMilepost       = wzConfig['GeneralInfo']['BeginningMilePost']
+    endingMilepost          = wzConfig['GeneralInfo']['EndingMilePost']
+    eventStatus             = wzConfig['GeneralInfo']['EventStatus']
+    creationDate            = wzConfig['GeneralInfo'].get('CreationDate', '')
+    updateDate              = wzConfig['GeneralInfo'].get('UpdateDate', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
-    if os.path.exists(vehPathDataFile) == False:
-        error = True
-        error_message = 'Vehicle Path Data file: '+fileName+' NOT found, ensure that you are using a valid configuration file and running this application in the correct order'
-        logMsg('Vehicle Path Data file: '+fileName+' NOT found, ensure that you are using a valid configuration file and running this application in the correct order')
-        logFile.close()
-        sys.exit(0)
-
-###
-#   Convert str from the config file to proper data types... VERY Important...
-###
-
-###
-#   Get sampling frequency...
-###
-
-    sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
-    sampleFreq = 1
-
-###
-#   Get LANE relevant information...
-###
-
-    totalLanes      = int(wzConfig['LANES']['NumberOfLanes'])           #total number of lanes in wz
-    laneWidth       = float(wzConfig['LANES']['AverageLaneWidth'])      #average lane width in meters
-    lanePadApp      = float(wzConfig['LANES']['ApproachLanePadding'])   #approach lane padding in meters
-    lanePadWZ       = float(wzConfig['LANES']['WorkzoneLanePadding'])   #WZ lane padding in meters
-    dataLane        = int(wzConfig['LANES']['VehiclePathDataLane'])     #lane used for collecting veh path data
-    wzDesc          = wzConfig['LANES']['Description']                  #WZ Description
-
-###
-#   Get SPEED information...
-###
-
-    speedList       = wzConfig['SPEED']['NormalSpeed'], wzConfig['SPEED']['ReferencePointSpeed'], \
-                      wzConfig['SPEED']['WorkersPresentSpeed']              
-###
-#   Get WZ CAUSE/SUBCAUSE Codes... Entered by the User
-#
-#   Cause code - 3 = Roadworks, Subcause code - (1=..., 2=..., 4=Short term stationary, 5= ... upto 255)
-###
-
-    c_sc_codes      = [int(wzConfig['CAUSE']['CauseCode']), int(wzConfig['CAUSE']['SubCauseCode'])]
-
-###
-#   Get WZ SCHEDULE Information...
-###
-
-    wzStartDate     = wzConfig['SCHEDULE']['WZStartDate']
-    wzStartTime     = wzConfig['SCHEDULE']['WZStartTime']
-    wzEndDate       = wzConfig['SCHEDULE']['WZEndDate']
-    wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
-    wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
-
-    wzStartLat      = wzConfig['LOCATION']['WZStartLat']
-    wzStartLon      = wzConfig['LOCATION']['WZStartLon']
-    wzEndLat        = wzConfig['LOCATION']['WZEndLat']
-    wzEndLon        = wzConfig['LOCATION']['WZEndLon']
-
-    if wzStartDate == '':                                               #wz start date and time are mandatory
-        wzStartDate = datetime.datetime.now().strftime('%Y-%m-%d')
-        wzStartTime = time.strftime('%H:%M')
-    pass
-
-    roadName        = wzConfig['INFO']['RoadName']
-    roadNumber      = wzConfig['INFO'].get('RoadNumber', '')
-    direction        = wzConfig['INFO'].get('Direction', '')
-    beginningCrossStreet  = wzConfig['INFO'].get('BeginningCrossStreet', '')
-    endingCrossStreet = wzConfig['INFO'].get('EndingCrossStreet', '')
-    beginningMilepost = wzConfig['INFO'].get('BeginningMilePost', '')
-    endingMilepost = wzConfig['INFO'].get('EndingMilePost', '')
-    issuingOrganization = wzConfig['INFO'].get('IssuingOrganization', '')
-    creationDate = wzConfig['INFO'].get('CreationDate', '')
-    updateDate = wzConfig['INFO'].get('UpdateDate', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
-
-    eventStatus = wzConfig['INFO'].get('EventStatus', '')
-    beginingAccuracy = wzConfig['INFO'].get('BeginingAccuracy', 'estimated')
-    endingAccuracy = wzConfig['INFO'].get('EndingAccuracy', 'estimated')
-    startDateAccuracy = wzConfig['INFO'].get('StartDateAccuracy', 'estimated')
-    endDateAccuracy = wzConfig['INFO'].get('EndDateAccuracy', 'estimated')
-    typeOfWork = wzConfig['INFO'].get('TypeOfWork', [])
+    typeOfWork = wzConfig['TypesOfWork']
     if not typeOfWork: typeOfWork = []
-    laneRestrictions = wzConfig['INFO'].get('LaneRestrictions', [])
-    if not laneRestrictions: laneRestrictions = []
-    laneType = wzConfig['INFO'].get('RoadNumbeLaneTyper', [])
-    if not laneType: laneType = []
+
+    totalLanes              = int(wzConfig['LaneInfo']['NumberOfLanes'])           #total number of lanes in wz
+    laneWidth               = float(wzConfig['LaneInfo']['AverageLaneWidth'])      #average lane width in meters
+    lanePadApp              = float(wzConfig['LaneInfo']['ApproachLanePadding'])   #approach lane padding in meters
+    lanePadWZ               = float(wzConfig['LaneInfo']['WorkzoneLanePadding'])   #WZ lane padding in meters
+    dataLane                = int(wzConfig['LaneInfo']['VehiclePathDataLane'])     #lane used for collecting veh path data
+    lanes_obj               = list(wzConfig['LaneInfo']['Lanes'])
+
+    speedList               = wzConfig['SpeedLimits']['NormalSpeed'], wzConfig['SpeedLimits']['ReferencePointSpeed'], \
+                              wzConfig['SpeedLimits']['WorkersPresentSpeed']
+
+    c_sc_codes              = [int(wzConfig['CauseCodes']['CauseCode']), int(wzConfig['CauseCodes']['SubCauseCode'])]
+
+    startDateTime           = wzConfig['Schedule']['StartDate']
+    wzStartDate             = datetime.datetime.strptime(startDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y")
+    wzStartTime             = datetime.datetime.strptime(startDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%H:%M")
+    startDateAccuracy       = wzConfig['Schedule'].get('StartDateAccuracy', 'estimated')
+    endDateTime             = wzConfig['Schedule']['EndDate']
+    wzEndDate               = datetime.datetime.strptime(endDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y")
+    wzEndTime               = datetime.datetime.strptime(endDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%H:%M")
+    endDateAccuracy         = wzConfig['Schedule'].get('EndDateAccuracy', 'estimated')
+    wzDaysOfWeek            = wzConfig['Schedule']['DaysOfWeek']
+
+    wzStartLat              = wzConfig['Location']['BeginningLocation']['Lat']
+    wzStartLon              = wzConfig['Location']['BeginningLocation']['Lon']
+    beginingAccuracy        = wzConfig['Location']['BeginningAccuracy']
+    wzEndLat                = wzConfig['Location']['EndingLocation']['Lat']
+    wzEndLon                = wzConfig['Location']['EndingLocation']['Lon']
+    endingAccuracy          = wzConfig['Location']['EndingAccuracy']
 
 ###
 #   ------------------------- End of getConfigVars -----------------------
@@ -578,8 +522,7 @@ def build_messages():
     info['end_date_accuracy'] = endDateAccuracy
 
     info['types_of_work'] = typeOfWork
-    info['lane_restrictions'] = laneRestrictions
-    info['lane_type'] = laneType
+    info['lanes_obj'] = lanes_obj
     logMsg('Converting RSM XMl to WZDx message')
     wzdx = wzdx_creator(rsmSegments, dataLane, info)
     wzdxFile.write(json.dumps(wzdx, indent=2))

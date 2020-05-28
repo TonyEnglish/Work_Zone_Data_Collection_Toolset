@@ -1,0 +1,439 @@
+{
+  "road_event_feed_info": {
+    "feed_update_date": "2020-05-28T17:20:46Z",
+    "metadata": "https://fake-site.tld/dummy-metadata.txt",
+    "version": "2.0"
+  },
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "subidentifier": "IU78CX",
+        "road_name": "Habitat Dr",
+        "road_number": "",
+        "direction": "southbound",
+        "beginning_cross_street": "Habitat Dr.",
+        "ending_cross_street": "Spine Rd.",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-05-28T11:14:00Z",
+        "end_date": "2020-05-30T11:12:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "all-lanes-open",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "test-plan-test-1",
+        "restrictions": [
+          "no-trucks"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-05-28T17:20:44Z",
+        "types_of_work": [],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -105.2116795,
+            40.06101,
+            1589
+          ],
+          [
+            -105.211712,
+            40.0609496,
+            1589
+          ],
+          [
+            -105.2117593,
+            40.0604095,
+            1589
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "subidentifier": "IU78CX",
+        "road_name": "Habitat Dr",
+        "road_number": "",
+        "direction": "southbound",
+        "beginning_cross_street": "Habitat Dr.",
+        "ending_cross_street": "Spine Rd.",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-05-28T11:14:00Z",
+        "end_date": "2020-05-30T11:12:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "test-plan-test-1",
+        "restrictions": [
+          "no-trucks"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-05-28T17:20:44Z",
+        "types_of_work": [],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "closed"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -105.2117593,
+            40.0604095,
+            1589
+          ],
+          [
+            -105.2118241,
+            40.0601991,
+            1589
+          ],
+          [
+            -105.2119048,
+            40.0600496,
+            1589
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "subidentifier": "IU78CX",
+        "road_name": "Habitat Dr",
+        "road_number": "",
+        "direction": "southbound",
+        "beginning_cross_street": "Habitat Dr.",
+        "ending_cross_street": "Spine Rd.",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-05-28T11:14:00Z",
+        "end_date": "2020-05-30T11:12:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": true,
+        "reduced_speed_limit": 15,
+        "description": "test-plan-test-1",
+        "restrictions": [
+          "no-trucks"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-05-28T17:20:44Z",
+        "types_of_work": [],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "closed"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -105.2119048,
+            40.0600496,
+            1589
+          ],
+          [
+            -105.212047,
+            40.0598633,
+            1589
+          ],
+          [
+            -105.2122156,
+            40.059703,
+            1589
+          ],
+          [
+            -105.2124233,
+            40.0595645,
+            1589
+          ],
+          [
+            -105.2126753,
+            40.0594383,
+            1589
+          ],
+          [
+            -105.2128818,
+            40.0593565,
+            1589
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "subidentifier": "IU78CX",
+        "road_name": "Habitat Dr",
+        "road_number": "",
+        "direction": "southbound",
+        "beginning_cross_street": "Habitat Dr.",
+        "ending_cross_street": "Spine Rd.",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-05-28T11:14:00Z",
+        "end_date": "2020-05-30T11:12:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "test-plan-test-1",
+        "restrictions": [
+          "no-trucks"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-05-28T17:20:44Z",
+        "types_of_work": [],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "closed"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -105.2128818,
+            40.0593565,
+            1589
+          ],
+          [
+            -105.2131641,
+            40.059281,
+            1590
+          ],
+          [
+            -105.2134273,
+            40.059232,
+            1590
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "subidentifier": "IU78CX",
+        "road_name": "Habitat Dr",
+        "road_number": "",
+        "direction": "southbound",
+        "beginning_cross_street": "Habitat Dr.",
+        "ending_cross_street": "Spine Rd.",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-05-28T11:14:00Z",
+        "end_date": "2020-05-30T11:12:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "all-lanes-open",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "test-plan-test-1",
+        "restrictions": [
+          "no-trucks"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-05-28T17:20:44Z",
+        "types_of_work": [],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "merge-left"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -105.2134273,
+            40.059232,
+            1590
+          ],
+          [
+            -105.2137356,
+            40.0592095,
+            1591
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "subidentifier": "IU78CX",
+        "road_name": "Habitat Dr",
+        "road_number": "",
+        "direction": "southbound",
+        "beginning_cross_street": "Habitat Dr.",
+        "ending_cross_street": "Spine Rd.",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-05-28T11:14:00Z",
+        "end_date": "2020-05-30T11:12:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "all-lanes-open",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "test-plan-test-1",
+        "restrictions": [
+          "no-trucks"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-05-28T17:20:44Z",
+        "types_of_work": [],
+        "lanes": [
+          {
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -105.2137356,
+            40.0592095,
+            1591
+          ],
+          [
+            -105.2147118,
+            40.0591983,
+            1592
+          ],
+          [
+            -105.2153698,
+            40.0591928,
+            1592
+          ],
+          [
+            -105.2157635,
+            40.059189,
+            1592
+          ]
+        ]
+      }
+    }
+  ]
+}

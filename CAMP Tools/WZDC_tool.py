@@ -173,12 +173,12 @@ def getConfigVars():
     c_sc_codes              = [int(wzConfig['CauseCodes']['CauseCode']), int(wzConfig['CauseCodes']['SubCauseCode'])]
 
     startDateTime           = wzConfig['Schedule']['StartDate']
-    wzStartDate             = datetime.datetime.strptime(startDateTime, "%m-%d-%YT%H:%M:%SZ").strftime("%m/%d/%Y")
-    wzStartTime             = datetime.datetime.strptime(startDateTime, "%m-%d-%YT%H:%M:%SZ").strftime("%H:%M")
+    wzStartDate             = datetime.datetime.strptime(startDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y")
+    wzStartTime             = datetime.datetime.strptime(startDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%H:%M")
     startDateAccuracy       = wzConfig['Schedule'].get('StartDateAccuracy', 'estimated')
     endDateTime             = wzConfig['Schedule']['EndDate']
-    wzEndDate               = datetime.datetime.strptime(endDateTime, "%m-%d-%YT%H:%M:%SZ").strftime("%m/%d/%Y")
-    wzEndTime               = datetime.datetime.strptime(endDateTime, "%m-%d-%YT%H:%M:%SZ").strftime("%H:%M")
+    wzEndDate               = datetime.datetime.strptime(endDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y")
+    wzEndTime               = datetime.datetime.strptime(endDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%H:%M")
     endDateAccuracy         = wzConfig['Schedule'].get('EndDateAccuracy', 'estimated')
     wzDaysOfWeek            = wzConfig['Schedule']['DaysOfWeek']
 
