@@ -9,15 +9,19 @@ import string
 # Translator 
 def wzdx_creator(messages, dataLane, info):
     wzd = {}
-    ids = False # Enables ids linking tables together within file
     wzd['road_event_feed_info'] = {}
     # if ids:
-    wzd['road_event_feed_info']['feed_info_id'] = str(uuid.uuid4())
+    # wzd['road_event_feed_info']['feed_info_id'] = str(uuid.uuid4())
     wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    # wzd['road_event_feed_info']['metadata'] = info['metadata']
+    wzd['road_event_feed_info']['metadata'] = "https://fake-site.tld/dummy-metadata.txt"
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
     nodes = []
+    subidentifier = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6)) #Create random 6 character digit/letter string
+    road_event_id = str(uuid.uuid4())
+    ids = {}
+    ids['subidentifier'] = subidentifier
+    ids['road_event_id'] = road_event_id
     for message in messages:
         RSM = message['MessageFrame']['value']['RoadsideSafetyMessage']
         node_list = extract_nodes(RSM, wzd, ids, int(dataLane), info)
@@ -97,7 +101,6 @@ def form_len(string):
 
 # Create feature for every node from RSM message
 def extract_nodes(RSM, wzd, ids, dataLane, info):
-    subidentifier = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6)) #Create random 6 character digit/letter string
     lanes = RSM['rszContainer']['rszRegion']['roadwayGeometry']['rsmLanes']['RSMLane']
     num_lanes = len(lanes)
     nodes = lanes[0]['laneGeometry']['nodeSet']['NodeLLE']
@@ -122,7 +125,6 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
         people_present = False #initialization
         geometry = {}
         geometry['type'] = 'LineString'
-        road_event_id = str(uuid.uuid4())
         for j in range(len(lanes)):
             lane = {}
 
@@ -134,10 +136,21 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
 
             # Generically set lane type
             lane_type = ""
+            lane['lane_restrictions'] = []#no-trucks, travel-peak-hours-only, hov-3, hov-2, no-parking
+                #reduced-width, reduced-height, reduced-length, reduced-weight, axle-load-limit, gross-weight-limit, towing-prohibited, permitted-oversize-loads-prohibited
+            
             # Overwrite lane_type if present in configuration file
-            for lane_type_obj in info['lane_type']:
-                if lane_type_obj['LaneNumber'] == lane['lane_number']:
-                    lane_type = lane_type_obj['LaneTypes']
+            for lane_obj in info['lanes_obj']:
+                if lane_obj['LaneNumber'] == lane['lane_number']:
+                    lane_type = lane_obj['LaneType']
+                    for lane_restriction_info in lane_obj['LaneRestrictions']:
+                        lane_restriction = {}
+                        lane_restriction['restriction_type'] = lane_restriction_info['RestrictionType']
+                        if not lane_restriction_info['RestrictionType'] in restrictions: restrictions.append(lane_restriction_info['RestrictionType'])
+                        if lane_restriction['restriction_type'] in ['reduced-width', 'reduced-height', 'reduced-length', 'reduced-weight', 'axle-load-limit', 'gross-weight-limit']:
+                            lane_restriction['restriction_value'] = lane_restriction_info['RestrictionValue']
+                            lane_restriction['restriction_units'] = lane_restriction_info['RestrictionUnits']
+                        lane['lane_restrictions'].append(lane_restriction)
             if not lane_type: #Generally set lane type (right, middle or left)
                 lane_type = 'middle-lane' #left-lane, right-lane, middle-lane, right-exit-lane, left-exit-lane, ... (exit lanes, merging lanes, turning lanes)
                 if lane['lane_edge_reference'] == 'left':
@@ -185,17 +198,17 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
                 geometry['coordinates'].append(lane_coordinate)
 
             # Lane Restrictions
-            lane['lane_restrictions'] = []#no-trucks, travel-peak-hours-only, hov-3, hov-2, no-parking
-                #reduced-width, reduced-height, reduced-length, reduced-weight, axle-load-limit, gross-weight-limit, towing-prohibited, permitted-oversize-loads-prohibited
-            for lane_restriction_info in info['lane_restrictions']:
-                if lane['lane_number'] == lane_restriction_info['LaneNumber']:
-                    lane_restriction = {}
-                    lane_restriction['restriction_type'] = lane_restriction_info['RestrictionType']
-                    if not lane_restriction_info['RestrictionType'] in restrictions: restrictions.append(lane_restriction_info['RestrictionType'])
-                    if lane_restriction['restriction_type'] in ['reduced-width', 'reduced-height', 'reduced-length', 'reduced-weight', 'axle-load-limit', 'gross-weight-limit']:
-                        lane_restriction['restriction_value'] = lane_restriction_info['RestrictionValue']
-                        lane_restriction['restriction_units'] = lane_restriction_info['RestrictionUnits']
-                    lane['lane_restrictions'].append(lane_restriction)
+            # lane['lane_restrictions'] = []#no-trucks, travel-peak-hours-only, hov-3, hov-2, no-parking
+            #     #reduced-width, reduced-height, reduced-length, reduced-weight, axle-load-limit, gross-weight-limit, towing-prohibited, permitted-oversize-loads-prohibited
+            # for lane_restriction_info in info['lane_restrictions']:
+            #     if lane['lane_number'] == lane_restriction_info['LaneNumber']:
+            #         lane_restriction = {}
+            #         lane_restriction['restriction_type'] = lane_restriction_info['RestrictionType']
+            #         if not lane_restriction_info['RestrictionType'] in restrictions: restrictions.append(lane_restriction_info['RestrictionType'])
+            #         if lane_restriction['restriction_type'] in ['reduced-width', 'reduced-height', 'reduced-length', 'reduced-weight', 'axle-load-limit', 'gross-weight-limit']:
+            #             lane_restriction['restriction_value'] = lane_restriction_info['RestrictionValue']
+            #             lane_restriction['restriction_units'] = lane_restriction_info['RestrictionUnits']
+            #         lane['lane_restrictions'].append(lane_restriction)
 
             # Reduced Speed Limit
             if node_contents.get('nodeAttributes', {}).get('speedLimit', {}).get('type', {}).get('vehicleMaxSpeed', {}) == None:
@@ -219,16 +232,19 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
             lanes_wzdx.append(lane)
 
         # feed_info_id
-        lanes_obj['feed_info_id'] = wzd['road_event_feed_info']['feed_info_id']
+        # lanes_obj['feed_info_id'] = wzd['road_event_feed_info']['feed_info_id']
 
         # Subidentifier
-        lanes_obj['subidentifier'] = subidentifier
+        lanes_obj['subidentifier'] = ids['subidentifier']
 
         # road_name
         lanes_obj['road_name'] = info['road_name']
 
+        # road_name
+        lanes_obj['road_number'] = info['road_number']
+
         # direction
-        lanes_obj['direction'] = 'unknown'
+        lanes_obj['direction'] = info['direction']
 
         # beginning_cross_street
         if info['beginning_cross_street']:
@@ -252,20 +268,26 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
         # ending_accuracy
         lanes_obj['ending_accuracy'] = info['ending_accuracy']
 
+        # start_date
+        start_date = RSM['commonContainer']['eventInfo']['startDateTime'] #Offset is in minutes from UTC (-5 hours, ET), unused
+        lanes_obj['start_date'] = str(start_date['year']+'-'+form_len(start_date['month'])+'-'+form_len(start_date['day'])+'T'+form_len(start_date['hour'])+':'+form_len(start_date['minute'])+':00Z')
+        
+        # end_date
+        end_date = RSM['commonContainer']['eventInfo']['endDateTime']
+        lanes_obj['end_date'] = str(end_date['year']+'-'+form_len(end_date['month'])+'-'+form_len(end_date['day'])+'T'+form_len(end_date['hour'])+':'+form_len(end_date['minute'])+':00Z')
+        
         # start_date_accuracy
         lanes_obj['start_date_accuracy'] = info['start_date_accuracy']
 
         # end_date_accuracy
         lanes_obj['end_date_accuracy'] = info['end_date_accuracy']
 
+        # event status
+        if info['event_status']:
+            lanes_obj['event_status'] = info['event_status']
+
         # total_num_lanes
         lanes_obj['total_num_lanes'] = num_lanes
-
-        # reduced_speed_limit
-        lanes_obj['reduced_speed_limit'] = reduced_speed_limit #Will either be set to the reference value or a lower value if found
-
-        # workser_present
-        lanes_obj['workers_present'] = people_present
 
         # vehicle_impact
         num_closed_lanes = 0
@@ -279,35 +301,17 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
         else:
             lanes_obj['vehicle_impact'] = 'some_lanes_closed'
 
-        # start_date
-        start_date = RSM['commonContainer']['eventInfo']['startDateTime'] #Offset is in minutes from UTC (-5 hours, ET), unused
-        lanes_obj['start_date'] = str(start_date['year']+'-'+form_len(start_date['month'])+'-'+form_len(start_date['day'])+'T'+form_len(start_date['hour'])+':'+form_len(start_date['minute'])+':00Z')
-        
-        # end_date
-        end_date = RSM['commonContainer']['eventInfo']['endDateTime']
-        lanes_obj['end_date'] = str(end_date['year']+'-'+form_len(end_date['month'])+'-'+form_len(end_date['day'])+'T'+form_len(end_date['hour'])+':'+form_len(end_date['minute'])+':00Z')
-        
-        #type_of_work
-        #maintenance, minor-road-defect-repair, roadside-work, overhead-work, below-road-work, barrier-work, surface-work, painting, roadway-relocation, roadway-creation
-        lanes_obj['types_of_work'] = []
-        for types_of_work in info['types_of_work']:
-            type_of_work = {}
-            type_of_work['type_of_work'] = types_of_work['WorkType']
-            if types_of_work.get('Is_Architectural_Change', '') != '': type_of_work['is_architectural_change'] = types_of_work['Is_Architectural_Change']
-            lanes_obj['types_of_work'].append(type_of_work)
+        # workser_present
+        lanes_obj['workers_present'] = people_present
 
-        # restrictions
-        lanes_obj['restrictions'] = restrictions
-
-        # Lanes object
-        lanes_obj['lanes'] = lanes_wzdx
+        # reduced_speed_limit
+        lanes_obj['reduced_speed_limit'] = reduced_speed_limit #Will either be set to the reference value or a lower value if found
 
         # description
         lanes_obj['description'] = info['description']
 
-        # event status
-        if info['event_status']:
-            lanes_obj['event_status'] = info['event_status']
+        # restrictions
+        lanes_obj['restrictions'] = restrictions
 
         # issuing_organization
         if info['issuing_organization']:
@@ -319,6 +323,18 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
         
         # update_date
         lanes_obj['update_date'] = info['update_date']
+
+        #type_of_work
+        #maintenance, minor-road-defect-repair, roadside-work, overhead-work, below-road-work, barrier-work, surface-work, painting, roadway-relocation, roadway-creation
+        lanes_obj['types_of_work'] = []
+        for types_of_work in info['types_of_work']:
+            type_of_work = {}
+            type_of_work['type_of_work'] = types_of_work['WorkType']
+            if types_of_work.get('Is_Architectural_Change', '') != '': type_of_work['is_architectural_change'] = types_of_work['Is_Architectural_Change']
+            lanes_obj['types_of_work'].append(type_of_work)
+
+        # Lanes object
+        lanes_obj['lanes'] = lanes_wzdx
 
         # properties
         lanes_obj_properties = {}

@@ -230,6 +230,7 @@ def getConfigVars():
 
     global  roadName
     global  roadNumber
+    global  direction
     global  beginningCrossStreet
     global  endingCrossStreet
     global  beginningMilepost
@@ -266,7 +267,7 @@ def getConfigVars():
 #   vehPathDataFile - input data file
 ###
     vehPathDataFile = dirName + '/' + fileName                          #complete file name with directory
-    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--FullTest-5212020--Highland Hills Cir.csv'
+    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--test-work-zone-2--road-name.csv'
            
     # if os.path.exists(dirName) == False:
     #     error = True
@@ -339,10 +340,11 @@ def getConfigVars():
 
     roadName        = wzConfig['INFO']['RoadName']
     roadNumber      = wzConfig['INFO'].get('RoadNumber', '')
+    direction        = wzConfig['INFO'].get('Direction', '')
     beginningCrossStreet  = wzConfig['INFO'].get('BeginningCrossStreet', '')
     endingCrossStreet = wzConfig['INFO'].get('EndingCrossStreet', '')
-    beginningMilepost = wzConfig['INFO'].get('BeginningMilepost', '')
-    endingMilepost = wzConfig['INFO'].get('EndingMilepost', '')
+    beginningMilepost = wzConfig['INFO'].get('BeginningMilePost', '')
+    endingMilepost = wzConfig['INFO'].get('EndingMilePost', '')
     issuingOrganization = wzConfig['INFO'].get('IssuingOrganization', '')
     creationDate = wzConfig['INFO'].get('CreationDate', '')
     updateDate = wzConfig['INFO'].get('UpdateDate', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
@@ -561,6 +563,7 @@ def build_messages():
     info['road_name'] = roadName
     info['road_number'] = roadNumber
     info['description'] = wzDesc
+    info['direction'] = direction
     info['beginning_cross_street'] = beginningCrossStreet
     info['ending_cross_street'] = endingCrossStreet
     info['beginning_milepost'] = beginningMilepost

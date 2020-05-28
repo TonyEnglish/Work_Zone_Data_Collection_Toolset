@@ -18,6 +18,7 @@ import  string                                  #string functions
 import  csv                                     #CSV file read/write
 import  serial.tools.list_ports                      #used to enumerate COMM ports
 from    serial import SerialException           #serial port exception
+import  pynmea2
 
 import  zipfile
 import  xmltodict                                       #dict to xml converter
@@ -64,6 +65,7 @@ def inputFileDialog():
             set_config_description(local_config_path)
             wzConfig_file.set(local_config_path)
         except Exception as e:
+            print(e)
             logMsg('ERROR: Config read failed, ' + str(e))
             messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
     pass
@@ -89,101 +91,104 @@ def getConfigVars():
     # global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
+    # General Information
+    global  wzDesc                                          #WZ Description
+    global  roadName
+    global  roadNumber
+    global  direction
+    global  issuingOrganization
+    global  beginningCrossStreet
+    global  endingCrossStreet
+    global  beginningMilepost
+    global  endingMilepost
+    global  eventStatus
+    global  creationDate
+    global  updateDate
+
+    # Types of Work
+    global  typeOfWork
+
+    # Lane Information
     global  totalLanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
     global  lanePadApp                                      #approach lane padding in meters
     global  lanePadWZ                                       #WZ lane padding in meters
     global  dataLane                                        #lane used for collecting veh path data
-    global  wzDesc                                          #WZ Description
+    global  lanes_obj
 
+    # Speed Limits
     global  speedList                                       #speed limits
+
+    # Cause Codes
     global  c_sc_codes                                      #cause/subcause code
 
+    # Schedule
+    global  startDateTime
     global  wzStartDate                                     #wz start date
-    global  wzStartTime                                     #wz start time    
+    global  wzStartTime                                     #wz start time
+    global  startDateAccuracy
+    global  endDateTime
     global  wzEndDate                                       #wz end date
     global  wzEndTime                                       #wz end time
+    global  endDateAccuracy
     global  wzDaysOfWeek                                    #wz active days of week
 
+    # Location
     global  wzStartLat                                     #wz start date
-    global  wzStartLon                                     #wz start time    
+    global  wzStartLon                                     #wz start time
+    global  beginingAccuracy
     global  wzEndLat                                       #wz end date
     global  wzEndLon                                       #wz end time
-
-    global  roadName
-    global  roadNumber
-    global  beginningCrossStreet
-    global  endingCrossStreet
-    global  beginningMilepost
-    global  endingMilepost
-    global  issuingOrganization
-    global  creationDate
-    global  updateDate
-
-    global  eventStatus
-    global  beginingAccuracy
     global  endingAccuracy
-    global  startDateAccuracy
-    global  endDateAccuracy
-    global  typeOfWork
-    global  laneRestrictions
-    global  laneType
 
-    dirName     = wzConfig['FILES']['VehiclePathDataDir']   #veh path data file directory
-    fileName    = wzConfig['FILES']['VehiclePathDataFile']  #veh path data file name
 
-    sampleFreq      = int(wzConfig['SERIALPORT']['DataRate'])           #data sampling freq
+    sampleFreq              = 10
 
-    totalLanes      = int(wzConfig['LANES']['NumberOfLanes'])           #total number of lanes in wz
-    laneWidth       = float(wzConfig['LANES']['AverageLaneWidth'])      #average lane width in meters
-    lanePadApp      = float(wzConfig['LANES']['ApproachLanePadding'])   #approach lane padding in meters
-    lanePadWZ       = float(wzConfig['LANES']['WorkzoneLanePadding'])   #WZ lane padding in meters
-    dataLane        = int(wzConfig['LANES']['VehiclePathDataLane'])     #lane used for collecting veh path data
-    wzDesc          = wzConfig['LANES']['Description']                  #WZ Description
+    wzDesc                  = wzConfig['GeneralInfo']['Description']
+    roadName                = wzConfig['GeneralInfo']['RoadName']
+    roadNumber              = wzConfig['GeneralInfo']['RoadNumber']
+    direction               = wzConfig['GeneralInfo']['Direction']
+    issuingOrganization     = wzConfig['GeneralInfo']['IssuingOrganization']
+    beginningCrossStreet    = wzConfig['GeneralInfo']['BeginningCrossStreet']
+    endingCrossStreet       = wzConfig['GeneralInfo']['EndingCrossStreet']
+    beginningMilepost       = wzConfig['GeneralInfo']['BeginningMilePost']
+    endingMilepost          = wzConfig['GeneralInfo']['EndingMilePost']
+    eventStatus             = wzConfig['GeneralInfo']['EventStatus']
+    creationDate            = wzConfig['GeneralInfo'].get('CreationDate', '')
+    updateDate              = wzConfig['GeneralInfo'].get('UpdateDate', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
-    speedList       = wzConfig['SPEED']['NormalSpeed'], wzConfig['SPEED']['ReferencePointSpeed'], \
-                      wzConfig['SPEED']['WorkersPresentSpeed']
-
-    c_sc_codes      = [int(wzConfig['CAUSE']['CauseCode']), int(wzConfig['CAUSE']['SubCauseCode'])]
-
-    wzStartDate     = wzConfig['SCHEDULE']['WZStartDate']
-    wzStartTime     = wzConfig['SCHEDULE']['WZStartTime']
-    wzEndDate       = wzConfig['SCHEDULE']['WZEndDate']
-    wzEndTime       = wzConfig['SCHEDULE']['WZEndTime']
-    wzDaysOfWeek    = wzConfig['SCHEDULE']['WZDaysOfWeek']
-
-    wzStartLat      = wzConfig['LOCATION']['WZStartLat']
-    wzStartLon      = wzConfig['LOCATION']['WZStartLon']
-    wzEndLat        = wzConfig['LOCATION']['WZEndLat']
-    wzEndLon        = wzConfig['LOCATION']['WZEndLon']
-
-    if wzStartDate == '':                                               #wz start date and time are mandatory
-        wzStartDate = datetime.datetime.now().strftime('%Y-%m-%d')
-        wzStartTime = time.strftime('%H:%M')
-    pass
-
-    roadName        = wzConfig['INFO']['RoadName']
-    roadNumber      = wzConfig['INFO'].get('RoadNumber', '')
-    beginningCrossStreet  = wzConfig['INFO'].get('BeginningCrossStreet', '')
-    endingCrossStreet = wzConfig['INFO'].get('EndingCrossStreet', '')
-    beginningMilepost = wzConfig['INFO'].get('BeginningMilepost', '')
-    endingMilepost = wzConfig['INFO'].get('EndingMilepost', '')
-    issuingOrganization = wzConfig['INFO'].get('IssuingOrganization', '')
-    creationDate = wzConfig['INFO'].get('CreationDate', '')
-    updateDate = wzConfig['INFO'].get('UpdateDate', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
-
-    eventStatus = wzConfig['INFO'].get('EventStatus', '')
-    beginingAccuracy = wzConfig['INFO'].get('BeginingAccuracy', 'estimated')
-    endingAccuracy = wzConfig['INFO'].get('EndingAccuracy', 'estimated')
-    startDateAccuracy = wzConfig['INFO'].get('StartDateAccuracy', 'estimated')
-    endDateAccuracy = wzConfig['INFO'].get('EndDateAccuracy', 'estimated')
-    typeOfWork = wzConfig['INFO'].get('TypeOfWork', [])
+    typeOfWork = wzConfig['TypesOfWork']
     if not typeOfWork: typeOfWork = []
-    laneRestrictions = wzConfig['INFO'].get('LaneRestrictions', [])
-    if not laneRestrictions: laneRestrictions = []
-    laneType = wzConfig['INFO'].get('RoadNumbeLaneTyper', [])
-    if not laneType: laneType = []
 
+    totalLanes              = int(wzConfig['LaneInfo']['NumberOfLanes'])           #total number of lanes in wz
+    laneWidth               = float(wzConfig['LaneInfo']['AverageLaneWidth'])      #average lane width in meters
+    lanePadApp              = float(wzConfig['LaneInfo']['ApproachLanePadding'])   #approach lane padding in meters
+    lanePadWZ               = float(wzConfig['LaneInfo']['WorkzoneLanePadding'])   #WZ lane padding in meters
+    dataLane                = int(wzConfig['LaneInfo']['VehiclePathDataLane'])     #lane used for collecting veh path data
+    lanes_obj               = list(wzConfig['LaneInfo']['Lanes'])
+
+    speedList               = wzConfig['SpeedLimits']['NormalSpeed'], wzConfig['SpeedLimits']['ReferencePointSpeed'], \
+                              wzConfig['SpeedLimits']['WorkersPresentSpeed']
+
+    c_sc_codes              = [int(wzConfig['CauseCodes']['CauseCode']), int(wzConfig['CauseCodes']['SubCauseCode'])]
+
+    startDateTime           = wzConfig['Schedule']['StartDate']
+    wzStartDate             = datetime.datetime.strptime(startDateTime, "%m-%d-%YT%H:%M:%SZ").strftime("%m/%d/%Y")
+    wzStartTime             = datetime.datetime.strptime(startDateTime, "%m-%d-%YT%H:%M:%SZ").strftime("%H:%M")
+    startDateAccuracy       = wzConfig['Schedule'].get('StartDateAccuracy', 'estimated')
+    endDateTime             = wzConfig['Schedule']['EndDate']
+    wzEndDate               = datetime.datetime.strptime(endDateTime, "%m-%d-%YT%H:%M:%SZ").strftime("%m/%d/%Y")
+    wzEndTime               = datetime.datetime.strptime(endDateTime, "%m-%d-%YT%H:%M:%SZ").strftime("%H:%M")
+    endDateAccuracy         = wzConfig['Schedule'].get('EndDateAccuracy', 'estimated')
+    wzDaysOfWeek            = wzConfig['Schedule']['DaysOfWeek']
+
+    wzStartLat              = wzConfig['Location']['BeginningLocation']['Lat']
+    wzStartLon              = wzConfig['Location']['BeginningLocation']['Lon']
+    beginingAccuracy        = wzConfig['Location']['BeginningAccuracy']
+    wzEndLat                = wzConfig['Location']['EndingLocation']['Lat']
+    wzEndLon                = wzConfig['Location']['EndingLocation']['Lon']
+    endingAccuracy          = wzConfig['Location']['EndingAccuracy']
+ 
 # Set description box in UI from config file
 def set_config_description(config_file):
     global isConfigReady
@@ -196,10 +201,12 @@ def set_config_description(config_file):
             '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
         logMsg('Configuration File Summary: \n' + config_description)
         msg['text'] = config_description
+        msg['fg'] = 'black'
         isConfigReady = True
         updateMainButton()
     else:
-        msg['text'] = 'No config file found, please select a config file below'
+        msg['text'] = 'NO CONFIGURATION FILE SELECTED'
+        msg['fg'] = 'red'
 
 # Move on to data collection/acquisition
 def launch_WZ_veh_path_data_acq():
@@ -257,6 +264,7 @@ def downloadConfig():
         wzConfig_file.set(local_config_path)
     except Exception as e:
         logMsg('ERROR: Config read failed, ' + str(e))
+        print(e)
         messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
 
 # Check internet connectivity by pinging google.com
@@ -348,7 +356,7 @@ isConfigReady = False
 lbl_top = Label(root, text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
 lbl_top.place(x=300, y=20)
 
-msg = Label(root, text='No config file found, please select a config file below',bg='slategray1',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
+msg = Label(root, text='NO CONFIGURATION FILE SELECTED',bg='slategray1', fg='red',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
 msg.place(x=100, y=80)
 
 # Retrieve zure cloud connection string from environment variable
@@ -449,60 +457,82 @@ isGPSReady = False
 # test serial port for GPS device (check for NMEA string)
 def testGPSConnection(retry=False, *args):
     global isGPSReady
+    gpsFix = False
+    gpsFound = False
     try:
-        ser = serial.Serial(port=tkPortVar.get()[0:4], baudrate=tkBaudVar.get(), timeout=1.1)
+        ser = serial.Serial(port=tkPortVar.get()[0:5].strip(), baudrate=tkBaudVar.get(), timeout=1.1)
         sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
+        
+        NMEAData = sio.readline()
+        if NMEAData: 
+            for i in range(20):
+                NMEAData = sio.readline()
+                if NMEAData[0:3] == '$GP':
+                    gpsFound = True
+                if NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]:
+                    gpsFix = True
+                    break
+                elif NMEAData[0:6] == '$GPGGA' and NMEAData.split(',')[2]:
+                    gpsFix = True
+                    break
+                # print(NMEAData)
+                # if not NMEAData: break
+                # msg = pynmea2.parse(NMEAData)
+                # print(repr(msg))
     except:
         return False
-    NMEAData = sio.readline()
-    ser.close()
-    print(NMEAData)
     # pattern = re.compile('\$?GP[a-zA-Z]{3,},([a-zA-Z0-9\.]*,)+([a-zA-Z0-9]{1,2}\*[a-zA-Z0-9]{1,2})')
-    if NMEAData == '':
+    if gpsFound: # Beginning of NMEA String
+        # if NMEAData[0:6] == '$GPTXT' or NMEAData[0:6] == '$GPGSA':
+        if gpsFix:
+            commLabel['text']   = 'GPS DEVICE FOUND'
+            commLabel['fg']     = 'green'
+            isGPSReady = True
+            updateMainButton()
+            return True
+        else:
+            commLabel['text']   = 'INVALID GPS POSITION'
+            commLabel['fg']     = 'orange'
+            return True
+            # commLabel['bg']     = 'yellow'
+
+    # if retry:
+    #     isGPSReady = testGPSConnection()
+    #     return isGPSReady
+    else:
+        # print('Not NMEA')
         btnBegin['state']   = 'disabled'                    #enable the start button for map building...
         btnBegin['bg']     = '#F0F0F0'
         commLabel['text']   = 'GPS DEVICE NOT FOUND'
         commLabel['fg']     = 'red'
         isGPSReady = False
         return False
-    elif NMEAData[0:3] == '$GP': # Beginning of NMEA String
-        # print('Matched!')
-        # btnBegin['state']   = 'normal'                    #enable the start button for map building...
-        # btnBegin['bg']      = 'green'
-        commLabel['text']   = 'GPS DEVICE FOUND'
-        commLabel['fg']     = 'green'
-        isGPSReady = True
-        updateMainButton()
-        return True
-    else:
-        if retry:
-            isGPSReady = testGPSConnection()
-            return isGPSReady
-        else:
-            # print('Not NMEA')
-            btnBegin['state']   = 'disabled'                    #enable the start button for map building...
-            btnBegin['bg']     = '#F0F0F0'
-            commLabel['text']   = 'GPS DEVICE NOT FOUND'
-            commLabel['fg']     = 'red'
-            isGPSReady = False
-            return False
+
+def showSerialDropdowns():
+    serialButton.destroy()
+    baudLabel.place(x=850, y=370)
+    baudPopupMenu.place(x=850, y=390)
+    dataLabel.place(x=950, y=370)
+    dataPopupMenu.place(x=950, y=390)
 
 # Set baud rate and data rate labels
 baudLabel = Label(root, text='Baud Rate (bps)')
-baudLabel.place(x=850, y=370)
+# baudLabel.place(x=850, y=370)
 baudRates = ['4800', '9600', '19200', '57600', '115200']
 tkBaudVar = StringVar(window)
 tkBaudVar.set('115200') #default is first comm port
 baudPopupMenu = OptionMenu(root, tkBaudVar, *baudRates)
-baudPopupMenu.place(x=850, y=390)
+# baudPopupMenu.place(x=850, y=390)
 
-baudLabel = Label(root, text='Data Rate (Hz)')
-baudLabel.place(x=950, y=370)
+dataLabel = Label(root, text='Data Rate (Hz)')
+# baudLabel.place(x=950, y=370)
 dataRates = ['1', '2', '5', '10']
 tkDataVar = StringVar(window)
 tkDataVar.set('10') #default is first comm port
-baudPopupMenu = OptionMenu(root, tkDataVar, *dataRates)
-baudPopupMenu.place(x=950, y=390)
+dataPopupMenu = OptionMenu(root, tkDataVar, *dataRates)
+# baudPopupMenu.place(x=950, y=390)
+serialButton = Button(root, text='Show Advanced Serial Settings', command=showSerialDropdowns)
+serialButton.place(x=850, y=370)
 
 ports = serial.tools.list_ports.comports(include_links=False)
 if not ports: ports = ['NO DEVICES FOUND']
@@ -1324,6 +1354,7 @@ def build_messages():
     info['road_name'] = roadName
     info['road_number'] = roadNumber
     info['description'] = wzDesc
+    info['direction'] = direction
     info['beginning_cross_street'] = beginningCrossStreet
     info['ending_cross_street'] = endingCrossStreet
     info['beginning_milepost'] = beginningMilepost
@@ -1338,8 +1369,7 @@ def build_messages():
     info['end_date_accuracy'] = endDateAccuracy
 
     info['types_of_work'] = typeOfWork
-    info['lane_restrictions'] = laneRestrictions
-    info['lane_type'] = laneType
+    info['lanes_obj'] = lanes_obj
     logMsg('Converting RSM XMl to WZDx message')
     wzdx = wzdx_creator(rsmSegments, dataLane, info)
     wzdxFile.write(json.dumps(wzdx, indent=2))
