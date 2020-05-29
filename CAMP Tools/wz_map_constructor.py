@@ -271,7 +271,8 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
             # Go to step 7
 
     # Step 3
-        deltaHeadings = Pnext[4] - Pstarting[4]
+        deltaHeadings = abs(Pnext[4] - Pstarting[4])
+        if deltaHeadings > 180: deltaHeadings = 360 - deltaHeadings
         deltaHeadings = abs(math.radians(deltaHeadings))
 
     # Step 4
