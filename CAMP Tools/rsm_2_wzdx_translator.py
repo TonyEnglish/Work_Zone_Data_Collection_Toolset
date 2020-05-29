@@ -301,7 +301,7 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
         # vehicle_impact
         num_closed_lanes = 0
         for lane in lanes_wzdx:
-            if lane['lane_status'] == 'closed':
+            if lane['lane_status'] == 'closed' or lane['lane_status'] == 'merge-left' or lane['lane_status'] == 'merge-right':
                 num_closed_lanes = num_closed_lanes + 1
         if num_closed_lanes == 0:
             lanes_obj['vehicle_impact'] = 'all-lanes-open'

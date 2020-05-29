@@ -256,7 +256,7 @@ def getConfigVars():
 
     global vehPathDataFile
 
-    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--test-plan-test-1--habitat-dr.csv'
+    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--sample-work-zone--white-rock-cir.csv'
 
     sampleFreq              = 10
 

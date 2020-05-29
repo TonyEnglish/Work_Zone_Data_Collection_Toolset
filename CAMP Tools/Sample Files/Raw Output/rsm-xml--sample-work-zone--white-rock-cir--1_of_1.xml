@@ -6,47 +6,47 @@
       <version>1</version>
       <commonContainer>
         <eventInfo>
-          <eventID>00002d51</eventID>
+          <eventID>00007699</eventID>
           <msgSegmentInfo>
             <totalMsgSegments>1</totalMsgSegments>
             <thisSegmentNum>1</thisSegmentNum>
           </msgSegmentInfo>
           <startDateTime>
             <year>2020</year>
-            <month>05</month>
-            <day>28</day>
-            <hour>11</hour>
-            <minute>14</minute>
+            <month>06</month>
+            <day>01</day>
+            <hour>12</hour>
+            <minute>00</minute>
             <offset>-300</offset>
           </startDateTime>
           <endDateTime>
             <year>2020</year>
-            <month>05</month>
-            <day>30</day>
+            <month>06</month>
+            <day>27</day>
             <hour>11</hour>
-            <minute>12</minute>
+            <minute>58</minute>
           </endDateTime>
           <eventRecurrence>
             <EventRecurrence>
               <startTime>
-                <hour>11</hour>
-                <minute>14</minute>
+                <hour>12</hour>
+                <minute>00</minute>
                 <second>0</second>
               </startTime>
               <endTime>
                 <hour>11</hour>
-                <minute>12</minute>
+                <minute>58</minute>
                 <second>0</second>
               </endTime>
               <startDate>
                 <year>2020</year>
-                <month>05</month>
-                <day>28</day>
+                <month>06</month>
+                <day>01</day>
               </startDate>
               <endDate>
                 <year>2020</year>
-                <month>05</month>
-                <day>30</day>
+                <month>06</month>
+                <day>27</day>
               </endDate>
               <monday>
                 <true/>
@@ -61,7 +61,7 @@
                 <false/>
               </thursday>
               <friday>
-                <false/>
+                <true/>
               </friday>
               <saturday>
                 <false/>
@@ -87,12 +87,12 @@
           <referencePointType>
             <startOfEvent/>
           </referencePointType>
-          <descriptiveName>test-plan-test-1</descriptiveName>
+          <descriptiveName>sample work zone</descriptiveName>
           <speedLimit>
             <type>
               <vehicleMaxSpeed/>
             </type>
-            <speed>20</speed>
+            <speed>65</speed>
             <speedUnits>
               <mph/>
             </speedUnits>
@@ -106,6 +106,61 @@
                   <laneID>1</laneID>
                   <lanePosition>1</lanePosition>
                   <laneName>Lane #1</laneName>
+                  <laneWidth>360</laneWidth>
+                  <laneGeometry>
+                    <nodeSet>
+                      <NodeLLE>
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>400609629</lat>
+                            <long>-1052104930</long>
+                            <elevation>1588</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>400609539</lat>
+                            <long>-1052110781</long>
+                            <elevation>1589</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>400609834</lat>
+                            <long>-1052115513</long>
+                            <elevation>1589</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>400609771</lat>
+                            <long>-1052116011</long>
+                            <elevation>1589</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                      <NodeLLE>
+                        <nodePoint>
+                          <node-3Dabsolute>
+                            <lat>400609693</lat>
+                            <long>-1052116138</long>
+                            <elevation>1589</elevation>
+                          </node-3Dabsolute>
+                        </nodePoint>
+                      </NodeLLE>
+                    </nodeSet>
+                  </laneGeometry>
+                </RSMLane>
+                <RSMLane>
+                  <laneID>2</laneID>
+                  <lanePosition>2</lanePosition>
+                  <laneName>Lane #2</laneName>
                   <laneWidth>360</laneWidth>
                   <laneGeometry>
                     <nodeSet>
@@ -158,9 +213,9 @@
                   </laneGeometry>
                 </RSMLane>
                 <RSMLane>
-                  <laneID>2</laneID>
-                  <lanePosition>2</lanePosition>
-                  <laneName>Lane #2</laneName>
+                  <laneID>3</laneID>
+                  <lanePosition>3</lanePosition>
+                  <laneName>Lane #3</laneName>
                   <laneWidth>360</laneWidth>
                   <laneGeometry>
                     <nodeSet>
@@ -222,7 +277,7 @@
           <type>
             <vehicleMaxSpeed/>
           </type>
-          <speed>20</speed>
+          <speed>65</speed>
           <speedUnits>
             <mph/>
           </speedUnits>
@@ -235,6 +290,214 @@
                 <laneID>1</laneID>
                 <lanePosition>1</lanePosition>
                 <laneName>Left Lane: Lane #1</laneName>
+                <laneWidth>360</laneWidth>
+                <laneGeometry>
+                  <nodeSet>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400609687</lat>
+                          <long>-1052116142</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400609403</lat>
+                          <long>-1052116282</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400603999</lat>
+                          <long>-1052116756</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <taperLeft>
+                          <false/>
+                        </taperLeft>
+                        <taperRight>
+                          <true/>
+                        </taperRight>
+                        <laneClosed>
+                          <true/>
+                        </laneClosed>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400601803</lat>
+                          <long>-1052117432</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400600220</lat>
+                          <long>-1052118282</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <speedLimit>
+                          <type>
+                            <vehicleMaxSpeed/>
+                          </type>
+                          <speed>55</speed>
+                          <speedUnits>
+                            <mph/>
+                          </speedUnits>
+                        </speedLimit>
+                        <peoplePresent>
+                          <true/>
+                        </peoplePresent>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400598272</lat>
+                          <long>-1052119767</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400596582</lat>
+                          <long>-1052121545</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400595142</lat>
+                          <long>-1052123700</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400593823</lat>
+                          <long>-1052126327</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400592976</lat>
+                          <long>-1052128466</long>
+                          <elevation>1589</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <speedLimit>
+                          <type>
+                            <vehicleMaxSpeed/>
+                          </type>
+                          <speed>65</speed>
+                          <speedUnits>
+                            <mph/>
+                          </speedUnits>
+                        </speedLimit>
+                        <peoplePresent>
+                          <false/>
+                        </peoplePresent>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400592190</lat>
+                          <long>-1052131395</long>
+                          <elevation>1590</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400591682</lat>
+                          <long>-1052134123</long>
+                          <elevation>1590</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                      <nodeAttributes>
+                        <taperLeft>
+                          <true/>
+                        </taperLeft>
+                        <taperRight>
+                          <false/>
+                        </taperRight>
+                        <laneClosed>
+                          <false/>
+                        </laneClosed>
+                      </nodeAttributes>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400591447</lat>
+                          <long>-1052137333</long>
+                          <elevation>1591</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400591335</lat>
+                          <long>-1052147128</long>
+                          <elevation>1592</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400591280</lat>
+                          <long>-1052153685</long>
+                          <elevation>1592</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>400591242</lat>
+                          <long>-1052157639</long>
+                          <elevation>1592</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                  </nodeSet>
+                </laneGeometry>
+                <connectsTo>
+                  <LaneID>1</LaneID>
+                  <LaneID>2</LaneID>
+                </connectsTo>
+              </RSMLane>
+              <RSMLane>
+                <laneID>2</laneID>
+                <lanePosition>2</lanePosition>
+                <laneName>Lane #2</laneName>
                 <laneWidth>360</laneWidth>
                 <laneGeometry>
                   <nodeSet>
@@ -264,17 +527,6 @@
                           <elevation>1589</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
-                      <nodeAttributes>
-                        <taperLeft>
-                          <false/>
-                        </taperLeft>
-                        <taperRight>
-                          <true/>
-                        </taperRight>
-                        <laneClosed>
-                          <true/>
-                        </laneClosed>
-                      </nodeAttributes>
                     </NodeLLE>
                     <NodeLLE>
                       <nodePoint>
@@ -298,7 +550,7 @@
                           <type>
                             <vehicleMaxSpeed/>
                           </type>
-                          <speed>15</speed>
+                          <speed>55</speed>
                           <speedUnits>
                             <mph/>
                           </speedUnits>
@@ -357,7 +609,7 @@
                           <type>
                             <vehicleMaxSpeed/>
                           </type>
-                          <speed>20</speed>
+                          <speed>65</speed>
                           <speedUnits>
                             <mph/>
                           </speedUnits>
@@ -384,17 +636,6 @@
                           <elevation>1590</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
-                      <nodeAttributes>
-                        <taperLeft>
-                          <true/>
-                        </taperLeft>
-                        <taperRight>
-                          <false/>
-                        </taperRight>
-                        <laneClosed>
-                          <false/>
-                        </laneClosed>
-                      </nodeAttributes>
                     </NodeLLE>
                     <NodeLLE>
                       <nodePoint>
@@ -434,15 +675,11 @@
                     </NodeLLE>
                   </nodeSet>
                 </laneGeometry>
-                <connectsTo>
-                  <LaneID>1</LaneID>
-                  <LaneID>2</LaneID>
-                </connectsTo>
               </RSMLane>
               <RSMLane>
-                <laneID>2</laneID>
-                <lanePosition>2</lanePosition>
-                <laneName>Right Lane: Lane #2</laneName>
+                <laneID>3</laneID>
+                <lanePosition>3</lanePosition>
+                <laneName>Right Lane: Lane #3</laneName>
                 <laneWidth>360</laneWidth>
                 <laneGeometry>
                   <nodeSet>
@@ -495,7 +732,7 @@
                           <type>
                             <vehicleMaxSpeed/>
                           </type>
-                          <speed>15</speed>
+                          <speed>55</speed>
                           <speedUnits>
                             <mph/>
                           </speedUnits>
@@ -554,7 +791,7 @@
                           <type>
                             <vehicleMaxSpeed/>
                           </type>
-                          <speed>20</speed>
+                          <speed>65</speed>
                           <speedUnits>
                             <mph/>
                           </speedUnits>
