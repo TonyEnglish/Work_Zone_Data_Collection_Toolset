@@ -1,0 +1,71 @@
+{
+    "DateCreated": "5/11/2020",
+    "GeneralInfo": {
+        "Description": "WZ Test 5-11-20",
+        "RoadName": "Highland Hills Cir",
+        "RoadNumber": "",
+        "Direction": "northbound",
+        "IssuingOrganization": "Neaera Consulting",
+        "BeginingCrossStreet": "",
+        "EndingCrossStreet": "",
+        "BeginingMilePost": -1,
+        "EndingMilePost": -1,
+        "EventStatus": ""
+    },
+    "TypesOfWork": [
+        {
+            "WorkType": "",
+            "IsArchitecturalChange": false
+        }
+    ],
+    "LaneInfo": {
+        "NumberOfLanes": 2,
+        "AverageLaneWidth": 3.6,
+        "ApproachLanePadding": 0.0,
+        "WorkzoneLanePadding": 0.0,
+        "VehiclePathDataLane": 2,
+        "Lanes": [
+            {
+                "LaneNumber": 1,
+                "LaneType": "",
+                "LaneRestrictions": [
+                    {
+                        "RestrictionType": "",
+                        "RestrictionValue": 0,
+                        "RestrictionUnits": ""
+                    }
+                ]
+            }
+        ]
+    },
+    "SpeedLimits": {
+        "NormalSpeed": 30,
+        "ReferencePointSpeed": 20,
+        "WorkersPresentSpeed": 10
+    },
+    "CauseCodes": {
+        "CauseCode": 3,
+        "SubCauseCode": 0
+    },
+    "Schedule": {
+        "StartDate": "2020-04-24T01:00:00Z",
+        "StartDateAccuracy": "estimated",
+        "EndDate": "2020-04-24T01:00:00Z",
+        "EndDateAccuracy": "estimated",
+        "DaysOfWeek": [
+            "Mon"
+        ]
+    },
+    "Location": {
+        "BeginningLocation": {
+            "Lat": 40.4727224065725,
+            "Lon": -104.965486240182
+        },
+        "BeginningAccuracy": "estimated",
+        "EndingLocation": {
+            "Lat": 40.4714165399093,
+            "Lon": -104.970357131754
+        },
+        "EndingAccuracy": "estimated"
+    }
+}
