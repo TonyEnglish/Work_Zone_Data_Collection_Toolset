@@ -8,7 +8,7 @@ Tasks 6-7
 
 # Work Zone Data Collection Tool
 
-The WZDC tool is an open source, standards based work zone capturing tool. Using a gps and a computer, a user can drive through a work zone and mark important elements of the work zone, including lane closures, speed limits and the presence of workers. This data is captured and output as RSM messages in xml and binary (uper) formats as well as a WZDx message. This tool was built alogsite the TMC cloud website, which enables the creation of configuration files and the visualization of work zones. 
+The WZDC tool is an open source, standards based work zone capturing tool. Using a gps and a computer, a user can drive through a work zone and mark important elements of the work zone, including lane closures, speed limits and the presence of workers. This data is captured and output as RSM messages in xml and binary (uper) formats as well as a WZDx message. This tool was built alongside the TMC cloud website, which enables the creation of configuration files and the visualization of work zones. 
 
 # Configuration File Loading and GPS Connection Test
 ![Config Loading UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/config_loading_ui_screenshot.jpg)
