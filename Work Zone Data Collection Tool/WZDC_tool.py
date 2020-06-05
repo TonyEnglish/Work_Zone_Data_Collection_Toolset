@@ -96,7 +96,6 @@ def getConfigVars():
     global  roadName
     global  roadNumber
     global  direction
-    global  issuingOrganization
     global  beginningCrossStreet
     global  endingCrossStreet
     global  beginningMilepost
@@ -140,6 +139,15 @@ def getConfigVars():
     global  wzEndLat                                       #wz end date
     global  wzEndLon                                       #wz end time
     global  endingAccuracy
+    
+    global  wzLocationMethod
+    global  lrsType
+    global  locationVerifyMethod
+    global  dataFeedFrequencyUpdate
+    global  timestampMetadataUpdate
+    global  contactName
+    global  contactEmail
+    global  issuingOrganization
 
 
     sampleFreq              = 10
@@ -148,7 +156,6 @@ def getConfigVars():
     roadName                = wzConfig['GeneralInfo']['RoadName']
     roadNumber              = wzConfig['GeneralInfo']['RoadNumber']
     direction               = wzConfig['GeneralInfo']['Direction']
-    issuingOrganization     = wzConfig['GeneralInfo']['IssuingOrganization']
     beginningCrossStreet    = wzConfig['GeneralInfo']['BeginningCrossStreet']
     endingCrossStreet       = wzConfig['GeneralInfo']['EndingCrossStreet']
     beginningMilepost       = wzConfig['GeneralInfo']['BeginningMilePost']
@@ -188,6 +195,15 @@ def getConfigVars():
     wzEndLat                = wzConfig['Location']['EndingLocation']['Lat']
     wzEndLon                = wzConfig['Location']['EndingLocation']['Lon']
     endingAccuracy          = wzConfig['Location']['EndingAccuracy']
+
+    wzLocationMethod        = wzConfig['metadata']['wz_location_method']
+    lrsType                 = wzConfig['metadata']['lrs_type']
+    locationVerifyMethod    = wzConfig['metadata']['location_verify_method']
+    dataFeedFrequencyUpdate = wzConfig['metadata']['data_feed_frequecy_update']
+    timestampMetadataUpdate = wzConfig['metadata']['timestamp_metadata_update']
+    contactName             = wzConfig['metadata']['contactname']
+    contactEmail            = wzConfig['metadata']['contactemail']
+    issuingOrganization     = wzConfig['metadata']['IssuingOrganization']
  
 # Set description box in UI from config file
 def set_config_description(config_file):
@@ -1367,6 +1383,18 @@ def build_messages():
     info['ending_accuracy'] = endingAccuracy
     info['start_date_accuracy'] = startDateAccuracy
     info['end_date_accuracy'] = endDateAccuracy
+
+    info['metadata'] = {}
+    info['metadata']['wz_location_method'] = wzLocationMethod
+    info['metadata']['lrs_type'] = lrsType
+    info['metadata']['location_verify_method'] = locationVerifyMethod
+    if dataFeedFrequencyUpdate:
+        info['metadata']['data_feed_frequecy_update'] = dataFeedFrequencyUpdate
+    info['metadata']['timestamp_metadata_update'] = timestampMetadataUpdate
+    info['metadata']['contact_name'] = contactName
+    info['metadata']['contact_email'] = contactEmail
+    info['metadata']['issuing_organization'] = issuingOrganization
+    
 
     info['types_of_work'] = typeOfWork
     info['lanes_obj'] = lanes_obj

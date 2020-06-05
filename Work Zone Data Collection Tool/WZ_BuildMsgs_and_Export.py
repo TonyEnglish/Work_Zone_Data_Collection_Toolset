@@ -101,9 +101,6 @@ from tkinter                import filedialog
 
 import  configparser                                    #config file parser 
 
-uper_failed = False
-error = False
-error_message = ''
 
 ### ------------------------------------------------------------------------------------------------------------------
 #
@@ -125,20 +122,12 @@ def inputFileDialog(filename):
 ##
 
 def buildWZMap(filename):
-    global uper_failed
-    global error
-    global error_message
     
     startMainProcess()
 
     if msgSegList[0][0] == -1:                          #Segmentation failed...
         error = True
-        error_message = 'Failed to build message segmentation'
         logMsg('Error in building message segmentation')
-    elif uper_failed:   
-        error = True
-        error_message = 'Failed to run message builder UPER conversion'
-        logMsg('UPER RSM Conversion failed\nEnsure Java is installed and\nadded to your system PATH')
     else:
         logMsg('WZ Map Completed Successfully\nReview map_builder.log file in WP_MapMsg Folder...')
     pass
@@ -162,8 +151,6 @@ def buildWZMap(filename):
    
 def configRead(file):
     global wzConfig
-    global error
-    global error_message
     if os.path.exists(file):
         try:
             cfg = open(file)
@@ -173,12 +160,9 @@ def configRead(file):
 		
         except Exception as e:
             error = True
-            error_message = 'Configuration file read failed: ' + file + '\n' + str(e)
             logMsg('Configuration file read failed: ' + file + '\n' + str(e))
     else:
-        error = True
-        error_message = 'Configuration file NOT FOUND: ' + file + '\n' + str(e)
-        logMsg('Configuration file NOT FOUND: ' + file + '\n' + str(e))
+        logMsg('Configuration file NOT FOUND')
 
 ###
 # ----------------- End of config_read --------------------
@@ -209,7 +193,6 @@ def getConfigVars():
     global  roadName
     global  roadNumber
     global  direction
-    global  issuingOrganization
     global  beginningCrossStreet
     global  endingCrossStreet
     global  beginningMilepost
@@ -253,10 +236,19 @@ def getConfigVars():
     global  wzEndLat                                       #wz end date
     global  wzEndLon                                       #wz end time
     global  endingAccuracy
+    
+    global  wzLocationMethod
+    global  lrsType
+    global  locationVerifyMethod
+    global  dataFeedFrequencyUpdate
+    global  timestampMetadataUpdate
+    global  contactName
+    global  contactEmail
+    global  issuingOrganization
 
     global vehPathDataFile
 
-    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/CAMP Tools/WZ_VehPathData/path-data--sample-work-zone--white-rock-cir.csv'
+    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/Work Zone Data Collection Tool/WZ_VehPathData/path-data--sample-work-zone--white-rock-cir.csv'
 
     sampleFreq              = 10
 
@@ -264,7 +256,6 @@ def getConfigVars():
     roadName                = wzConfig['GeneralInfo']['RoadName']
     roadNumber              = wzConfig['GeneralInfo']['RoadNumber']
     direction               = wzConfig['GeneralInfo']['Direction']
-    issuingOrganization     = wzConfig['GeneralInfo']['IssuingOrganization']
     beginningCrossStreet    = wzConfig['GeneralInfo']['BeginningCrossStreet']
     endingCrossStreet       = wzConfig['GeneralInfo']['EndingCrossStreet']
     beginningMilepost       = wzConfig['GeneralInfo']['BeginningMilePost']
@@ -305,6 +296,15 @@ def getConfigVars():
     wzEndLon                = wzConfig['Location']['EndingLocation']['Lon']
     endingAccuracy          = wzConfig['Location']['EndingAccuracy']
 
+    wzLocationMethod        = wzConfig['metadata']['wz_location_method']
+    lrsType                 = wzConfig['metadata']['lrs_type']
+    locationVerifyMethod    = wzConfig['metadata']['location_verify_method']
+    dataFeedFrequencyUpdate = wzConfig['metadata']['data_feed_frequecy_update']
+    timestampMetadataUpdate = wzConfig['metadata']['timestamp_metadata_update']
+    contactName             = wzConfig['metadata']['contactname']
+    contactEmail            = wzConfig['metadata']['contactemail']
+    issuingOrganization     = wzConfig['metadata']['IssuingOrganization']
+
 ###
 #   ------------------------- End of getConfigVars -----------------------
 #
@@ -318,7 +318,6 @@ def getConfigVars():
 ###
 
 def build_messages():
-    global uper_failed
     global files_list
     
 ###
@@ -487,7 +486,6 @@ def build_messages():
         rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent='  ')
         xmlFile.write(rsm_xml)
 
-    
 ###
 #   Done, finito, close files
 ###   
@@ -520,6 +518,16 @@ def build_messages():
     info['ending_accuracy'] = endingAccuracy
     info['start_date_accuracy'] = startDateAccuracy
     info['end_date_accuracy'] = endDateAccuracy
+
+    info['metadata'] = {}
+    info['metadata']['wz_location_method'] = wzLocationMethod
+    info['metadata']['lrs_type'] = lrsType
+    info['metadata']['location_verify_method'] = locationVerifyMethod
+    info['metadata']['data_feed_frequecy_update'] = dataFeedFrequencyUpdate
+    info['metadata']['timestamp_metadata_update'] = timestampMetadataUpdate
+    info['metadata']['contact_name'] = contactName
+    info['metadata']['contact_email'] = contactEmail
+    info['metadata']['issuing_organization'] = issuingOrganization
 
     info['types_of_work'] = typeOfWork
     info['lanes_obj'] = lanes_obj

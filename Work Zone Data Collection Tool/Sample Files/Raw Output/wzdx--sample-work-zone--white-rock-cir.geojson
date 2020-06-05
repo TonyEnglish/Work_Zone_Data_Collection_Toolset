@@ -1,8 +1,17 @@
 {
   "road_event_feed_info": {
-    "feed_info_id": "23dff5c4-08f7-421a-b11a-d443f06754ad",
-    "feed_update_date": "2020-05-29T15:24:35Z",
-    "metadata": "https://fake-site.tld/dummy-metadata.txt",
+    "feed_info_id": "60757443-9a60-465f-ace6-72304898f7f9",
+    "feed_update_date": "2020-06-05T12:49:55Z",
+    "metadata": {
+      "wz_location_method": "channel-device-method",
+      "lrs_type": "referent",
+      "location_verify_method": "GPS equipment accurate to 1 m",
+      "data_feed_frequecy_update": null,
+      "timestamp_metadata_update": "2020-06-05T05:48:42Z",
+      "contact_name": "test name",
+      "contact_email": "test@gmail.com",
+      "issuing_organization": "Neaera Consulting"
+    },
     "version": "2.0"
   },
   "type": "FeatureCollection",
@@ -10,9 +19,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "a3638dbe-6815-4dd7-9c3e-8f7130d84931",
-        "feed_info_id": "23dff5c4-08f7-421a-b11a-d443f06754ad",
-        "subidentifier": "3U2CME",
+        "road_event_id": "4cfbde1c-19a5-483b-a6d2-0c49c85ab2c1",
+        "feed_info_id": "60757443-9a60-465f-ace6-72304898f7f9",
+        "subidentifier": "GQIKTE",
         "road_name": "White Rock Cir",
         "road_number": "",
         "direction": "southbound",
@@ -22,8 +31,8 @@
         "ending_milepost": 2,
         "beginning_accuracy": "estimated",
         "ending_accuracy": "estimated",
-        "start_date": "2020-06-01T12:00:00Z",
-        "end_date": "2020-06-27T11:58:00Z",
+        "start_date": "2020-06-05T06:00:00Z",
+        "end_date": "2020-06-14T05:58:00Z",
         "start_date_accuracy": "estimated",
         "end_date_accuracy": "estimated",
         "event_status": "planned",
@@ -38,30 +47,31 @@
           "reduced-weight"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-05-29T15:24:34Z",
+        "update_date": "2020-06-05T12:49:54Z",
+        "creation_date": "2020-06-05T12:49:54Z",
         "types_of_work": [
           {
-            "types_of_work_id": "40decff3-7798-4a28-b11e-e96a8a294820",
-            "road_event_id": "a3638dbe-6815-4dd7-9c3e-8f7130d84931",
+            "types_of_work_id": "dcc766e7-4086-4409-96d2-1bdf86c06742",
+            "road_event_id": "4cfbde1c-19a5-483b-a6d2-0c49c85ab2c1",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "9be82fa5-076e-42cd-836c-d882c59d4e1a",
-            "road_event_id": "a3638dbe-6815-4dd7-9c3e-8f7130d84931",
+            "lane_id": "66248b40-f9df-45c2-84f9-014a2cccec9d",
+            "road_event_id": "4cfbde1c-19a5-483b-a6d2-0c49c85ab2c1",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "7dde8cc7-05fa-473a-bc9f-d1bd9c5f15ef",
-                "lane_id": "9be82fa5-076e-42cd-836c-d882c59d4e1a",
+                "lane_restriction_id": "6dc78059-cf6e-4751-99fe-5821ecd390d7",
+                "lane_id": "66248b40-f9df-45c2-84f9-014a2cccec9d",
                 "restriction_type": "hov-3"
               },
               {
-                "lane_restriction_id": "a79b7dc4-0183-48e4-b0d4-46bb3c47e1bc",
-                "lane_id": "9be82fa5-076e-42cd-836c-d882c59d4e1a",
+                "lane_restriction_id": "336c7ece-e73d-4404-b4ad-36241983250a",
+                "lane_id": "66248b40-f9df-45c2-84f9-014a2cccec9d",
                 "restriction_type": "reduced-height",
                 "restriction_value": 12.0,
                 "restriction_units": "feet"
@@ -71,14 +81,14 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "f758fb50-1b55-44ad-94ad-ec3c655db343",
-            "road_event_id": "a3638dbe-6815-4dd7-9c3e-8f7130d84931",
+            "lane_id": "3c1bc158-c592-41b9-8c71-583172ab8e59",
+            "road_event_id": "4cfbde1c-19a5-483b-a6d2-0c49c85ab2c1",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "d70c912f-8ca3-4c28-8259-d38e265815c1",
-                "lane_id": "f758fb50-1b55-44ad-94ad-ec3c655db343",
+                "lane_restriction_id": "b9e55782-9a7f-4e8e-9d70-cebefb8204fd",
+                "lane_id": "3c1bc158-c592-41b9-8c71-583172ab8e59",
                 "restriction_type": "reduced-weight",
                 "restriction_value": 50.0,
                 "restriction_units": "tons"
@@ -88,8 +98,8 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "04ed4c9a-6c8c-483f-853f-e0d65fa30875",
-            "road_event_id": "a3638dbe-6815-4dd7-9c3e-8f7130d84931",
+            "lane_id": "41cb0b66-bb27-4a5d-9cba-c2746f21afc5",
+            "road_event_id": "4cfbde1c-19a5-483b-a6d2-0c49c85ab2c1",
             "lane_number": 3,
             "lane_edge_reference": "left",
             "lane_restrictions": [],
@@ -122,9 +132,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "0b4f4776-a915-4fd8-aa63-7716de99c11b",
-        "feed_info_id": "23dff5c4-08f7-421a-b11a-d443f06754ad",
-        "subidentifier": "3U2CME",
+        "road_event_id": "45e2ac2f-e8cf-479b-b914-4cdbf0149964",
+        "feed_info_id": "60757443-9a60-465f-ace6-72304898f7f9",
+        "subidentifier": "GQIKTE",
         "road_name": "White Rock Cir",
         "road_number": "",
         "direction": "southbound",
@@ -134,8 +144,8 @@
         "ending_milepost": 2,
         "beginning_accuracy": "estimated",
         "ending_accuracy": "estimated",
-        "start_date": "2020-06-01T12:00:00Z",
-        "end_date": "2020-06-27T11:58:00Z",
+        "start_date": "2020-06-05T06:00:00Z",
+        "end_date": "2020-06-14T05:58:00Z",
         "start_date_accuracy": "estimated",
         "end_date_accuracy": "estimated",
         "event_status": "planned",
@@ -150,30 +160,31 @@
           "reduced-weight"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-05-29T15:24:34Z",
+        "update_date": "2020-06-05T12:49:54Z",
+        "creation_date": "2020-06-05T12:49:54Z",
         "types_of_work": [
           {
-            "types_of_work_id": "11956eb4-81ca-429b-bcc6-72b2f6de5228",
-            "road_event_id": "0b4f4776-a915-4fd8-aa63-7716de99c11b",
+            "types_of_work_id": "ad27de2e-5a31-4eea-8dc9-2c8ab3aeb572",
+            "road_event_id": "45e2ac2f-e8cf-479b-b914-4cdbf0149964",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "0fc1d2d9-00d8-467a-ab0c-58f1e030b291",
-            "road_event_id": "0b4f4776-a915-4fd8-aa63-7716de99c11b",
+            "lane_id": "f7902a3f-192f-47bc-ba5f-1c3a505d42c9",
+            "road_event_id": "45e2ac2f-e8cf-479b-b914-4cdbf0149964",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "f1c53aff-14a7-4e29-9728-8fa6ebdb2e71",
-                "lane_id": "0fc1d2d9-00d8-467a-ab0c-58f1e030b291",
+                "lane_restriction_id": "47256d26-2aa8-40b6-8290-83dbf971dc03",
+                "lane_id": "f7902a3f-192f-47bc-ba5f-1c3a505d42c9",
                 "restriction_type": "hov-3"
               },
               {
-                "lane_restriction_id": "21125dea-d737-4631-8271-b6a0d53e30f3",
-                "lane_id": "0fc1d2d9-00d8-467a-ab0c-58f1e030b291",
+                "lane_restriction_id": "26117537-18c5-426a-9d01-8b44b7772f2f",
+                "lane_id": "f7902a3f-192f-47bc-ba5f-1c3a505d42c9",
                 "restriction_type": "reduced-height",
                 "restriction_value": 12.0,
                 "restriction_units": "feet"
@@ -183,14 +194,14 @@
             "lane_status": "merge-right"
           },
           {
-            "lane_id": "bce4600b-ad20-43c4-9b50-1ed7b2b3d330",
-            "road_event_id": "0b4f4776-a915-4fd8-aa63-7716de99c11b",
+            "lane_id": "e1db4760-0b61-499f-b1b1-d4118f7682d4",
+            "road_event_id": "45e2ac2f-e8cf-479b-b914-4cdbf0149964",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "e3dc06a6-e417-4585-aa18-63d5d76ae499",
-                "lane_id": "bce4600b-ad20-43c4-9b50-1ed7b2b3d330",
+                "lane_restriction_id": "f7251940-de4f-4bf1-a837-3fb9ddd1dafe",
+                "lane_id": "e1db4760-0b61-499f-b1b1-d4118f7682d4",
                 "restriction_type": "reduced-weight",
                 "restriction_value": 50.0,
                 "restriction_units": "tons"
@@ -200,8 +211,8 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "57eb292d-ce67-43e8-bd00-84b7a7f168f9",
-            "road_event_id": "0b4f4776-a915-4fd8-aa63-7716de99c11b",
+            "lane_id": "1e89f820-2bd9-4755-baf1-8a550c3e9d67",
+            "road_event_id": "45e2ac2f-e8cf-479b-b914-4cdbf0149964",
             "lane_number": 3,
             "lane_edge_reference": "left",
             "lane_restrictions": [],
@@ -229,9 +240,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "58790172-1998-4e12-8796-2ba9ce4c125e",
-        "feed_info_id": "23dff5c4-08f7-421a-b11a-d443f06754ad",
-        "subidentifier": "3U2CME",
+        "road_event_id": "9581c412-8d42-4c01-ad10-850fcdca39da",
+        "feed_info_id": "60757443-9a60-465f-ace6-72304898f7f9",
+        "subidentifier": "GQIKTE",
         "road_name": "White Rock Cir",
         "road_number": "",
         "direction": "southbound",
@@ -241,8 +252,8 @@
         "ending_milepost": 2,
         "beginning_accuracy": "estimated",
         "ending_accuracy": "estimated",
-        "start_date": "2020-06-01T12:00:00Z",
-        "end_date": "2020-06-27T11:58:00Z",
+        "start_date": "2020-06-05T06:00:00Z",
+        "end_date": "2020-06-14T05:58:00Z",
         "start_date_accuracy": "estimated",
         "end_date_accuracy": "estimated",
         "event_status": "planned",
@@ -257,30 +268,31 @@
           "reduced-weight"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-05-29T15:24:34Z",
+        "update_date": "2020-06-05T12:49:54Z",
+        "creation_date": "2020-06-05T12:49:54Z",
         "types_of_work": [
           {
-            "types_of_work_id": "ae4e3cf7-e08f-430b-b8bd-ce9bb6973ede",
-            "road_event_id": "58790172-1998-4e12-8796-2ba9ce4c125e",
+            "types_of_work_id": "a5f19f94-3dd2-4959-82b2-40a59c9806e6",
+            "road_event_id": "9581c412-8d42-4c01-ad10-850fcdca39da",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "d4a769a5-b57a-4dde-a7be-2eb054884b56",
-            "road_event_id": "58790172-1998-4e12-8796-2ba9ce4c125e",
+            "lane_id": "6980a31a-a982-4093-9502-e974c761fb65",
+            "road_event_id": "9581c412-8d42-4c01-ad10-850fcdca39da",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "12f05fdc-507e-4040-be02-e93cdc9ed7d6",
-                "lane_id": "d4a769a5-b57a-4dde-a7be-2eb054884b56",
+                "lane_restriction_id": "72a914fe-15d0-4086-8c05-b69518d1c06f",
+                "lane_id": "6980a31a-a982-4093-9502-e974c761fb65",
                 "restriction_type": "hov-3"
               },
               {
-                "lane_restriction_id": "bdecde93-dcf7-4c02-a1de-4e07801d998c",
-                "lane_id": "d4a769a5-b57a-4dde-a7be-2eb054884b56",
+                "lane_restriction_id": "f5e4c883-15e5-41ad-84a1-6b4465254743",
+                "lane_id": "6980a31a-a982-4093-9502-e974c761fb65",
                 "restriction_type": "reduced-height",
                 "restriction_value": 12.0,
                 "restriction_units": "feet"
@@ -290,14 +302,14 @@
             "lane_status": "closed"
           },
           {
-            "lane_id": "a510c0a8-041e-48ff-b28f-ad527bb5d8d3",
-            "road_event_id": "58790172-1998-4e12-8796-2ba9ce4c125e",
+            "lane_id": "72154cfd-4ae5-4b8b-bf16-db32cfb8d7a6",
+            "road_event_id": "9581c412-8d42-4c01-ad10-850fcdca39da",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "581e39a3-f4d6-4f27-ac45-80a229a8b8f5",
-                "lane_id": "a510c0a8-041e-48ff-b28f-ad527bb5d8d3",
+                "lane_restriction_id": "37aced89-a568-4dc2-b2ed-9630ef617431",
+                "lane_id": "72154cfd-4ae5-4b8b-bf16-db32cfb8d7a6",
                 "restriction_type": "reduced-weight",
                 "restriction_value": 50.0,
                 "restriction_units": "tons"
@@ -307,8 +319,8 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "e542522d-e201-4cb3-ad1e-964afd13a16a",
-            "road_event_id": "58790172-1998-4e12-8796-2ba9ce4c125e",
+            "lane_id": "ca6b9d35-e71d-453b-9041-dea6807223ce",
+            "road_event_id": "9581c412-8d42-4c01-ad10-850fcdca39da",
             "lane_number": 3,
             "lane_edge_reference": "left",
             "lane_restrictions": [],
@@ -336,9 +348,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "b1297f4c-8034-4601-a6a1-0b09329efd8d",
-        "feed_info_id": "23dff5c4-08f7-421a-b11a-d443f06754ad",
-        "subidentifier": "3U2CME",
+        "road_event_id": "cbcba1f2-d973-4309-b9df-1575a75dfa91",
+        "feed_info_id": "60757443-9a60-465f-ace6-72304898f7f9",
+        "subidentifier": "GQIKTE",
         "road_name": "White Rock Cir",
         "road_number": "",
         "direction": "southbound",
@@ -348,8 +360,8 @@
         "ending_milepost": 2,
         "beginning_accuracy": "estimated",
         "ending_accuracy": "estimated",
-        "start_date": "2020-06-01T12:00:00Z",
-        "end_date": "2020-06-27T11:58:00Z",
+        "start_date": "2020-06-05T06:00:00Z",
+        "end_date": "2020-06-14T05:58:00Z",
         "start_date_accuracy": "estimated",
         "end_date_accuracy": "estimated",
         "event_status": "planned",
@@ -364,30 +376,31 @@
           "reduced-weight"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-05-29T15:24:34Z",
+        "update_date": "2020-06-05T12:49:54Z",
+        "creation_date": "2020-06-05T12:49:54Z",
         "types_of_work": [
           {
-            "types_of_work_id": "4b7830a9-8bc3-4117-9525-078a8b74da6e",
-            "road_event_id": "b1297f4c-8034-4601-a6a1-0b09329efd8d",
+            "types_of_work_id": "112dc9db-4264-46b1-87c1-a6da1436e123",
+            "road_event_id": "cbcba1f2-d973-4309-b9df-1575a75dfa91",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "08596482-b697-4d5b-9435-19058daed375",
-            "road_event_id": "b1297f4c-8034-4601-a6a1-0b09329efd8d",
+            "lane_id": "445d1f02-7b4f-4443-84a7-54111bb2ac66",
+            "road_event_id": "cbcba1f2-d973-4309-b9df-1575a75dfa91",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "38f5ae6c-463c-41a4-aa36-516eec9ab54c",
-                "lane_id": "08596482-b697-4d5b-9435-19058daed375",
+                "lane_restriction_id": "24ddc5cc-7861-4787-8bd6-c554c1a20767",
+                "lane_id": "445d1f02-7b4f-4443-84a7-54111bb2ac66",
                 "restriction_type": "hov-3"
               },
               {
-                "lane_restriction_id": "40a74202-89d7-4a1a-81a4-0de04df2b11a",
-                "lane_id": "08596482-b697-4d5b-9435-19058daed375",
+                "lane_restriction_id": "5a1de3f3-935a-48ad-a840-000fa1223428",
+                "lane_id": "445d1f02-7b4f-4443-84a7-54111bb2ac66",
                 "restriction_type": "reduced-height",
                 "restriction_value": 12.0,
                 "restriction_units": "feet"
@@ -397,14 +410,14 @@
             "lane_status": "closed"
           },
           {
-            "lane_id": "0591cae2-b662-4a2a-b490-d25e58caac4b",
-            "road_event_id": "b1297f4c-8034-4601-a6a1-0b09329efd8d",
+            "lane_id": "de5731c7-0a08-4837-968e-8f61bd5c9ff0",
+            "road_event_id": "cbcba1f2-d973-4309-b9df-1575a75dfa91",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "85af854a-dd84-4119-8aa4-489b27d27da7",
-                "lane_id": "0591cae2-b662-4a2a-b490-d25e58caac4b",
+                "lane_restriction_id": "6a100aad-0377-43c4-a748-9d62161e5ba0",
+                "lane_id": "de5731c7-0a08-4837-968e-8f61bd5c9ff0",
                 "restriction_type": "reduced-weight",
                 "restriction_value": 50.0,
                 "restriction_units": "tons"
@@ -414,8 +427,8 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "d32cf7fd-e96c-4544-a265-17b669cc93d5",
-            "road_event_id": "b1297f4c-8034-4601-a6a1-0b09329efd8d",
+            "lane_id": "877f21b3-f749-404d-ab28-6ab3df15ea99",
+            "road_event_id": "cbcba1f2-d973-4309-b9df-1575a75dfa91",
             "lane_number": 3,
             "lane_edge_reference": "left",
             "lane_restrictions": [],
@@ -463,9 +476,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "38689761-9cf0-4a27-aeb2-91110b43b66b",
-        "feed_info_id": "23dff5c4-08f7-421a-b11a-d443f06754ad",
-        "subidentifier": "3U2CME",
+        "road_event_id": "97e91f21-006b-44d0-a41c-38ac2d65cf8b",
+        "feed_info_id": "60757443-9a60-465f-ace6-72304898f7f9",
+        "subidentifier": "GQIKTE",
         "road_name": "White Rock Cir",
         "road_number": "",
         "direction": "southbound",
@@ -475,8 +488,8 @@
         "ending_milepost": 2,
         "beginning_accuracy": "estimated",
         "ending_accuracy": "estimated",
-        "start_date": "2020-06-01T12:00:00Z",
-        "end_date": "2020-06-27T11:58:00Z",
+        "start_date": "2020-06-05T06:00:00Z",
+        "end_date": "2020-06-14T05:58:00Z",
         "start_date_accuracy": "estimated",
         "end_date_accuracy": "estimated",
         "event_status": "planned",
@@ -491,30 +504,31 @@
           "reduced-weight"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-05-29T15:24:34Z",
+        "update_date": "2020-06-05T12:49:54Z",
+        "creation_date": "2020-06-05T12:49:54Z",
         "types_of_work": [
           {
-            "types_of_work_id": "540a6de7-f8a8-4211-8c5f-3b9a1e218d0d",
-            "road_event_id": "38689761-9cf0-4a27-aeb2-91110b43b66b",
+            "types_of_work_id": "267469c2-99c6-40f8-951a-625f7474e420",
+            "road_event_id": "97e91f21-006b-44d0-a41c-38ac2d65cf8b",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "0186a827-4632-4b6a-a074-165c6b9e1a77",
-            "road_event_id": "38689761-9cf0-4a27-aeb2-91110b43b66b",
+            "lane_id": "ace1edea-6e31-4596-be9b-5a8d0ead121d",
+            "road_event_id": "97e91f21-006b-44d0-a41c-38ac2d65cf8b",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "d914020f-9680-4069-841f-c50d367e89d3",
-                "lane_id": "0186a827-4632-4b6a-a074-165c6b9e1a77",
+                "lane_restriction_id": "f5cb87cb-63b2-453e-bb40-bd70071f1d59",
+                "lane_id": "ace1edea-6e31-4596-be9b-5a8d0ead121d",
                 "restriction_type": "hov-3"
               },
               {
-                "lane_restriction_id": "1f604265-8aa4-417d-a8ee-5fe72f150544",
-                "lane_id": "0186a827-4632-4b6a-a074-165c6b9e1a77",
+                "lane_restriction_id": "e98f374f-1f95-4ced-82aa-328bc1ffe4e8",
+                "lane_id": "ace1edea-6e31-4596-be9b-5a8d0ead121d",
                 "restriction_type": "reduced-height",
                 "restriction_value": 12.0,
                 "restriction_units": "feet"
@@ -524,14 +538,14 @@
             "lane_status": "closed"
           },
           {
-            "lane_id": "ace10d4b-52e0-48c5-b588-a1fba8e37b26",
-            "road_event_id": "38689761-9cf0-4a27-aeb2-91110b43b66b",
+            "lane_id": "c5f4f0c5-d3c3-4179-aed5-acc0799c7902",
+            "road_event_id": "97e91f21-006b-44d0-a41c-38ac2d65cf8b",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "41b7752b-7707-4c52-b557-655562699307",
-                "lane_id": "ace10d4b-52e0-48c5-b588-a1fba8e37b26",
+                "lane_restriction_id": "335ad417-c3b1-4f39-8766-3d419c5ff61a",
+                "lane_id": "c5f4f0c5-d3c3-4179-aed5-acc0799c7902",
                 "restriction_type": "reduced-weight",
                 "restriction_value": 50.0,
                 "restriction_units": "tons"
@@ -541,8 +555,8 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "91b42832-e4d7-427f-8dc7-7b3c1c5ba838",
-            "road_event_id": "38689761-9cf0-4a27-aeb2-91110b43b66b",
+            "lane_id": "b2670ac0-c022-4d7c-ba46-34a641adbd41",
+            "road_event_id": "97e91f21-006b-44d0-a41c-38ac2d65cf8b",
             "lane_number": 3,
             "lane_edge_reference": "left",
             "lane_restrictions": [],
@@ -575,9 +589,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "70fb5552-4df1-44bd-9864-fc7e4a1487c4",
-        "feed_info_id": "23dff5c4-08f7-421a-b11a-d443f06754ad",
-        "subidentifier": "3U2CME",
+        "road_event_id": "3aea2b4a-9129-4382-a274-8802ad272034",
+        "feed_info_id": "60757443-9a60-465f-ace6-72304898f7f9",
+        "subidentifier": "GQIKTE",
         "road_name": "White Rock Cir",
         "road_number": "",
         "direction": "southbound",
@@ -587,8 +601,8 @@
         "ending_milepost": 2,
         "beginning_accuracy": "estimated",
         "ending_accuracy": "estimated",
-        "start_date": "2020-06-01T12:00:00Z",
-        "end_date": "2020-06-27T11:58:00Z",
+        "start_date": "2020-06-05T06:00:00Z",
+        "end_date": "2020-06-14T05:58:00Z",
         "start_date_accuracy": "estimated",
         "end_date_accuracy": "estimated",
         "event_status": "planned",
@@ -603,30 +617,31 @@
           "reduced-weight"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-05-29T15:24:34Z",
+        "update_date": "2020-06-05T12:49:54Z",
+        "creation_date": "2020-06-05T12:49:54Z",
         "types_of_work": [
           {
-            "types_of_work_id": "cba72c5e-50f5-46b3-b582-b2f7ce3f13fb",
-            "road_event_id": "70fb5552-4df1-44bd-9864-fc7e4a1487c4",
+            "types_of_work_id": "4498b3ec-af8a-4e4e-86eb-db854bbd39fa",
+            "road_event_id": "3aea2b4a-9129-4382-a274-8802ad272034",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "d7410543-69b9-4064-81fc-476896acea28",
-            "road_event_id": "70fb5552-4df1-44bd-9864-fc7e4a1487c4",
+            "lane_id": "8e91a595-e6b2-49a4-ad86-fc2cc5cb389a",
+            "road_event_id": "3aea2b4a-9129-4382-a274-8802ad272034",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "90d7a7e5-4ab0-49fa-b948-c6c7a5f0237e",
-                "lane_id": "d7410543-69b9-4064-81fc-476896acea28",
+                "lane_restriction_id": "8ace2275-5055-4396-81f8-da3651238a45",
+                "lane_id": "8e91a595-e6b2-49a4-ad86-fc2cc5cb389a",
                 "restriction_type": "hov-3"
               },
               {
-                "lane_restriction_id": "5af05c14-6fc5-4115-933b-e43bdd8e4eae",
-                "lane_id": "d7410543-69b9-4064-81fc-476896acea28",
+                "lane_restriction_id": "b9e7e9a9-4398-44dd-b650-4cc1f4885651",
+                "lane_id": "8e91a595-e6b2-49a4-ad86-fc2cc5cb389a",
                 "restriction_type": "reduced-height",
                 "restriction_value": 12.0,
                 "restriction_units": "feet"
@@ -636,14 +651,14 @@
             "lane_status": "merge-left"
           },
           {
-            "lane_id": "3b10fc35-3d6a-4e00-bb87-098b01f95a54",
-            "road_event_id": "70fb5552-4df1-44bd-9864-fc7e4a1487c4",
+            "lane_id": "12875a4a-bda2-448e-91d0-24074b08f42d",
+            "road_event_id": "3aea2b4a-9129-4382-a274-8802ad272034",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "a0277d5a-94e3-4ad0-b505-e9273ba38114",
-                "lane_id": "3b10fc35-3d6a-4e00-bb87-098b01f95a54",
+                "lane_restriction_id": "6a311d32-5207-42b7-8184-23a7a9186469",
+                "lane_id": "12875a4a-bda2-448e-91d0-24074b08f42d",
                 "restriction_type": "reduced-weight",
                 "restriction_value": 50.0,
                 "restriction_units": "tons"
@@ -653,8 +668,8 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "7047602a-e33f-4983-9b16-b73721982801",
-            "road_event_id": "70fb5552-4df1-44bd-9864-fc7e4a1487c4",
+            "lane_id": "d32ca724-004f-4d8d-a84e-1d372c706293",
+            "road_event_id": "3aea2b4a-9129-4382-a274-8802ad272034",
             "lane_number": 3,
             "lane_edge_reference": "left",
             "lane_restrictions": [],
@@ -682,9 +697,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "3f436eed-140b-4ed1-a316-815744c087fb",
-        "feed_info_id": "23dff5c4-08f7-421a-b11a-d443f06754ad",
-        "subidentifier": "3U2CME",
+        "road_event_id": "d70843e0-7aef-4f35-a638-7c27439e822e",
+        "feed_info_id": "60757443-9a60-465f-ace6-72304898f7f9",
+        "subidentifier": "GQIKTE",
         "road_name": "White Rock Cir",
         "road_number": "",
         "direction": "southbound",
@@ -694,8 +709,8 @@
         "ending_milepost": 2,
         "beginning_accuracy": "estimated",
         "ending_accuracy": "estimated",
-        "start_date": "2020-06-01T12:00:00Z",
-        "end_date": "2020-06-27T11:58:00Z",
+        "start_date": "2020-06-05T06:00:00Z",
+        "end_date": "2020-06-14T05:58:00Z",
         "start_date_accuracy": "estimated",
         "end_date_accuracy": "estimated",
         "event_status": "planned",
@@ -710,30 +725,31 @@
           "reduced-weight"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-05-29T15:24:34Z",
+        "update_date": "2020-06-05T12:49:54Z",
+        "creation_date": "2020-06-05T12:49:54Z",
         "types_of_work": [
           {
-            "types_of_work_id": "659c6a9f-dead-43e4-b003-48226451ec5f",
-            "road_event_id": "3f436eed-140b-4ed1-a316-815744c087fb",
+            "types_of_work_id": "639f6f41-f086-4872-b44d-1fe05bdc39d5",
+            "road_event_id": "d70843e0-7aef-4f35-a638-7c27439e822e",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "6c125627-9bc0-4ab7-a4c3-6d11a1308710",
-            "road_event_id": "3f436eed-140b-4ed1-a316-815744c087fb",
+            "lane_id": "cefbd3eb-bba3-43ea-a2c1-e3b3c0b8bc7e",
+            "road_event_id": "d70843e0-7aef-4f35-a638-7c27439e822e",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "a941e10f-2146-43ef-bd9d-434b303290f5",
-                "lane_id": "6c125627-9bc0-4ab7-a4c3-6d11a1308710",
+                "lane_restriction_id": "084c28a4-dd91-4761-8fac-39674f2b54df",
+                "lane_id": "cefbd3eb-bba3-43ea-a2c1-e3b3c0b8bc7e",
                 "restriction_type": "hov-3"
               },
               {
-                "lane_restriction_id": "fe272014-e4c8-4302-9ba5-f149126e6ecb",
-                "lane_id": "6c125627-9bc0-4ab7-a4c3-6d11a1308710",
+                "lane_restriction_id": "3bae2b2e-fdf1-4ee4-89ef-46f43e8b4d09",
+                "lane_id": "cefbd3eb-bba3-43ea-a2c1-e3b3c0b8bc7e",
                 "restriction_type": "reduced-height",
                 "restriction_value": 12.0,
                 "restriction_units": "feet"
@@ -743,14 +759,14 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "84dbff4f-dbe1-4f69-8e92-d28a55474edf",
-            "road_event_id": "3f436eed-140b-4ed1-a316-815744c087fb",
+            "lane_id": "5479444b-318f-4ef6-8775-b079ea3cfde4",
+            "road_event_id": "d70843e0-7aef-4f35-a638-7c27439e822e",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "d6bf6192-d722-4d0a-ad60-a324358b6231",
-                "lane_id": "84dbff4f-dbe1-4f69-8e92-d28a55474edf",
+                "lane_restriction_id": "a16e0e92-1725-4617-9d6a-21454cfc817e",
+                "lane_id": "5479444b-318f-4ef6-8775-b079ea3cfde4",
                 "restriction_type": "reduced-weight",
                 "restriction_value": 50.0,
                 "restriction_units": "tons"
@@ -760,8 +776,8 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "5191902d-be46-494c-9a34-e643187e4620",
-            "road_event_id": "3f436eed-140b-4ed1-a316-815744c087fb",
+            "lane_id": "70502e12-8b40-428d-a8f5-a0d1ed01374f",
+            "road_event_id": "d70843e0-7aef-4f35-a638-7c27439e822e",
             "lane_number": 3,
             "lane_edge_reference": "left",
             "lane_restrictions": [],
