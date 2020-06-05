@@ -96,10 +96,10 @@
     "wz_location_method": "channel-device-method",
     "lrs_type": "referent",
     "location_verify_method": "GPS equipment accurate to 1 m",
-    "data_feed_frequecy_update": null,
+    "data_feed_frequency_update": null,
     "timestamp_metadata_update": "2020-06-05T05:48:42Z",
-    "contactname": "test name",
-    "contactemail": "test@gmail.com",
-    "IssuingOrganization": "Neaera Consulting"
+    "contact_name": "test name",
+    "contact_email": "test@gmail.com",
+    "issuing_organization": "Neaera Consulting"
   }
 }

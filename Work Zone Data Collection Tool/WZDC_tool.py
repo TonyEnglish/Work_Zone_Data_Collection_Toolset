@@ -199,11 +199,11 @@ def getConfigVars():
     wzLocationMethod        = wzConfig['metadata']['wz_location_method']
     lrsType                 = wzConfig['metadata']['lrs_type']
     locationVerifyMethod    = wzConfig['metadata']['location_verify_method']
-    dataFeedFrequencyUpdate = wzConfig['metadata']['data_feed_frequecy_update']
+    dataFeedFrequencyUpdate = wzConfig['metadata']['datafeed_frequency_update']
     timestampMetadataUpdate = wzConfig['metadata']['timestamp_metadata_update']
-    contactName             = wzConfig['metadata']['contactname']
-    contactEmail            = wzConfig['metadata']['contactemail']
-    issuingOrganization     = wzConfig['metadata']['IssuingOrganization']
+    contactName             = wzConfig['metadata']['contact_name']
+    contactEmail            = wzConfig['metadata']['contact_email']
+    issuingOrganization     = wzConfig['metadata']['issuing_organization']
  
 # Set description box in UI from config file
 def set_config_description(config_file):
@@ -1389,7 +1389,7 @@ def build_messages():
     info['metadata']['lrs_type'] = lrsType
     info['metadata']['location_verify_method'] = locationVerifyMethod
     if dataFeedFrequencyUpdate:
-        info['metadata']['data_feed_frequecy_update'] = dataFeedFrequencyUpdate
+        info['metadata']['datafeed_frequency_update'] = dataFeedFrequencyUpdate
     info['metadata']['timestamp_metadata_update'] = timestampMetadataUpdate
     info['metadata']['contact_name'] = contactName
     info['metadata']['contact_email'] = contactEmail
