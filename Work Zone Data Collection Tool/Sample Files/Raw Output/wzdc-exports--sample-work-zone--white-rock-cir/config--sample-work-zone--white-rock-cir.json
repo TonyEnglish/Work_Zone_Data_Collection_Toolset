@@ -94,9 +94,9 @@
   },
   "metadata": {
     "wz_location_method": "channel-device-method",
-    "lrs_type": "referent",
+    "lrs_type": "interlopative",
     "location_verify_method": "GPS equipment accurate to 1 m",
-    "data_feed_frequency_update": null,
+    "datafeed_frequency_update": null,
     "timestamp_metadata_update": "2020-06-05T05:48:42Z",
     "contact_name": "test name",
     "contact_email": "test@gmail.com",

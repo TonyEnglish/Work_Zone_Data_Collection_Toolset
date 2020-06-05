@@ -1,11 +1,10 @@
 {
-  "DateCreated": "5/29/2020",
+  "DateCreated": "6/5/2020",
   "GeneralInfo": {
     "Description": "sample work zone",
     "RoadName": "White Rock Cir",
     "RoadNumber": "",
     "Direction": "southbound",
-    "IssuingOrganization": "Neaera Consulting",
     "BeginningCrossStreet": "Habitat Dr",
     "EndingCrossStreet": "Spine Rd",
     "BeginningMilePost": 1,
@@ -69,9 +68,9 @@
     "SubCauseCode": 0
   },
   "Schedule": {
-    "StartDate": "2020-06-01T12:00:00Z",
+    "StartDate": "2020-06-05T06:00:00Z",
     "StartDateAccuracy": "estimated",
-    "EndDate": "2020-06-27T11:58:00Z",
+    "EndDate": "2020-06-14T05:58:00Z",
     "EndDateAccuracy": "estimated",
     "DaysOfWeek": [
       "Mon",
@@ -92,5 +91,15 @@
       "Elev": null
     },
     "EndingAccuracy": "estimated"
+  },
+  "metadata": {
+    "wz_location_method": "channel-device-method",
+    "lrs_type": "interlopative",
+    "location_verify_method": "GPS equipment accurate to 1 m",
+    "datafeed_frequency_update": null,
+    "timestamp_metadata_update": "2020-06-05T05:48:42Z",
+    "contact_name": "test name",
+    "contact_email": "test@gmail.com",
+    "issuing_organization": "Neaera Consulting"
   }
 }

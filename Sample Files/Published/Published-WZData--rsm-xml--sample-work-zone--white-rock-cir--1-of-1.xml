@@ -6,7 +6,7 @@
       <version>1</version>
       <commonContainer>
         <eventInfo>
-          <eventID>00007699</eventID>
+          <eventID>0000118d</eventID>
           <msgSegmentInfo>
             <totalMsgSegments>1</totalMsgSegments>
             <thisSegmentNum>1</thisSegmentNum>
@@ -14,39 +14,39 @@
           <startDateTime>
             <year>2020</year>
             <month>06</month>
-            <day>01</day>
-            <hour>12</hour>
+            <day>05</day>
+            <hour>06</hour>
             <minute>00</minute>
             <offset>-300</offset>
           </startDateTime>
           <endDateTime>
             <year>2020</year>
             <month>06</month>
-            <day>27</day>
-            <hour>11</hour>
+            <day>14</day>
+            <hour>05</hour>
             <minute>58</minute>
           </endDateTime>
           <eventRecurrence>
             <EventRecurrence>
               <startTime>
-                <hour>12</hour>
+                <hour>06</hour>
                 <minute>00</minute>
                 <second>0</second>
               </startTime>
               <endTime>
-                <hour>11</hour>
+                <hour>05</hour>
                 <minute>58</minute>
                 <second>0</second>
               </endTime>
               <startDate>
                 <year>2020</year>
                 <month>06</month>
-                <day>01</day>
+                <day>05</day>
               </startDate>
               <endDate>
                 <year>2020</year>
                 <month>06</month>
-                <day>27</day>
+                <day>14</day>
               </endDate>
               <monday>
                 <true/>
@@ -320,9 +320,6 @@
                         </node-3Dabsolute>
                       </nodePoint>
                       <nodeAttributes>
-                        <taperLeft>
-                          <false/>
-                        </taperLeft>
                         <taperRight>
                           <true/>
                         </taperRight>
@@ -339,6 +336,11 @@
                           <elevation>1589</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
+                      <nodeAttributes>
+                        <taperRight>
+                          <false/>
+                        </taperRight>
+                      </nodeAttributes>
                     </NodeLLE>
                     <NodeLLE>
                       <nodePoint>
@@ -443,9 +445,6 @@
                         <taperLeft>
                           <true/>
                         </taperLeft>
-                        <taperRight>
-                          <false/>
-                        </taperRight>
                         <laneClosed>
                           <false/>
                         </laneClosed>
@@ -459,6 +458,11 @@
                           <elevation>1591</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
+                      <nodeAttributes>
+                        <taperLeft>
+                          <false/>
+                        </taperLeft>
+                      </nodeAttributes>
                     </NodeLLE>
                     <NodeLLE>
                       <nodePoint>

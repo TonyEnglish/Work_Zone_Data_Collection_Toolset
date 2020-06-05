@@ -741,7 +741,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
     #                5*tab+"<roadwayGeometry>\n" +  \
     #                6*tab+"<scale>"+str(wzLaneScale)+"</scale>\n")
     # xmlFile.write (6*tab+"<rsmLanes>\n")
-
+    laneTaperStat = [{"left": False, "right": False}]*totLane
     ln = 0
     while ln < totLane:
         
@@ -870,7 +870,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 #
 #               Check following logic for adding node attributes...
 ###
-
+                updatedTapers = False
                 if currLaneStat != prevLaneStat or currWPStat != prevWPStat:
                     NodeLLE['nodeAttributes'] = {}
                     # xmlFile.write (11*tab+"<nodeAttributes>\n")               
@@ -958,43 +958,137 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 ### 
                             
                             lClosed = {"true": None} #"<laneClosed><true/></laneClosed>"
-                            if ln < 2:                                  #lane 1 or 2 closed...
-                                tLeft  = {"false": None} #"<taperLeft><false/></taperLeft>"                           
+                            tLeftVal = False
+                            tLeft = {"false": None}
+                            tRightVal = False
+                            tRight = {"false": None}
+                            # if ln == 0:
+                            #     tLeft  = {"false": None} #"<taperLeft><false/></taperLeft>"
+                            #     tRight = {"true": None} #"<taperRight><true/></taperRight>"
+                            # elif ln == totLane-1:
+                            #     tLeft  = {"true": None} #"<taperLeft><false/></taperLeft>"
+                            #     tRight = {"false": None} #"<taperRight><true/></taperRight>"
+                            # else:
+                            leftLaneClosed = True
+                            if ln != 0 and arrayMapPt[kt][(ln-1)*4+3] != 1:
+                                leftLaneClosed = False
+                                
+                            rightLaneClosed = True
+                            if ln != (totLane - 1) and arrayMapPt[kt][(ln+1)*4+3] != 1:
+                                rightLaneClosed = False
+
+
+                            if leftLaneClosed and not rightLaneClosed:
+                                # tLeftVal = False
+                                # tLeft  = {"false": None} #"<taperLeft><false/></taperLeft>"
+                                tRightVal = True
                                 tRight = {"true": None} #"<taperRight><true/></taperRight>"
-                            pass
+                            elif rightLaneClosed and not leftLaneClosed:
+                                tLeftVal = True
+                                tLeft  = {"true": None} #"<taperLeft><false/></taperLeft>"
+                                # tRightVal = False
+                                # tRight = {"false": None} #"<taperRight><true/></taperRight>"
+                            # else:
+                            #     tLeftVal = False
+                            #     tLeft  = {"false": None} #"<taperLeft><false/></taperLeft>"
+                            #     tRightVal = False
+                            #     tRight = {"false": None} #"<taperRight><true/></taperRight>"
+
+                            if laneTaperStat[ln]['left'] == tLeftVal: tLeft = None
+                            if laneTaperStat[ln]['right'] == tRightVal: tRight = None
+
+                            laneTaperStat[ln]['left'] = tLeftVal
+                            laneTaperStat[ln]['right'] = tRightVal
+
+                            # if ln < 2:                                  #lane 1 or 2 closed...
+                            #     tLeft  = {"false": None} #"<taperLeft><false/></taperLeft>"                           
+                            #     tRight = {"true": None} #"<taperRight><true/></taperRight>"
+                            # pass
                 
-                            if ln > 1:                                  #lane 3 or 4 closed...
-                                tLeft  = {"true": None} #"<taperLeft><true/></taperLeft>"                           
-                                tRight = {"false": None} #"<taperRight><false/></taperRight>"                                             
-                            pass
+                            # if ln > 1:                                  #lane 3 or 4 closed...
+                            #     tLeft  = {"true": None} #"<taperLeft><true/></taperLeft>"                           
+                            #     tRight = {"false": None} #"<taperRight><false/></taperRight>"                                             
+                            # pass
                         pass
 
                         if currLaneStat == 0:                           #lane is opened at this node
                             lClosed = {"false": None} #"<laneClosed><false/></laneClosed>"
-                            if ln < 2:                                  #lane 1 or 2 opened...
-                                tLeft  = {"true": None} #"<taperLeft><true/></taperLeft>"                           
-                                tRight = {"false": None} #"<taperRight><false/></taperRight>"
-                            pass    
+                            tLeftVal = False
+                            tLeft = {"false": None}
+                            tRightVal = False
+                            tRight = {"false": None}
+                            
+                            leftLaneOpen = True
+                            if ln == 0 or arrayMapPt[kt][max((ln-1), 0)*4+3] == 1:
+                                leftLaneOpen = False
+
+                            rightLaneOpen = True
+                            if ln == (totLane - 1) or arrayMapPt[kt][min((ln+1), totLane-1)*4+3] == 1:
+                                rightLaneOpen = False
+
+                            if leftLaneOpen and not rightLaneOpen:
+                                # tLeftVal = False
+                                # tLeft = {"false": None} #"<taperLeft><false/></taperLeft>"
+                                tRightVal = True
+                                tRight = {"true": None} #"<taperRight><true/></taperRight>"
+                                
+                            elif rightLaneOpen and not leftLaneOpen:
+                                tLeftVal = True
+                                tLeft = {"true": None} #"<taperLeft><false/></taperLeft>"
+                                # tRightVal = False
+                                # tRight = {"false": None} #"<taperRight><true/></taperRight>"
+                            # else:
+                            #     tLeftVal = False
+                            #     tLeft = {"false": None} #"<taperLeft><false/></taperLeft>"
+                            #     tRightVal = False
+                            #     tRight = {"false": None} #"<taperRight><true/></taperRight>"
+
+                            if laneTaperStat[ln]['left'] == tLeftVal: tLeft = None
+                            if laneTaperStat[ln]['right'] == tRightVal: tRight = None
+
+                            laneTaperStat[ln]['left'] = tLeftVal
+                            laneTaperStat[ln]['right'] = tRightVal
+
+                            # if ln < 2:                                  #lane 1 or 2 opened...
+                            #     tLeft  = {"true": None} #"<taperLeft><true/></taperLeft>"                           
+                            #     tRight = {"false": None} #"<taperRight><false/></taperRight>"
+                            # pass    
                     
-                            if ln > 1:                                  #lane 3 or 4 opened...
-                                tLeft  = {"false": None} #"<taperLeft><false/></taperLeft>"                           
-                                tRight = {"true": None} #"<taperRight><true/></taperRight>"                                             
-                            pass
+                            # if ln > 1:                                  #lane 3 or 4 opened...
+                            #     tLeft  = {"false": None} #"<taperLeft><false/></taperLeft>"                           
+                            #     tRight = {"true": None} #"<taperRight><true/></taperRight>"                                             
+                            # pass
                         pass
 
 ###
 #                       Write Lane taper attributes...
 ###
-                        NodeLLE['nodeAttributes']['taperLeft'] = tLeft
-                        NodeLLE['nodeAttributes']['taperRight'] = tRight
+                        if tLeft != None: NodeLLE['nodeAttributes']['taperLeft'] = tLeft
+                        if tRight != None: NodeLLE['nodeAttributes']['taperRight'] = tRight
                         NodeLLE['nodeAttributes']['laneClosed'] = lClosed
+                        updatedTapers = True
                         # xmlFile.write (12*tab+""+tLeft+"\n" + \
                         #                12*tab+""+tRight+"\n" + \
                         #                12*tab+""+lClosed+"\n")
 
                         prevLaneStat = currLaneStat                     #set prev status same as current
-                
                     pass                                                #end of lc/lo attributes
+                
+                if not updatedTapers and (laneTaperStat[ln]['left'] or laneTaperStat[ln]['right']):
+                    tLeftVal = False
+                    tLeft = {"false": None}
+                    tRightVal = False
+                    tRight = {"false": None}
+
+                    if laneTaperStat[ln]['left'] == tLeftVal: tLeft = None
+                    if laneTaperStat[ln]['right'] == tRightVal: tRight = None
+
+                    laneTaperStat[ln]['left'] = tLeftVal
+                    laneTaperStat[ln]['right'] = tRightVal
+                    if not NodeLLE.get('nodeAttributes', False):
+                        NodeLLE['nodeAttributes'] = {}
+                    if tLeft != None: NodeLLE['nodeAttributes']['taperLeft'] = tLeft
+                    if tRight != None: NodeLLE['nodeAttributes']['taperRight'] = tRight
 ###
 #                   End of nodeAttributes...
 ###

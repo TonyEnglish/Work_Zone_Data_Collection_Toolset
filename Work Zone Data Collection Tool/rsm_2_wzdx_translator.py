@@ -13,7 +13,9 @@ def wzdx_creator(messages, dataLane, info):
     # if ids:
     wzd['road_event_feed_info']['feed_info_id'] = ""
     wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    wzd['road_event_feed_info']['metadata'] = "https://fake-site.tld/dummy-metadata.txt"
+
+    # wzd['road_event_feed_info']['metadata'] = "https://fake-site.tld/dummy-metadata.txt"
+    wzd['road_event_feed_info']['metadata'] = info['metadata']
     wzd['road_event_feed_info']['version'] = '2.0'
     wzd['type'] = 'FeatureCollection'
     nodes = []
@@ -332,6 +334,9 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
         
         # update_date
         lanes_obj['update_date'] = info['update_date']
+
+        # creation_date
+        lanes_obj['creation_date'] = info['update_date']
 
         #type_of_work
         #maintenance, minor-road-defect-repair, roadside-work, overhead-work, below-road-work, barrier-work, surface-work, painting, roadway-relocation, roadway-creation
