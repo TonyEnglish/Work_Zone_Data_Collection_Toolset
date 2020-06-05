@@ -1,0 +1,105 @@
+{
+  "DateCreated": "6/5/2020",
+  "GeneralInfo": {
+    "Description": "sample work zone",
+    "RoadName": "White Rock Cir",
+    "RoadNumber": "",
+    "Direction": "southbound",
+    "BeginningCrossStreet": "Habitat Dr",
+    "EndingCrossStreet": "Spine Rd",
+    "BeginningMilePost": 1,
+    "EndingMilePost": 2,
+    "EventStatus": "planned"
+  },
+  "TypesOfWork": [
+    {
+      "Is_Architectural_Change": false,
+      "WorkType": "maintenance"
+    }
+  ],
+  "LaneInfo": {
+    "NumberOfLanes": 3,
+    "AverageLaneWidth": 3.6,
+    "ApproachLanePadding": 0.0,
+    "WorkzoneLanePadding": 0.0,
+    "VehiclePathDataLane": 3,
+    "Lanes": [
+      {
+        "LaneNumber": 1,
+        "LaneType": "left-lane",
+        "LaneRestrictions": [
+          {
+            "RestrictionValue": null,
+            "RestrictionType": "hov-3",
+            "RestrictionUnits": null
+          },
+          {
+            "RestrictionValue": 12.0,
+            "RestrictionType": "reduced-height",
+            "RestrictionUnits": "feet"
+          }
+        ]
+      },
+      {
+        "LaneNumber": 2,
+        "LaneType": "middle-lane",
+        "LaneRestrictions": [
+          {
+            "RestrictionValue": 50.0,
+            "RestrictionType": "reduced-weight",
+            "RestrictionUnits": "tons"
+          }
+        ]
+      },
+      {
+        "LaneNumber": 3,
+        "LaneType": "right-lane",
+        "LaneRestrictions": []
+      }
+    ]
+  },
+  "SpeedLimits": {
+    "NormalSpeed": 75,
+    "ReferencePointSpeed": 65,
+    "WorkersPresentSpeed": 55
+  },
+  "CauseCodes": {
+    "CauseCode": 3,
+    "SubCauseCode": 0
+  },
+  "Schedule": {
+    "StartDate": "2020-06-05T06:00:00Z",
+    "StartDateAccuracy": "estimated",
+    "EndDate": "2020-06-14T05:58:00Z",
+    "EndDateAccuracy": "estimated",
+    "DaysOfWeek": [
+      "Mon",
+      "Wed",
+      "Fri"
+    ]
+  },
+  "Location": {
+    "BeginningLocation": {
+      "Lat": 40.0610154535084,
+      "Lon": -105.211646909321,
+      "Elev": null
+    },
+    "BeginningAccuracy": "estimated",
+    "EndingLocation": {
+      "Lat": 40.0591849898534,
+      "Lon": -105.216069847308,
+      "Elev": null
+    },
+    "EndingAccuracy": "estimated"
+  },
+  "metadata": {
+    "wz_location_method": "channel-device-method",
+    "lrs_type": "interlopative",
+    "location_verify_method": "GPS equipment accurate to 1 m",
+    "datafeed_frequency_update": null,
+    "timestamp_metadata_update": "2020-06-05T05:48:42Z",
+    "contact_name": "test name",
+    "contact_email": "test@gmail.com",
+    "issuing_organization": "Neaera Consulting"
+  }
+}
