@@ -313,7 +313,7 @@ def updateMainButton():
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
 ##
-        
+
 ###
 #   tkinter root window...
 ###
@@ -339,10 +339,9 @@ if os.path.exists(logFileName):
 else:
     append_write = 'w' # make a new file if not
 logFile = open(logFileName, append_write)         #log file
-##logMsg ('\n *** - '+wzDesc+' - ***\n')
 logMsg('*** Running Main UI ***')
 
-# Check java version for RSM 
+# Check java version for RSM binary conversion
 try:
     java_version = subprocess.check_output(['java', '-version'], stderr=subprocess.STDOUT).decode('utf-8')
     version_number = java_version.splitlines()[0].split()[2].strip('"')
@@ -375,6 +374,8 @@ lbl_top.place(x=300, y=20)
 msg = Label(root, text='NO CONFIGURATION FILE SELECTED',bg='slategray1', fg='red',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
 msg.place(x=100, y=80)
 
+
+
 # Retrieve zure cloud connection string from environment variable
 connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
 connect_str = os.getenv(connect_str_env_var)
@@ -389,70 +390,118 @@ else:
 
 download_file_path = './Config Files/local_config.json'
 
-# If internet connection detected, load cloud config files
-if internet_on():
-    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-    container_name = 'publishedconfigfiles'
-    container_client = blob_service_client.get_container_client(container_name)
-    #blob_client = blob_service_client.get_blob_client(container='', blob='')
+def loadCloudContent():
+    global blob_service_client
+    global blob_names_dict
+    global container_name
+
+    global frame
+    global listbox
+    global load_config
+    global config_label_or
+    global diag_wzConfig_file
+
+    global wzConfig_file
+    global wzConfig_file_name
+
+    try:
+        frame.destroy()
+        listbox.destroy() #?
+        load_config.destroy()
+        config_label_or.destroy()
+        diag_wzConfig_file.destroy()
+        wzConfig_file_name.destroy()
+    except:
+        try:
+            config_label_or.destroy()
+            diag_wzConfig_file.destroy()
+            wzConfig_file_name.destroy()
+        except:
+            pass
 
 
-    logMsg('Listing blobs in container:' + container_name)
-    blob_list = container_client.list_blobs()
+    # If internet connection detected, load cloud config files
+    if internet_on():
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+        container_name = 'publishedconfigfiles'
+        container_client = blob_service_client.get_container_client(container_name)
+        #blob_client = blob_service_client.get_blob_client(container='', blob='')
 
-    frame = Frame(root)
-    frame.place(x=100, y=200)
 
-    listbox = Listbox(frame, width=50, height=6, font=('Helvetica', 12), bg='white')
-    listbox.pack(side='left', fill='y')
+        logMsg('Listing blobs in container:' + container_name)
+        blob_list = container_client.list_blobs()
 
-    scrollbar = Scrollbar(frame, orient='vertical')
-    scrollbar.config(command=listbox.yview)
-    scrollbar.pack(side='right', fill='y')
+        frame = Frame(root)
+        frame.place(x=100, y=200)
 
-    listbox.config(yscrollcommand=scrollbar.set)
+        listbox = Listbox(frame, width=50, height=6, font=('Helvetica', 12), bg='white')
+        listbox.pack(side='left', fill='y')
 
-    now = datetime.datetime.now()
-    def getModTimeDelta(blob):
-        time_delta = now-blob.last_modified.replace(tzinfo=None)
-        return time_delta
+        scrollbar = Scrollbar(frame, orient='vertical')
+        scrollbar.config(command=listbox.yview)
+        scrollbar.pack(side='right', fill='y')
 
-    blob_names_dict = {}
-    blobListSorted = []
-    for blob in blob_list:
-        logMsg('Blob Name: ' + blob.name)
-        blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
-    blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
-    for blob in blobListSorted:
-        blob_name = blob.name.split('/')[-1]
-        if '.json' in blob_name:
-            blob_names_dict[blob_name] = blob.name
-            listbox.insert(END, blob_name)
+        listbox.config(yscrollcommand=scrollbar.set)
 
-    logMsg('Blobs sorted, filtered and inserted into listbox')
-    load_config = Button(root, text='Load Cloud Configuration File', font='Helvetica 10', padx=5, command=downloadConfig)
-    load_config.place(x=100, y=320)
+        now = datetime.datetime.now()
+        def getModTimeDelta(blob):
+            time_delta = now-blob.last_modified.replace(tzinfo=None)
+            return time_delta
 
-    config_label_or = Label(root, text='OR', font='Helvetica 10', padx=5)
-    config_label_or.place(x=150, y=352)
+        blob_names_dict = {}
+        blobListSorted = []
+        for blob in blob_list:
+            logMsg('Blob Name: ' + blob.name)
+            blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
+        blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
+        for blob in blobListSorted:
+            blob_name = blob.name.split('/')[-1]
+            if '.json' in blob_name:
+                blob_names_dict[blob_name] = blob.name
+                listbox.insert(END, blob_name)
 
-    diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
-    diag_wzConfig_file.place(x=115,y=380)
+        logMsg('Blobs sorted, filtered and inserted into listbox')
+        load_config = Button(root, text='Load Cloud Configuration File', font='Helvetica 10', padx=5, command=downloadConfig)
+        load_config.place(x=100, y=320)
 
-    wzConfig_file = StringVar()
-    wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-    wzConfig_file_name.place(x=220,y=390)
-else:
-    config_label_or = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
-    config_label_or.place(x=150, y=200)
+        config_label_or = Label(root, text='OR', font='Helvetica 10', padx=5)
+        config_label_or.place(x=150, y=352)
 
-    diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
-    diag_wzConfig_file.place(x=115,y=280)
+        diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+        diag_wzConfig_file.place(x=115,y=380)
 
-    wzConfig_file = StringVar()
-    wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-    wzConfig_file_name.place(x=220,y=290)
+        # wzConfig_file = StringVar()
+        # wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+        # wzConfig_file_name.place(x=220,y=390)
+        try:
+            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+            wzConfig_file_name.place(x=220,y=390)
+        except:
+            wzConfig_file = StringVar()
+            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+            wzConfig_file_name.place(x=220,y=390)
+    else:
+        config_label_or = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
+        config_label_or.place(x=150, y=200)
 
+        diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+        diag_wzConfig_file.place(x=115,y=280)
+
+        # wzConfig_file = StringVar()
+        try:
+            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+            wzConfig_file_name.place(x=220,y=290)
+        except:
+            wzConfig_file = StringVar()
+            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+            wzConfig_file_name.place(x=220,y=290)
+
+
+refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))                                         # Car image
+refreshButton = Button(root, image = refreshImg, command=loadCloudContent)                                  # Label with car image , command=loadCloudContent
+refreshButton.place(x=50, y=200)
+
+loadCloudContent()
 
 instructions = '''This is the configuration file selection component of the 
 Work Zone Data Collection tool. To use the tool,
@@ -483,6 +532,7 @@ def testGPSConnection(retry=False, *args):
         if NMEAData: 
             for i in range(20):
                 NMEAData = sio.readline()
+                print(NMEAData)
                 if NMEAData[0:3] == '$GP':
                     gpsFound = True
                 if NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]:
@@ -592,8 +642,13 @@ def searchPorts():
             break
     tkPortVar.trace_id = tkPortVar.trace("w", testGPSConnection)
 
-btnTestGps = Button(root, text='Refresh', font='Helvetica 13',border=2,command=updatePortsDropdown, anchor=W)
-btnTestGps.place(x=750,y=340)
+
+# refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))                                         # Car image
+btnTestGps = Button(root, image = refreshImg, command=updatePortsDropdown)                                  # Label with car image , command=loadCloudContent
+btnTestGps.place(x=800, y=340)
+
+# btnTestGps = Button(root, text='Refresh', font='Helvetica 13',border=2,command=updatePortsDropdown, anchor=W)
+# btnTestGps.place(x=750,y=340)
 
 def on_closing():
     logFile.close()
@@ -667,7 +722,7 @@ def getNMEA_String():
 #       --- Parse GGA String---
 #
 ###
-    
+
         if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == '$GNGGA':
             GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid)
 
@@ -682,7 +737,7 @@ def getNMEA_String():
 ###
 #       --- Parse RMC ---
 ###
-  
+
         if NMEAData[0:6] == '$GPRMC':
             RMC_out = parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid)
 
@@ -1024,7 +1079,7 @@ dataRate = int(tkDataVar.get())
 logMsg('*** Running Vehicle Path Data Acquisition ***')
 
 outDir      = './WZ_VehPathData'
-vehPathDataFileName = 'path-data--' + wzDesc + '--' + roadName + '.csv'
+vehPathDataFileName = 'path-data--' + wzDesc.lower().strip().replace(' ', '-') + '--' + roadName.lower().strip().replace(' ', '-') + '.csv'
 vehPathDataFile = outDir + '/' + vehPathDataFileName
 
 ##########################################################################
@@ -1394,7 +1449,6 @@ def build_messages():
     info['metadata']['contact_name'] = contactName
     info['metadata']['contact_email'] = contactEmail
     info['metadata']['issuing_organization'] = issuingOrganization
-    
 
     info['types_of_work'] = typeOfWork
     info['lanes_obj'] = lanes_obj
