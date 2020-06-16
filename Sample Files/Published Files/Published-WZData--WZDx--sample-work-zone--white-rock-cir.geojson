@@ -4,7 +4,7 @@
     "feed_update_date": "2020-06-05T13:53:12Z",
     "metadata": {
       "wz_location_method": "channel-device-method",
-      "lrs_type": "interlopative",
+      "lrs_type": "interpolative",
       "location_verify_method": "GPS equipment accurate to 1 m",
       "timestamp_metadata_update": "2020-06-05T05:48:42Z",
       "contact_name": "test name",
