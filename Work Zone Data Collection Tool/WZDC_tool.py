@@ -772,7 +772,7 @@ def getNMEA_String():
                 stopDataLog()
                 #appRunning = False
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if not gotRefPt and distanceToStartPt > prevDistance and i >= 25: #Auto mark reference point
+            if not gotRefPt and distanceToStartPt > prevDistance and i >= 10: #Auto mark reference point
                 logMsg('-------- Auto Marking Reference Point (by location, distance=' + str(distanceToStartPt) + ') -------')
                 markRefPt()
             if gotRefPt:
