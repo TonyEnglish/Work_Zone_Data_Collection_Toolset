@@ -1,0 +1,693 @@
+{
+  "road_event_feed_info": {
+    "feed_info_id": "d4f25ea0-1e6f-4924-b69c-20b3a6e5e0ae",
+    "feed_update_date": "2020-06-11T12:16:13Z",
+    "metadata": {
+      "wz_location_method": "channel-device-method",
+      "lrs_type": "interpolative",
+      "location_verify_method": "GPS equipment accurate to 1 m",
+      "timestamp_metadata_update": "2020-06-11T16:32:28Z",
+      "contact_name": "Jacob Frye",
+      "contact_email": "jfrye@neaeraconsulting.com",
+      "issuing_organization": "Neaera Consulting"
+    },
+    "version": "2.0"
+  },
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "f7427534-456b-4aee-9b71-e0d1cfcfd675",
+        "feed_info_id": "d4f25ea0-1e6f-4924-b69c-20b3a6e5e0ae",
+        "subidentifier": "ZHKTJ7",
+        "road_name": "Prairie Center Cir",
+        "road_number": "",
+        "direction": "eastbound",
+        "beginning_cross_street": "HR Ranch Road",
+        "ending_cross_street": "Laramie County Public Works",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-15T06:00:00Z",
+        "end_date": "2020-06-20T11:59:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "all-lanes-open",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "accuracy-test-2",
+        "restrictions": [
+          "no-trucks",
+          "towing-prohibited"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-06-11T12:13:48Z",
+        "creation_date": "2020-06-11T12:13:48Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "bc97da3e-fe67-4bb3-a8ed-0edc046b5a97",
+            "road_event_id": "f7427534-456b-4aee-9b71-e0d1cfcfd675",
+            "type_of_work": "maintenance",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "0668ecab-8e60-4e07-9754-a5bed78b2552",
+            "road_event_id": "f7427534-456b-4aee-9b71-e0d1cfcfd675",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "f3ccdc38-aca8-4aab-9ba8-c49fc336585f",
+                "lane_id": "0668ecab-8e60-4e07-9754-a5bed78b2552",
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_id": "2b9c953b-17fb-4767-a14d-a9845ba8ebab",
+            "road_event_id": "f7427534-456b-4aee-9b71-e0d1cfcfd675",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "f2c5f6e3-bc4e-4bb8-bc17-3a7064b0d3e3",
+                "lane_id": "2b9c953b-17fb-4767-a14d-a9845ba8ebab",
+                "restriction_type": "towing-prohibited"
+              }
+            ],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.655925,
+            41.1469341,
+            1833
+          ],
+          [
+            -104.6550193,
+            41.146929,
+            1832
+          ],
+          [
+            -104.6539576,
+            41.1469633,
+            1833
+          ],
+          [
+            -104.6529931,
+            41.1470325,
+            1832
+          ],
+          [
+            -104.6520871,
+            41.1471246,
+            1832
+          ],
+          [
+            -104.6514316,
+            41.1472103,
+            1832
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "69c9fac1-ff69-4b14-a21c-f20b66b862d3",
+        "feed_info_id": "d4f25ea0-1e6f-4924-b69c-20b3a6e5e0ae",
+        "subidentifier": "ZHKTJ7",
+        "road_name": "Prairie Center Cir",
+        "road_number": "",
+        "direction": "eastbound",
+        "beginning_cross_street": "HR Ranch Road",
+        "ending_cross_street": "Laramie County Public Works",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-15T06:00:00Z",
+        "end_date": "2020-06-20T11:59:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "accuracy-test-2",
+        "restrictions": [
+          "no-trucks",
+          "towing-prohibited"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-06-11T12:13:48Z",
+        "creation_date": "2020-06-11T12:13:48Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "71a72ada-1b7e-4e30-b697-baec8264da60",
+            "road_event_id": "69c9fac1-ff69-4b14-a21c-f20b66b862d3",
+            "type_of_work": "maintenance",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "a841f6df-2dd0-4865-afc9-a26aa888aac0",
+            "road_event_id": "69c9fac1-ff69-4b14-a21c-f20b66b862d3",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "8bb2d1f4-59b5-4edc-b28d-355c1005f840",
+                "lane_id": "a841f6df-2dd0-4865-afc9-a26aa888aac0",
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "merge-right"
+          },
+          {
+            "lane_id": "b9bbe5f8-d066-476e-b32d-fda683340348",
+            "road_event_id": "69c9fac1-ff69-4b14-a21c-f20b66b862d3",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "d2b17c2f-1c29-416a-8c6c-01960a3d8a73",
+                "lane_id": "b9bbe5f8-d066-476e-b32d-fda683340348",
+                "restriction_type": "towing-prohibited"
+              }
+            ],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6514316,
+            41.1472103,
+            1832
+          ],
+          [
+            -104.6504423,
+            41.1473685,
+            1832
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "24dc4e12-b0e0-468e-afa0-95f678e362ad",
+        "feed_info_id": "d4f25ea0-1e6f-4924-b69c-20b3a6e5e0ae",
+        "subidentifier": "ZHKTJ7",
+        "road_name": "Prairie Center Cir",
+        "road_number": "",
+        "direction": "eastbound",
+        "beginning_cross_street": "HR Ranch Road",
+        "ending_cross_street": "Laramie County Public Works",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-15T06:00:00Z",
+        "end_date": "2020-06-20T11:59:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "accuracy-test-2",
+        "restrictions": [
+          "no-trucks",
+          "towing-prohibited"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-06-11T12:13:48Z",
+        "creation_date": "2020-06-11T12:13:48Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "aea481fc-d33a-48c1-9ea1-9d215b7b332e",
+            "road_event_id": "24dc4e12-b0e0-468e-afa0-95f678e362ad",
+            "type_of_work": "maintenance",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "3828a42b-f18e-410d-94cb-7d5bccd36aa6",
+            "road_event_id": "24dc4e12-b0e0-468e-afa0-95f678e362ad",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "e99f9fe7-5a91-4924-9d52-38b7eeebad1c",
+                "lane_id": "3828a42b-f18e-410d-94cb-7d5bccd36aa6",
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "closed"
+          },
+          {
+            "lane_id": "e98c28e0-d7f1-41c4-aa8f-2ff44917d918",
+            "road_event_id": "24dc4e12-b0e0-468e-afa0-95f678e362ad",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "79237a82-2679-48f8-b679-44cd5c804969",
+                "lane_id": "e98c28e0-d7f1-41c4-aa8f-2ff44917d918",
+                "restriction_type": "towing-prohibited"
+              }
+            ],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6504423,
+            41.1473685,
+            1832
+          ],
+          [
+            -104.6495426,
+            41.1475491,
+            1832
+          ],
+          [
+            -104.6486843,
+            41.14776,
+            1832
+          ],
+          [
+            -104.6480783,
+            41.1479376,
+            1831
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "7d1fd8d7-eb03-4f43-b7af-7928e3ab95cd",
+        "feed_info_id": "d4f25ea0-1e6f-4924-b69c-20b3a6e5e0ae",
+        "subidentifier": "ZHKTJ7",
+        "road_name": "Prairie Center Cir",
+        "road_number": "",
+        "direction": "eastbound",
+        "beginning_cross_street": "HR Ranch Road",
+        "ending_cross_street": "Laramie County Public Works",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-15T06:00:00Z",
+        "end_date": "2020-06-20T11:59:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": true,
+        "reduced_speed_limit": 15,
+        "description": "accuracy-test-2",
+        "restrictions": [
+          "no-trucks",
+          "towing-prohibited"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-06-11T12:13:48Z",
+        "creation_date": "2020-06-11T12:13:48Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "6a538aa0-1c6d-4d8b-8a97-e0f3ef7ae17b",
+            "road_event_id": "7d1fd8d7-eb03-4f43-b7af-7928e3ab95cd",
+            "type_of_work": "maintenance",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "16d69156-6ee6-4f74-a9f0-59fe8d53fb83",
+            "road_event_id": "7d1fd8d7-eb03-4f43-b7af-7928e3ab95cd",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "ca90465d-e2d2-42b5-b847-dad561577026",
+                "lane_id": "16d69156-6ee6-4f74-a9f0-59fe8d53fb83",
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "closed"
+          },
+          {
+            "lane_id": "f4c8c780-7535-45e7-a778-2f8d8101ce40",
+            "road_event_id": "7d1fd8d7-eb03-4f43-b7af-7928e3ab95cd",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "ca6e6424-771b-444c-bf8a-6cf4d512cc86",
+                "lane_id": "f4c8c780-7535-45e7-a778-2f8d8101ce40",
+                "restriction_type": "towing-prohibited"
+              }
+            ],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6480783,
+            41.1479376,
+            1831
+          ],
+          [
+            -104.647564,
+            41.1481238,
+            1831
+          ],
+          [
+            -104.646981,
+            41.1483756,
+            1830
+          ],
+          [
+            -104.6464276,
+            41.1486491,
+            1829
+          ],
+          [
+            -104.6459738,
+            41.1489173,
+            1828
+          ],
+          [
+            -104.6454503,
+            41.1492781,
+            1827
+          ],
+          [
+            -104.6452731,
+            41.1494093,
+            1826
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "90390452-e17a-48d9-b4e1-5b3c13e82565",
+        "feed_info_id": "d4f25ea0-1e6f-4924-b69c-20b3a6e5e0ae",
+        "subidentifier": "ZHKTJ7",
+        "road_name": "Prairie Center Cir",
+        "road_number": "",
+        "direction": "eastbound",
+        "beginning_cross_street": "HR Ranch Road",
+        "ending_cross_street": "Laramie County Public Works",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-15T06:00:00Z",
+        "end_date": "2020-06-20T11:59:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "accuracy-test-2",
+        "restrictions": [
+          "no-trucks",
+          "towing-prohibited"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-06-11T12:13:48Z",
+        "creation_date": "2020-06-11T12:13:48Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "998996c7-2d6a-4e88-a481-dfc2d49c1250",
+            "road_event_id": "90390452-e17a-48d9-b4e1-5b3c13e82565",
+            "type_of_work": "maintenance",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "1bb79303-05be-4b31-999a-6761ed4397a2",
+            "road_event_id": "90390452-e17a-48d9-b4e1-5b3c13e82565",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "6d67309d-cd0d-40f4-9936-cfd02fb0b28b",
+                "lane_id": "1bb79303-05be-4b31-999a-6761ed4397a2",
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "closed"
+          },
+          {
+            "lane_id": "0f5199ca-7634-41af-b001-022bdf0b5b7f",
+            "road_event_id": "90390452-e17a-48d9-b4e1-5b3c13e82565",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "c4c3d085-c303-4cf2-b5b5-ef04dd77c1ec",
+                "lane_id": "0f5199ca-7634-41af-b001-022bdf0b5b7f",
+                "restriction_type": "towing-prohibited"
+              }
+            ],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6452731,
+            41.1494093,
+            1826
+          ],
+          [
+            -104.6448711,
+            41.1497275,
+            1825
+          ],
+          [
+            -104.644755,
+            41.1498365,
+            1824
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "000804b5-3115-48e6-8718-e77c25b28f8a",
+        "feed_info_id": "d4f25ea0-1e6f-4924-b69c-20b3a6e5e0ae",
+        "subidentifier": "ZHKTJ7",
+        "road_name": "Prairie Center Cir",
+        "road_number": "",
+        "direction": "eastbound",
+        "beginning_cross_street": "HR Ranch Road",
+        "ending_cross_street": "Laramie County Public Works",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-15T06:00:00Z",
+        "end_date": "2020-06-20T11:59:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "accuracy-test-2",
+        "restrictions": [
+          "no-trucks",
+          "towing-prohibited"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-06-11T12:13:48Z",
+        "creation_date": "2020-06-11T12:13:48Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "02468db6-087f-4852-8f39-0cdb4d87619c",
+            "road_event_id": "000804b5-3115-48e6-8718-e77c25b28f8a",
+            "type_of_work": "maintenance",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "3b3c90d1-ff01-46a3-ba12-1b6a0c25730d",
+            "road_event_id": "000804b5-3115-48e6-8718-e77c25b28f8a",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "5be383da-3aac-49bc-b929-cc300787a46c",
+                "lane_id": "3b3c90d1-ff01-46a3-ba12-1b6a0c25730d",
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "merge-left"
+          },
+          {
+            "lane_id": "3b669eca-7cc7-46cf-8ad4-1976479a7681",
+            "road_event_id": "000804b5-3115-48e6-8718-e77c25b28f8a",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "6a3a71e7-f6a8-4ab7-93f4-5658ba92f490",
+                "lane_id": "3b669eca-7cc7-46cf-8ad4-1976479a7681",
+                "restriction_type": "towing-prohibited"
+              }
+            ],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.644755,
+            41.1498365,
+            1824
+          ],
+          [
+            -104.6445833,
+            41.150039,
+            1824
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "44e44633-d0c1-4744-8111-a4de30c46371",
+        "feed_info_id": "d4f25ea0-1e6f-4924-b69c-20b3a6e5e0ae",
+        "subidentifier": "ZHKTJ7",
+        "road_name": "Prairie Center Cir",
+        "road_number": "",
+        "direction": "eastbound",
+        "beginning_cross_street": "HR Ranch Road",
+        "ending_cross_street": "Laramie County Public Works",
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-15T06:00:00Z",
+        "end_date": "2020-06-20T11:59:00Z",
+        "start_date_accuracy": "estimated",
+        "end_date_accuracy": "estimated",
+        "event_status": "planned",
+        "total_num_lanes": 2,
+        "vehicle_impact": "all-lanes-open",
+        "workers_present": false,
+        "reduced_speed_limit": 20,
+        "description": "accuracy-test-2",
+        "restrictions": [
+          "no-trucks",
+          "towing-prohibited"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-06-11T12:13:48Z",
+        "creation_date": "2020-06-11T12:13:48Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "566ec93f-58f4-407a-8d24-d32e8159eb7d",
+            "road_event_id": "44e44633-d0c1-4744-8111-a4de30c46371",
+            "type_of_work": "maintenance",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "355f9bf6-2adf-49b2-8f69-20d3ada95bf3",
+            "road_event_id": "44e44633-d0c1-4744-8111-a4de30c46371",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "c1aab807-1aa0-4fbd-870e-6c83273590e5",
+                "lane_id": "355f9bf6-2adf-49b2-8f69-20d3ada95bf3",
+                "restriction_type": "no-trucks"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_id": "b00913cb-df08-4058-a9fc-9bd0d0538f32",
+            "road_event_id": "44e44633-d0c1-4744-8111-a4de30c46371",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "b4e3f74c-6573-408d-9c3f-5ce6acc92aa9",
+                "lane_id": "b00913cb-df08-4058-a9fc-9bd0d0538f32",
+                "restriction_type": "towing-prohibited"
+              }
+            ],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6445833,
+            41.150039,
+            1824
+          ],
+          [
+            -104.6444808,
+            41.1502125,
+            1824
+          ],
+          [
+            -104.644404,
+            41.1504356,
+            1825
+          ]
+        ]
+      }
+    }
+  ]
+}

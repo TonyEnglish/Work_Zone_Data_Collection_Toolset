@@ -1,0 +1,97 @@
+{
+  "DateCreated": "6/11/2020",
+  "GeneralInfo": {
+    "Description": "accuracy-test-4",
+    "RoadName": "Prairie Center Cir",
+    "RoadNumber": "",
+    "Direction": "eastbound",
+    "BeginningCrossStreet": "HR Ranch Road",
+    "EndingCrossStreet": "Laramie County Public Works",
+    "BeginningMilePost": 0,
+    "EndingMilePost": 0,
+    "EventStatus": "planned"
+  },
+  "TypesOfWork": [
+    {
+      "Is_Architectural_Change": false,
+      "WorkType": "maintenance"
+    }
+  ],
+  "LaneInfo": {
+    "NumberOfLanes": 2,
+    "AverageLaneWidth": 3.6,
+    "ApproachLanePadding": 0.0,
+    "WorkzoneLanePadding": 0.0,
+    "VehiclePathDataLane": 2,
+    "Lanes": [
+      {
+        "LaneNumber": 1,
+        "LaneType": "left-lane",
+        "LaneRestrictions": [
+          {
+            "RestrictionValue": null,
+            "RestrictionType": "no-trucks",
+            "RestrictionUnits": null
+          }
+        ]
+      },
+      {
+        "LaneNumber": 2,
+        "LaneType": "right-lane",
+        "LaneRestrictions": [
+          {
+            "RestrictionValue": null,
+            "RestrictionType": "towing-prohibited",
+            "RestrictionUnits": null
+          }
+        ]
+      }
+    ]
+  },
+  "SpeedLimits": {
+    "NormalSpeed": 25,
+    "ReferencePointSpeed": 20,
+    "WorkersPresentSpeed": 15
+  },
+  "CauseCodes": {
+    "CauseCode": 3,
+    "SubCauseCode": 0
+  },
+  "Schedule": {
+    "StartDate": "2020-06-15T06:00:00Z",
+    "StartDateAccuracy": "estimated",
+    "EndDate": "2020-06-20T11:59:00Z",
+    "EndDateAccuracy": "estimated",
+    "DaysOfWeek": [
+      "Mon",
+      "Tues",
+      "Wed",
+      "Thurs",
+      "Fri"
+    ]
+  },
+  "Location": {
+    "BeginningLocation": {
+      "Lat": 41.146949089427,
+      "Lon": -104.655958174084,
+      "Elev": null
+    },
+    "BeginningAccuracy": "estimated",
+    "EndingLocation": {
+      "Lat": 41.1504290591271,
+      "Lon": -104.644421993111,
+      "Elev": null
+    },
+    "EndingAccuracy": "estimated"
+  },
+  "metadata": {
+    "wz_location_method": "channel-device-method",
+    "lrs_type": "interpolative",
+    "location_verify_method": "GPS equipment accurate to 1 m",
+    "datafeed_frequency_update": "",
+    "timestamp_metadata_update": "2020-06-11T16:32:28Z",
+    "contact_name": "Jacob Frye",
+    "contact_email": "jfrye@neaeraconsulting.com",
+    "issuing_organization": "Neaera Consulting"
+  }
+}
