@@ -654,6 +654,8 @@ def getNMEA_String():
     prevDistance = 0
     pi = 3.14159
     isFirstTime = True
+    i = 0
+    isNearEnd = False
 
     while (appRunning):                             #continue reading and processing NMEA string while TRUE
         NMEAData = sio.readline()                   #Read NMEA string from serial port COM7
@@ -710,20 +712,24 @@ def getNMEA_String():
         
         if dataLog:
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
-            if distanceToEndPt < 20: #Leaving Workzone
+            if distanceToEndPt < 20 and distanceToEndPt > prevDistance: #Leaving Workzone
                 logMsg('-------- Exiting Work Zone (by location, distance=' + str(distanceToEndPt) + ') -------')
                 stopDataLog()
                 #appRunning = False
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if not gotRefPt and distanceToStartPt > prevDistance and not isFirstTime: #Auto mark reference point
+            if not gotRefPt and distanceToStartPt > prevDistance and i >= 25: #Auto mark reference point
                 logMsg('-------- Auto Marking Reference Point (by location, distance=' + str(distanceToStartPt) + ') -------')
                 markRefPt()
-            prevDistance = distanceToStartPt
-            isFirstTime = False
+            if gotRefPt:
+                prevDistance = distanceToEndPt
+            else:
+                prevDistance = distanceToStartPt
+            # isFirstTime = False
+            i += 1
 
         else:
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if distanceToStartPt < 100: #Entering Workzone
+            if distanceToStartPt < 50: #Entering Workzone
                 logMsg('-------- Entering Work Zone (by location, distance=' + str(distanceToStartPt) + ') -------')
                 startDataLog()
                 prevDistance = distanceToStartPt
@@ -937,7 +943,7 @@ GPSSpeed    = 0.0                               #Speed in m/s
 GPSHeading  = 0.0                               #Heading in degrees
 GPSHdop     = 0.0                               #Horizontal dilution of precision
 GGAValid    = False                             #Init value
-RMCValid    = False                             #Init value
+RMCValid    = False                            #Init value
 GSAValid    = False                             #Init value
 
 
