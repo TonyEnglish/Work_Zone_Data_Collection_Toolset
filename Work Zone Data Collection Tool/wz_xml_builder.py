@@ -478,9 +478,9 @@ def build_xml_CC (xmlFile,idList,eDateTime,endDateTime,timeOffset,wzDaysOfWeek,c
 #
 ###
                 #lat = int(float(refPoint[0]) * 10000000)
-                lat = int((arrayMapPt[kt][ln*4+0]) * 10000000)
-                lon = int((arrayMapPt[kt][ln*4+1]) * 10000000)
-                elev = round(arrayMapPt[kt][ln*4+2])                        #in full meters only
+                lat = int((arrayMapPt[kt][ln*5+0]) * 10000000)
+                lon = int((arrayMapPt[kt][ln*5+1]) * 10000000)
+                elev = round(arrayMapPt[kt][ln*5+2])                        #in full meters only
 
                 NodeLLE['nodePoint'] = {}
                 NodeLLE['nodePoint']['node-3Dabsolute'] = {}
@@ -789,6 +789,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
         #kt = 0                                                          
         kt = msgSegList[currSeg+1][1] - 1                               #wz start and end nodes/seg starts
         prevLaneStat = 0                                                #previous lane state (open)
+        prevLaneTaperStat = 0                                                #previous lane state (open)
         prevWPStat   = 0                                                #previous WP state (no WP)
         connToFlag   = 0                                                #set flag for connectsTo 0
         
@@ -800,8 +801,9 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 ###
 #           First Get lane and WP status at the current node for the lane...
 ###
-            currLaneStat = arrayMapPt[kt][ln*4+3]                       #get lc/lo status for the node
-            currWPStat   = arrayMapPt[kt][len(arrayMapPt[kt])-2]        #get WP flag for the node
+            currLaneStat        = arrayMapPt[kt][ln*5+3]                       #get lc/lo status for the node
+            currLaneTaperStat   = arrayMapPt[kt][ln*5+4]                       #get lc/lo status for the node
+            currWPStat          = arrayMapPt[kt][len(arrayMapPt[kt])-2]        #get WP flag for the node
 
             ##print ("Lane=",ln," node=",kt,"pStat=",prevLaneStat,"cStat=",currLaneStat)
             ##print ("wpStat:",int(arrayMapPt[kt][len(arrayMapPt[kt])-1]))
@@ -840,9 +842,9 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 #               ASN.1 value range defined in J2735 (-900000000) .. (900000001)
 #
 ###
-                lat = int((arrayMapPt[kt][ln*4+0]) * 10000000)
-                lon = int((arrayMapPt[kt][ln*4+1]) * 10000000)
-                elev = round(arrayMapPt[kt][ln*4+2])                    #in full meters
+                lat = int((arrayMapPt[kt][ln*5+0]) * 10000000)
+                lon = int((arrayMapPt[kt][ln*5+1]) * 10000000)
+                elev = round(arrayMapPt[kt][ln*5+2])                    #in full meters
                 NodeLLE = {}
                 NodeLLE['nodePoint'] = {}
                 NodeLLE['nodePoint']['node-3Dabsolute'] = {}
@@ -871,7 +873,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 #               Check following logic for adding node attributes...
 ###
                 updatedTapers = False
-                if currLaneStat != prevLaneStat or currWPStat != prevWPStat:
+                if currLaneStat != prevLaneStat or currWPStat != prevWPStat or currLaneTaperStat != prevLaneTaperStat:
                     NodeLLE['nodeAttributes'] = {}
                     # xmlFile.write (11*tab+"<nodeAttributes>\n")               
   
@@ -889,6 +891,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 ###
 
                     if currWPStat != prevWPStat:                        #WP status change
+                        print(currWPStat)
                         if currWPStat == 1:                             #start of wp
                             sLoc = 3
                             pP = {"true": None}
@@ -1072,23 +1075,40 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
                         #                12*tab+""+lClosed+"\n")
 
                         prevLaneStat = currLaneStat                     #set prev status same as current
+                        prevLaneTaperStat = currLaneTaperStat                     #set prev status same as current
                     pass                                                #end of lc/lo attributes
+
+                    if currLaneTaperStat != prevLaneTaperStat and currLaneTaperStat == 0:
+                        tLeftVal = False
+                        tLeft = {"false": None}
+                        tRightVal = False
+                        tRight = {"false": None}
+
+                        if laneTaperStat[ln]['left'] == tLeftVal: tLeft = None
+                        if laneTaperStat[ln]['right'] == tRightVal: tRight = None
+
+                        laneTaperStat[ln]['left'] = tLeftVal
+                        laneTaperStat[ln]['right'] = tRightVal
+                        if not NodeLLE.get('nodeAttributes', False):
+                            NodeLLE['nodeAttributes'] = {}
+                        if tLeft != None: NodeLLE['nodeAttributes']['taperLeft'] = tLeft
+                        if tRight != None: NodeLLE['nodeAttributes']['taperRight'] = tRight
                 
-                if not updatedTapers and (laneTaperStat[ln]['left'] or laneTaperStat[ln]['right']):
-                    tLeftVal = False
-                    tLeft = {"false": None}
-                    tRightVal = False
-                    tRight = {"false": None}
+                # if not updatedTapers and (laneTaperStat[ln]['left'] or laneTaperStat[ln]['right']):
+                #     tLeftVal = False
+                #     tLeft = {"false": None}
+                #     tRightVal = False
+                #     tRight = {"false": None}
 
-                    if laneTaperStat[ln]['left'] == tLeftVal: tLeft = None
-                    if laneTaperStat[ln]['right'] == tRightVal: tRight = None
+                #     if laneTaperStat[ln]['left'] == tLeftVal: tLeft = None
+                #     if laneTaperStat[ln]['right'] == tRightVal: tRight = None
 
-                    laneTaperStat[ln]['left'] = tLeftVal
-                    laneTaperStat[ln]['right'] = tRightVal
-                    if not NodeLLE.get('nodeAttributes', False):
-                        NodeLLE['nodeAttributes'] = {}
-                    if tLeft != None: NodeLLE['nodeAttributes']['taperLeft'] = tLeft
-                    if tRight != None: NodeLLE['nodeAttributes']['taperRight'] = tRight
+                #     laneTaperStat[ln]['left'] = tLeftVal
+                #     laneTaperStat[ln]['right'] = tRightVal
+                #     if not NodeLLE.get('nodeAttributes', False):
+                #         NodeLLE['nodeAttributes'] = {}
+                #     if tLeft != None: NodeLLE['nodeAttributes']['taperLeft'] = tLeft
+                #     if tRight != None: NodeLLE['nodeAttributes']['taperRight'] = tRight
 ###
 #                   End of nodeAttributes...
 ###

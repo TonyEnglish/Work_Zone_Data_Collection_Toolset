@@ -115,7 +115,7 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
     prev_attributes_general = {'peoplePresent': False, 'reducedSpeedLimit': reduced_speed_limit}
 
     for k in range(len(lanes)):
-        prev_attributes_lane = {'laneClosed': False}
+        prev_attributes_lane = {'laneClosed': False, 'merge-left': False, 'merge-right': False}
         prev_attr_list.append(prev_attributes_lane)
     
     for i in range(len(nodes)):
@@ -183,7 +183,18 @@ def extract_nodes(RSM, wzd, ids, dataLane, info):
 
             if node_contents.get('nodeAttributes', {}).get('taperLeft', {}).get('true', {}) == None:
                 lane_status = 'merge-left'
-            elif node_contents.get('nodeAttributes', {}).get('taperRight', {}).get('true', {}) == None:
+                prev_attr_list[j]['merge-left'] = True
+            elif node_contents.get('nodeAttributes', {}).get('taperLeft', {}).get('false', {}) == None:
+                prev_attr_list[j]['merge-left'] = False
+            elif prev_attr_list[j]['merge-left']:
+                lane_status = 'merge-left'
+
+            if node_contents.get('nodeAttributes', {}).get('taperRight', {}).get('true', {}) == None:
+                lane_status = 'merge-right'
+                prev_attr_list[j]['merge-right'] = True
+            elif node_contents.get('nodeAttributes', {}).get('taperRight', {}).get('false', {}) == None:
+                prev_attr_list[j]['merge-right'] = False
+            elif prev_attr_list[j]['merge-right']:
                 lane_status = 'merge-right'
 
             lane['lane_status'] = lane_status

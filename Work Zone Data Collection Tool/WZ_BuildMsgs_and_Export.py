@@ -625,7 +625,7 @@ def startMainProcess():
 
     wzMapLen = [0,0]                                    #both approach and wz mapped length
     laneType = 1                                        #approach lanes
-    getLanePt(laneType,pathPt,appMapPt,laneWidth,lanePadApp,refPtIdx,appMapPtDist,laneStat,wpStat,dataLane,wzMapLen)
+    getLanePt(laneType,pathPt,appMapPt,laneWidth,lanePadApp,refPtIdx,appMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList)
 
     logMsg(' --- Mapped Approach Lanes: '+str(int(wzMapLen[0]))+' meters')
 
@@ -638,7 +638,7 @@ def startMainProcess():
 ###
     
     laneType    = 2                                     #wz lanes
-    getLanePt(laneType,pathPt,wzMapPt,laneWidth,lanePadWZ,refPtIdx,wzMapPtDist,laneStat,wpStat,dataLane,wzMapLen)
+    getLanePt(laneType,pathPt,wzMapPt,laneWidth,lanePadWZ,refPtIdx,wzMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList)
 
     logMsg(' --- Mapped Work zone Lanes: '+str(int(wzMapLen[1]))+' meters')
 
