@@ -207,7 +207,7 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
     tLanes  = laneStat[0][0]                            #total number of lanes...
 
     lcwpStat    = [0]*(tLanes+1)                        #Temporary list to store status of each node for each lane + WP state for the node
-    laneTaperStat = [0]*(tLanes+1)
+    laneTaperStat = [0]*(tLanes+1)                      #0 = no taper, 1 = taper-right, 2 = taper-left, 3=none, 4=either
     dL      = dataLane - 1                              #set lane number starting 0 as the left most lane                             
     # bearingRP   = pathPt[refPt][4]                      #bearing (heading) at the reference point
     # latRP       = pathPt[refPt][1]                      #lat/lon/alt    
@@ -257,14 +257,50 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
         if laneType == 2:                                   #WZ Lane
             for lnStat in range(1, len(laneStat)):          #total number of lc/lo/wp are length of laneStat-1
                 if laneStat[lnStat][0] == i-1:            #got LC/LO location
-                    print('Lane CLosure')
-                    print(i-1)
+                    ln = laneStat[lnStat][1]-1
                     requiredNode = True                       #set to True
+                    if incrDistLC: #other lane taper active, end other lane closure
+                        for lane in range(0, tLanes):
+                            if laneTaperStat[lane] != 0 and abs(lane - ln) <= 1:
+                                laneTaperStat[lane] = 0
                     incrDistLC = True
                     distFromLC = 0
-                    print(laneStat)
                     lcwpStat[laneStat[lnStat][1]-1] = laneStat[lnStat][2]       #get value from laneStat 
-                    laneTaperStat[laneStat[lnStat][1]-1] = 1       #get value from laneStat 
+                    laneTaperVal = 3
+                    if tLanes != 1:
+                        if laneStat[lnStat][2] == 1: #Lane closure
+                            if ln == 0 and lcwpStat[1] == 0: #Left lane, lane to right open
+                                laneTaperVal = 1
+                            elif ln == tLanes - 1 and lcwpStat[tLanes - 2] == 1: #Right lane, lane to left open
+                                laneTaperVal = 2
+                            elif ln != 0 and ln == tLanes - 1:
+                                leftLaneOpen = False
+                                if lcwpStat[ln-1] == 0: leftLaneOpen = True
+                                rightLaneOpen = False
+                                if lcwpStat[ln+1] == 0: rightLaneOpen = True
+
+                                if (leftLaneOpen and lcwpStat[ln+1] == 1): laneTaperVal = 2
+                                elif rightLaneOpen and lcwpStat[ln - 1] == 1: laneTaperVal = 1
+                                elif rightLaneOpen and leftLaneOpen: laneTaperVal = 4
+                        else:
+                            if ln == 0 and lcwpStat[1] == 0: #Left lane, lane to right open
+                                laneTaperVal = 2
+                            elif ln == tLanes - 1 and lcwpStat[tLanes - 2] == 0: #Right lane, lane to left open
+                                laneTaperVal = 1
+                            elif ln != 0 and ln == tLanes - 1:
+                                leftLaneOpen = False
+                                if lcwpStat[ln-1] == 0: leftLaneOpen = True
+                                rightLaneOpen = False
+                                if lcwpStat[ln+1] == 0: rightLaneOpen = True
+
+                                if (leftLaneOpen and lcwpStat[ln+1] == 1): laneTaperVal = 1
+                                elif rightLaneOpen and lcwpStat[ln - 1] == 1: laneTaperVal = 2
+                                elif rightLaneOpen and leftLaneOpen: laneTaperVal = 4
+                    print('lane taper val')
+                    print(laneTaperVal)
+                    laneTaperStat[laneStat[lnStat][1] - 1] = laneTaperVal
+
+                    #laneTaperStat[laneStat[lnStat][1]-1] = 1       #get value from laneStat 
                 elif distFromLC >= taperLength:
                     print('Taper ending')
                     print(i-1)

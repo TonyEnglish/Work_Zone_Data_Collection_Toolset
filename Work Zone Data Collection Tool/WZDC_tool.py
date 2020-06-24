@@ -140,6 +140,7 @@ def getConfigVars():
     global  wzEndLon                                       #wz end time
     global  endingAccuracy
     
+    global  feed_info_id
     global  wzLocationMethod
     global  lrsType
     global  locationVerifyMethod
@@ -196,6 +197,7 @@ def getConfigVars():
     wzEndLon                = wzConfig['Location']['EndingLocation']['Lon']
     endingAccuracy          = wzConfig['Location']['EndingAccuracy']
 
+    feed_info_id            = wzConfig['metadata']['feed_info_id']
     wzLocationMethod        = wzConfig['metadata']['wz_location_method']
     lrsType                 = wzConfig['metadata']['lrs_type']
     locationVerifyMethod    = wzConfig['metadata']['location_verify_method']
@@ -1428,6 +1430,7 @@ def build_messages():
         currSeg = currSeg+1
 
     info = {}
+    info['feed_info_id'] = feed_info_id
     info['road_name'] = roadName
     info['road_number'] = roadNumber
     info['description'] = wzDesc

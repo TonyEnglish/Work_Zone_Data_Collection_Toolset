@@ -11,7 +11,7 @@ def wzdx_creator(messages, dataLane, info):
     wzd = {}
     wzd['road_event_feed_info'] = {}
     # if ids:
-    wzd['road_event_feed_info']['feed_info_id'] = ""
+    wzd['road_event_feed_info']['feed_info_id'] = info['feed_info_id']
     wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     # wzd['road_event_feed_info']['metadata'] = "https://fake-site.tld/dummy-metadata.txt"
@@ -36,8 +36,8 @@ def wzdx_creator(messages, dataLane, info):
 # Add ids to message
 def add_ids(message, add_ids):
     if add_ids:
-        feed_info_id = str(uuid.uuid4())
-        message['road_event_feed_info']['feed_info_id'] = feed_info_id
+        feed_info_id = message['road_event_feed_info']['feed_info_id']
+        # message['road_event_feed_info']['feed_info_id'] = feed_info_id
         for feature in message['features']:
             road_event_id = str(uuid.uuid4())
             feature['properties']['road_event_id'] = road_event_id
