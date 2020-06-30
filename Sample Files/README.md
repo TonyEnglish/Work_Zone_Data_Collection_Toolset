@@ -16,7 +16,6 @@ Published Work Zone Files: Published Files
 
 Data From Testing 6/11/20: Testing Data
 - 5 tests were completed, resulting in 5 maps of the same work zone. The ZIP archives and unzipped directories for each of these tests are included in the Testing Data folder.
-  - Unfortunately, the path data file for the first dataset (accuracy-test-1) was accidentally deleted and cannot be retrieved. The configuration file and all 3 messages for this dataset still exist.
-- Preliminary Testing Results
+- Testing Results
   - Located in gps_data_accuracy_tests.xlsm
   - A formal write-up of the testing will be completed before 6/30/20.
