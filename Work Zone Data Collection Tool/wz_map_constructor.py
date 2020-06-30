@@ -224,7 +224,6 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
     taperLength = speedList[0]*(laneWidth + lanePad)*3.28084
     if speedList[0] <= 40:
         taperLength = ((laneWidth + lanePad)*3.28084*(speedList[0]**2)) / 60
-    print(taperLength)
     ALLOWABLEERROR = .5
     SMALLDELTAPHI = 0.01
     CHORDLENGTHTHRESHOLD = 500
@@ -268,7 +267,7 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
                     lcwpStat[laneStat[lnStat][1]-1] = laneStat[lnStat][2]       #get value from laneStat 
                     laneTaperVal = 3
                     if tLanes != 1:
-                        if laneStat[lnStat][2] == 1: #Lane closure
+                        if lcwpStat[ln] == 1: #Lane closure
                             if ln == 0 and lcwpStat[1] == 0: #Left lane, lane to right open
                                 laneTaperVal = 1
                             elif ln == tLanes - 1 and lcwpStat[tLanes - 2] == 1: #Right lane, lane to left open
@@ -296,15 +295,10 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
                                 if (leftLaneOpen and lcwpStat[ln+1] == 1): laneTaperVal = 1
                                 elif rightLaneOpen and lcwpStat[ln - 1] == 1: laneTaperVal = 2
                                 elif rightLaneOpen and leftLaneOpen: laneTaperVal = 4
-                    print('lane taper val')
-                    print(laneTaperVal)
                     laneTaperStat[laneStat[lnStat][1] - 1] = laneTaperVal
 
                     #laneTaperStat[laneStat[lnStat][1]-1] = 1       #get value from laneStat 
                 elif distFromLC >= taperLength:
-                    print('Taper ending')
-                    print(i-1)
-                    print(distFromLC)
                     requiredNode = True                       #set to True
                     incrDistLC = False
                     distFromLC = 0
@@ -314,7 +308,6 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
 
             for wpZone in range(0, len(wpStat)):
                 if wpStat[wpZone][0] == i-1:                      #got WP Zone True/False
-                    print('workers present')
                     requiredNode = True                               #set to True 
                     lcwpStat[len(lcwpStat)-1] = wpStat[wpZone][1]   #toggle WP Zone status
                 pass
@@ -374,7 +367,7 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
             insertMapPt(mapPt, pathPt, i-1, tLanes, laneWidth, dL, lcwpStat, totalDist, laneTaperStat)
 
         if incrDistLC:
-            distFromLC += pathPt[i-1][0]/dataFreq
+            distFromLC += (pathPt[i - 1][0] * 3.28084)/dataFreq
     # Step 9
         # Integrated into step 7
         

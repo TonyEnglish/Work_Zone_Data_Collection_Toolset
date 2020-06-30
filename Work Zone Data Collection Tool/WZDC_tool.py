@@ -91,6 +91,8 @@ def getConfigVars():
     # global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
+    global  feed_info_id
+    
     # General Information
     global  wzDesc                                          #WZ Description
     global  roadName
@@ -140,7 +142,6 @@ def getConfigVars():
     global  wzEndLon                                       #wz end time
     global  endingAccuracy
     
-    global  feed_info_id
     global  wzLocationMethod
     global  lrsType
     global  locationVerifyMethod
@@ -152,6 +153,8 @@ def getConfigVars():
 
 
     sampleFreq              = 10
+    
+    feed_info_id            = wzConfig['FeedInfoID']
 
     wzDesc                  = wzConfig['GeneralInfo']['Description']
     roadName                = wzConfig['GeneralInfo']['RoadName']
@@ -197,7 +200,6 @@ def getConfigVars():
     wzEndLon                = wzConfig['Location']['EndingLocation']['Lon']
     endingAccuracy          = wzConfig['Location']['EndingAccuracy']
 
-    feed_info_id            = wzConfig['metadata']['feed_info_id']
     wzLocationMethod        = wzConfig['metadata']['wz_location_method']
     lrsType                 = wzConfig['metadata']['lrs_type']
     locationVerifyMethod    = wzConfig['metadata']['location_verify_method']

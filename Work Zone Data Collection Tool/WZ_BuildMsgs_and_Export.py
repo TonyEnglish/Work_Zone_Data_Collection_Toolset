@@ -188,6 +188,8 @@ def getConfigVars():
     # global  vehPathDataFile                                 #collected vehicle path data file
     global  sampleFreq                                      #GPS sampling freq.
 
+    global  feed_info_id
+
     # General Information
     global  wzDesc                                          #WZ Description
     global  roadName
@@ -248,9 +250,11 @@ def getConfigVars():
 
     global vehPathDataFile
 
-    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/Work Zone Data Collection Tool/WZ_VehPathData/path-data--sample-work-zone--white-rock-cir.csv'
+    vehPathDataFile = 'C:/Users/rando/OneDrive/Documents/GitHub/V2X-manual-data-collection/Work Zone Data Collection Tool/WZ_VehPathData/path-data--accuracy-test-5--prairie-center-cir.csv'
 
     sampleFreq              = 10
+
+    feed_info_id            = wzConfig['FeedInfoID']
 
     wzDesc                  = wzConfig['GeneralInfo']['Description']
     roadName                = wzConfig['GeneralInfo']['RoadName']
@@ -502,6 +506,7 @@ def build_messages():
         currSeg = currSeg+1
     pass
     info = {}
+    info['feed_info_id'] = feed_info_id
     info['road_name'] = roadName
     info['road_number'] = roadNumber
     info['description'] = wzDesc

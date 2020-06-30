@@ -1,7 +1,7 @@
 {
   "road_event_feed_info": {
-    "feed_info_id": "ed40aa23-7a4f-49cf-ba31-541abae7ff08",
-    "feed_update_date": "2020-06-11T12:22:16Z",
+    "feed_info_id": "7ea881b1-3ee1-40f5-ab29-00883b977144",
+    "feed_update_date": "2020-06-30T13:59:38Z",
     "metadata": {
       "wz_location_method": "channel-device-method",
       "lrs_type": "interpolative",
@@ -18,9 +18,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "bd7241ce-c36f-41ad-b23b-e02f7fa1998c",
-        "feed_info_id": "ed40aa23-7a4f-49cf-ba31-541abae7ff08",
-        "subidentifier": "JO17MP",
+        "road_event_id": "046624bb-bd63-46e5-92e2-d41748ee454d",
+        "feed_info_id": "7ea881b1-3ee1-40f5-ab29-00883b977144",
+        "subidentifier": "GY55SX",
         "road_name": "Prairie Center Cir",
         "road_number": "",
         "direction": "eastbound",
@@ -43,26 +43,26 @@
           "towing-prohibited"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-06-11T12:20:10Z",
-        "creation_date": "2020-06-11T12:20:10Z",
+        "update_date": "2020-06-30T13:59:37Z",
+        "creation_date": "2020-06-30T13:59:37Z",
         "types_of_work": [
           {
-            "types_of_work_id": "5db79a75-3a22-4168-83cb-f4262fa50fc7",
-            "road_event_id": "bd7241ce-c36f-41ad-b23b-e02f7fa1998c",
+            "types_of_work_id": "8a5d98d3-177e-4573-9efc-3778eff1f33c",
+            "road_event_id": "046624bb-bd63-46e5-92e2-d41748ee454d",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "62c61b16-e926-4664-aab8-fce14d897149",
-            "road_event_id": "bd7241ce-c36f-41ad-b23b-e02f7fa1998c",
+            "lane_id": "ba4f3540-43de-4a28-8776-fd19d28d13e9",
+            "road_event_id": "046624bb-bd63-46e5-92e2-d41748ee454d",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "4be04e8b-51ba-46e5-854e-7d9f0bed51d4",
-                "lane_id": "62c61b16-e926-4664-aab8-fce14d897149",
+                "lane_restriction_id": "0ef60ee9-7786-4f3f-bf41-2f0a65ea9c39",
+                "lane_id": "ba4f3540-43de-4a28-8776-fd19d28d13e9",
                 "restriction_type": "no-trucks"
               }
             ],
@@ -70,14 +70,14 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "78f040a4-9dae-4214-aeb1-2c0299009e1f",
-            "road_event_id": "bd7241ce-c36f-41ad-b23b-e02f7fa1998c",
+            "lane_id": "51cdd917-caae-45d0-b4c7-f5bbda5cadc3",
+            "road_event_id": "046624bb-bd63-46e5-92e2-d41748ee454d",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "a9187943-e826-46f4-85ea-974b969350a9",
-                "lane_id": "78f040a4-9dae-4214-aeb1-2c0299009e1f",
+                "lane_restriction_id": "5f2eab0c-917e-4468-a929-bf8d0835fb4d",
+                "lane_id": "51cdd917-caae-45d0-b4c7-f5bbda5cadc3",
                 "restriction_type": "towing-prohibited"
               }
             ],
@@ -125,9 +125,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "cf3f2d0a-1ef1-448e-a9dc-57e265df3019",
-        "feed_info_id": "ed40aa23-7a4f-49cf-ba31-541abae7ff08",
-        "subidentifier": "JO17MP",
+        "road_event_id": "1a59486a-385d-413f-9f88-675a0c879f26",
+        "feed_info_id": "7ea881b1-3ee1-40f5-ab29-00883b977144",
+        "subidentifier": "GY55SX",
         "road_name": "Prairie Center Cir",
         "road_number": "",
         "direction": "eastbound",
@@ -150,26 +150,26 @@
           "towing-prohibited"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-06-11T12:20:10Z",
-        "creation_date": "2020-06-11T12:20:10Z",
+        "update_date": "2020-06-30T13:59:37Z",
+        "creation_date": "2020-06-30T13:59:37Z",
         "types_of_work": [
           {
-            "types_of_work_id": "164d7939-483d-40d4-9de5-361f520cce37",
-            "road_event_id": "cf3f2d0a-1ef1-448e-a9dc-57e265df3019",
+            "types_of_work_id": "b3e8a740-feb1-45d8-8a2a-96bdac90727c",
+            "road_event_id": "1a59486a-385d-413f-9f88-675a0c879f26",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "aa51fb26-b54b-4762-b61b-7868f1d26f4c",
-            "road_event_id": "cf3f2d0a-1ef1-448e-a9dc-57e265df3019",
+            "lane_id": "070e4db8-a67c-4bf2-8bc5-9160f50d2f91",
+            "road_event_id": "1a59486a-385d-413f-9f88-675a0c879f26",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "31a70b9f-f994-4658-9d6a-5c41b2a4daa0",
-                "lane_id": "aa51fb26-b54b-4762-b61b-7868f1d26f4c",
+                "lane_restriction_id": "887925da-648d-4ce7-81d5-3c28c712e288",
+                "lane_id": "070e4db8-a67c-4bf2-8bc5-9160f50d2f91",
                 "restriction_type": "no-trucks"
               }
             ],
@@ -177,14 +177,14 @@
             "lane_status": "merge-right"
           },
           {
-            "lane_id": "b9d908ab-acd7-416a-9d16-b305a299e547",
-            "road_event_id": "cf3f2d0a-1ef1-448e-a9dc-57e265df3019",
+            "lane_id": "ca554006-3c80-4237-a103-4ddfd38a5ff8",
+            "road_event_id": "1a59486a-385d-413f-9f88-675a0c879f26",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "66c01802-8ad2-4ab8-8e80-ada5cac1cbbe",
-                "lane_id": "b9d908ab-acd7-416a-9d16-b305a299e547",
+                "lane_restriction_id": "9b48fe23-b712-4672-a2c0-32dc81f5622c",
+                "lane_id": "ca554006-3c80-4237-a103-4ddfd38a5ff8",
                 "restriction_type": "towing-prohibited"
               }
             ],
@@ -202,8 +202,8 @@
             1828
           ],
           [
-            -104.6506115,
-            41.14735,
+            -104.6510203,
+            41.1472791,
             1829
           ]
         ]
@@ -212,9 +212,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "e24e8aa6-a9bc-460d-8997-cec90fe371cb",
-        "feed_info_id": "ed40aa23-7a4f-49cf-ba31-541abae7ff08",
-        "subidentifier": "JO17MP",
+        "road_event_id": "ffae1249-d3e9-4818-81fb-d92819c51ec3",
+        "feed_info_id": "7ea881b1-3ee1-40f5-ab29-00883b977144",
+        "subidentifier": "GY55SX",
         "road_name": "Prairie Center Cir",
         "road_number": "",
         "direction": "eastbound",
@@ -237,26 +237,26 @@
           "towing-prohibited"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-06-11T12:20:10Z",
-        "creation_date": "2020-06-11T12:20:10Z",
+        "update_date": "2020-06-30T13:59:37Z",
+        "creation_date": "2020-06-30T13:59:37Z",
         "types_of_work": [
           {
-            "types_of_work_id": "5d71ddb7-bb6b-44ff-82f7-98dc1073cfa1",
-            "road_event_id": "e24e8aa6-a9bc-460d-8997-cec90fe371cb",
+            "types_of_work_id": "a568c71e-0569-4ac9-b51a-6a05e1a271b8",
+            "road_event_id": "ffae1249-d3e9-4818-81fb-d92819c51ec3",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "52281350-5ece-4a6d-9dc3-8f5748ea6293",
-            "road_event_id": "e24e8aa6-a9bc-460d-8997-cec90fe371cb",
+            "lane_id": "f13bda0f-6440-4206-b851-b41f8fef4777",
+            "road_event_id": "ffae1249-d3e9-4818-81fb-d92819c51ec3",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "1db98be5-4833-4d7b-b79a-93e5d6f0e88c",
-                "lane_id": "52281350-5ece-4a6d-9dc3-8f5748ea6293",
+                "lane_restriction_id": "f9c844fa-a762-420b-8ec1-3a615735f756",
+                "lane_id": "f13bda0f-6440-4206-b851-b41f8fef4777",
                 "restriction_type": "no-trucks"
               }
             ],
@@ -264,14 +264,14 @@
             "lane_status": "closed"
           },
           {
-            "lane_id": "07200520-1b37-442c-9618-9f2a1854abbb",
-            "road_event_id": "e24e8aa6-a9bc-460d-8997-cec90fe371cb",
+            "lane_id": "44ac4309-5011-4c60-b242-b88b487365c9",
+            "road_event_id": "ffae1249-d3e9-4818-81fb-d92819c51ec3",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "112620a4-7fef-4392-b0ec-e210e68ce276",
-                "lane_id": "07200520-1b37-442c-9618-9f2a1854abbb",
+                "lane_restriction_id": "0d17c330-e093-47f3-af63-886b8a7e2081",
+                "lane_id": "44ac4309-5011-4c60-b242-b88b487365c9",
                 "restriction_type": "towing-prohibited"
               }
             ],
@@ -284,23 +284,23 @@
         "type": "LineString",
         "coordinates": [
           [
-            -104.6506115,
-            41.14735,
+            -104.6510203,
+            41.1472791,
             1829
           ],
           [
-            -104.6496443,
-            41.1475436,
+            -104.6500755,
+            41.1474531,
             1828
           ],
           [
-            -104.6488103,
-            41.1477383,
+            -104.6490656,
+            41.1476748,
             1827
           ],
           [
-            -104.6481491,
-            41.1479285,
+            -104.6483916,
+            41.1478548,
             1827
           ],
           [
@@ -314,9 +314,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "88324061-5156-4690-bf58-d8d73ce4ecd3",
-        "feed_info_id": "ed40aa23-7a4f-49cf-ba31-541abae7ff08",
-        "subidentifier": "JO17MP",
+        "road_event_id": "bba4180c-f3f3-44ab-9702-42c02ac5fce9",
+        "feed_info_id": "7ea881b1-3ee1-40f5-ab29-00883b977144",
+        "subidentifier": "GY55SX",
         "road_name": "Prairie Center Cir",
         "road_number": "",
         "direction": "eastbound",
@@ -339,26 +339,26 @@
           "towing-prohibited"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-06-11T12:20:10Z",
-        "creation_date": "2020-06-11T12:20:10Z",
+        "update_date": "2020-06-30T13:59:37Z",
+        "creation_date": "2020-06-30T13:59:37Z",
         "types_of_work": [
           {
-            "types_of_work_id": "a132b323-e2e4-4bb1-8fe1-64209dd1bfbd",
-            "road_event_id": "88324061-5156-4690-bf58-d8d73ce4ecd3",
+            "types_of_work_id": "4af51bdd-1a15-40c3-9b2d-05d1e65d8d52",
+            "road_event_id": "bba4180c-f3f3-44ab-9702-42c02ac5fce9",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "2baf5d4b-1817-4003-83ac-846a8cc92be9",
-            "road_event_id": "88324061-5156-4690-bf58-d8d73ce4ecd3",
+            "lane_id": "303b23bd-8da8-4d40-85e2-1d6f1bb96c5e",
+            "road_event_id": "bba4180c-f3f3-44ab-9702-42c02ac5fce9",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "d4b2ef70-c6d1-4035-aaea-2174a2f99de9",
-                "lane_id": "2baf5d4b-1817-4003-83ac-846a8cc92be9",
+                "lane_restriction_id": "107ba124-6d7e-4b44-9580-bc539b107cde",
+                "lane_id": "303b23bd-8da8-4d40-85e2-1d6f1bb96c5e",
                 "restriction_type": "no-trucks"
               }
             ],
@@ -366,14 +366,14 @@
             "lane_status": "closed"
           },
           {
-            "lane_id": "f01018c3-3c27-4d3b-ac26-a1e9550e091f",
-            "road_event_id": "88324061-5156-4690-bf58-d8d73ce4ecd3",
+            "lane_id": "c1001f4d-0f6c-43bd-becc-c41cfd1bda08",
+            "road_event_id": "bba4180c-f3f3-44ab-9702-42c02ac5fce9",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "ad6ba20e-9f97-44f0-ae69-d2d0e56e09c6",
-                "lane_id": "f01018c3-3c27-4d3b-ac26-a1e9550e091f",
+                "lane_restriction_id": "96405ec1-144f-49b3-98d6-4afe4facb3d8",
+                "lane_id": "c1001f4d-0f6c-43bd-becc-c41cfd1bda08",
                 "restriction_type": "towing-prohibited"
               }
             ],
@@ -426,9 +426,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "105ee966-6646-46e1-8d44-bdba52dc7594",
-        "feed_info_id": "ed40aa23-7a4f-49cf-ba31-541abae7ff08",
-        "subidentifier": "JO17MP",
+        "road_event_id": "e6b5a603-a972-42c6-9e8c-bfc20c3a055b",
+        "feed_info_id": "7ea881b1-3ee1-40f5-ab29-00883b977144",
+        "subidentifier": "GY55SX",
         "road_name": "Prairie Center Cir",
         "road_number": "",
         "direction": "eastbound",
@@ -451,26 +451,26 @@
           "towing-prohibited"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-06-11T12:20:10Z",
-        "creation_date": "2020-06-11T12:20:10Z",
+        "update_date": "2020-06-30T13:59:37Z",
+        "creation_date": "2020-06-30T13:59:37Z",
         "types_of_work": [
           {
-            "types_of_work_id": "509c65be-ecf8-4ed2-8957-ca0b8288d28c",
-            "road_event_id": "105ee966-6646-46e1-8d44-bdba52dc7594",
+            "types_of_work_id": "01837310-0d4f-4ae8-b123-b88bc20fe166",
+            "road_event_id": "e6b5a603-a972-42c6-9e8c-bfc20c3a055b",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "3fb7be0f-daed-41c4-81cb-9a14f348b1f2",
-            "road_event_id": "105ee966-6646-46e1-8d44-bdba52dc7594",
+            "lane_id": "149aa6d2-1e5a-4e88-a23c-16db0f271d6c",
+            "road_event_id": "e6b5a603-a972-42c6-9e8c-bfc20c3a055b",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "8824ad17-ce30-431d-8422-8953d71a5b60",
-                "lane_id": "3fb7be0f-daed-41c4-81cb-9a14f348b1f2",
+                "lane_restriction_id": "c3d7e878-f724-4652-96c5-b8ca83fd075d",
+                "lane_id": "149aa6d2-1e5a-4e88-a23c-16db0f271d6c",
                 "restriction_type": "no-trucks"
               }
             ],
@@ -478,14 +478,14 @@
             "lane_status": "closed"
           },
           {
-            "lane_id": "9eef2b17-ab67-4b21-a00e-f78fca0fa82f",
-            "road_event_id": "105ee966-6646-46e1-8d44-bdba52dc7594",
+            "lane_id": "03fd488e-fb18-4e2a-82bd-64fac3d00307",
+            "road_event_id": "e6b5a603-a972-42c6-9e8c-bfc20c3a055b",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "9e46de6d-adb8-4134-bb3f-0594514b0037",
-                "lane_id": "9eef2b17-ab67-4b21-a00e-f78fca0fa82f",
+                "lane_restriction_id": "20b87372-e491-4de4-886f-6608b1cbc325",
+                "lane_id": "03fd488e-fb18-4e2a-82bd-64fac3d00307",
                 "restriction_type": "towing-prohibited"
               }
             ],
@@ -518,9 +518,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "ae23df27-b262-44ff-8be2-35d64104b2f7",
-        "feed_info_id": "ed40aa23-7a4f-49cf-ba31-541abae7ff08",
-        "subidentifier": "JO17MP",
+        "road_event_id": "95464228-e5d1-4f36-bf7a-e8ac335d6609",
+        "feed_info_id": "7ea881b1-3ee1-40f5-ab29-00883b977144",
+        "subidentifier": "GY55SX",
         "road_name": "Prairie Center Cir",
         "road_number": "",
         "direction": "eastbound",
@@ -543,26 +543,26 @@
           "towing-prohibited"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-06-11T12:20:10Z",
-        "creation_date": "2020-06-11T12:20:10Z",
+        "update_date": "2020-06-30T13:59:37Z",
+        "creation_date": "2020-06-30T13:59:37Z",
         "types_of_work": [
           {
-            "types_of_work_id": "ef447f8d-e42c-432c-874c-0264ce340677",
-            "road_event_id": "ae23df27-b262-44ff-8be2-35d64104b2f7",
+            "types_of_work_id": "4a1b2c6d-976b-4ae0-a5d3-75c4a95eb2a2",
+            "road_event_id": "95464228-e5d1-4f36-bf7a-e8ac335d6609",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "879cfe51-0103-44c7-aba5-18b605d562e7",
-            "road_event_id": "ae23df27-b262-44ff-8be2-35d64104b2f7",
+            "lane_id": "918d436b-eacf-4a11-9cfa-003845a2bd9c",
+            "road_event_id": "95464228-e5d1-4f36-bf7a-e8ac335d6609",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "1252af86-9f9c-4577-b1dd-af8a90eda735",
-                "lane_id": "879cfe51-0103-44c7-aba5-18b605d562e7",
+                "lane_restriction_id": "13bac9f6-962f-4366-8fc7-150a2504e300",
+                "lane_id": "918d436b-eacf-4a11-9cfa-003845a2bd9c",
                 "restriction_type": "no-trucks"
               }
             ],
@@ -570,14 +570,14 @@
             "lane_status": "merge-left"
           },
           {
-            "lane_id": "a49732cd-a2d2-4753-af17-91bfef6ee320",
-            "road_event_id": "ae23df27-b262-44ff-8be2-35d64104b2f7",
+            "lane_id": "7a63d447-db6d-4eba-8b12-acac98dce2dd",
+            "road_event_id": "95464228-e5d1-4f36-bf7a-e8ac335d6609",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "ca8ea2a3-0ba7-4a54-a237-a729e4a120f8",
-                "lane_id": "a49732cd-a2d2-4753-af17-91bfef6ee320",
+                "lane_restriction_id": "4ab2a0f5-a92b-4dd9-8a69-5805824b67b5",
+                "lane_id": "7a63d447-db6d-4eba-8b12-acac98dce2dd",
                 "restriction_type": "towing-prohibited"
               }
             ],
@@ -598,6 +598,11 @@
             -104.6445946,
             41.1500173,
             1822
+          ],
+          [
+            -104.6445343,
+            41.1501038,
+            1822
           ]
         ]
       }
@@ -605,9 +610,9 @@
     {
       "type": "Feature",
       "properties": {
-        "road_event_id": "d6f2ca31-bf5f-4dd7-889d-2f2a00fcb05d",
-        "feed_info_id": "ed40aa23-7a4f-49cf-ba31-541abae7ff08",
-        "subidentifier": "JO17MP",
+        "road_event_id": "81e91825-d2f4-4333-bdaf-b4887c40dc10",
+        "feed_info_id": "7ea881b1-3ee1-40f5-ab29-00883b977144",
+        "subidentifier": "GY55SX",
         "road_name": "Prairie Center Cir",
         "road_number": "",
         "direction": "eastbound",
@@ -630,26 +635,26 @@
           "towing-prohibited"
         ],
         "issuing_organization": "Neaera Consulting",
-        "update_date": "2020-06-11T12:20:10Z",
-        "creation_date": "2020-06-11T12:20:10Z",
+        "update_date": "2020-06-30T13:59:37Z",
+        "creation_date": "2020-06-30T13:59:37Z",
         "types_of_work": [
           {
-            "types_of_work_id": "b82a42d1-0b12-49a3-a5d1-d463e04bd4cd",
-            "road_event_id": "d6f2ca31-bf5f-4dd7-889d-2f2a00fcb05d",
+            "types_of_work_id": "ec14fbcc-0ef5-4d36-bfad-41aac56356cc",
+            "road_event_id": "81e91825-d2f4-4333-bdaf-b4887c40dc10",
             "type_of_work": "maintenance",
             "is_architectural_change": false
           }
         ],
         "lanes": [
           {
-            "lane_id": "f125bf29-25be-4c46-b656-dba8287bcd4d",
-            "road_event_id": "d6f2ca31-bf5f-4dd7-889d-2f2a00fcb05d",
+            "lane_id": "5549e155-9909-4c51-b7db-c19ada70d17d",
+            "road_event_id": "81e91825-d2f4-4333-bdaf-b4887c40dc10",
             "lane_number": 1,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "a6976b7a-84d8-4172-81a2-539f09d81907",
-                "lane_id": "f125bf29-25be-4c46-b656-dba8287bcd4d",
+                "lane_restriction_id": "0c63e5c8-bd99-4bfe-a9c7-9033017a9107",
+                "lane_id": "5549e155-9909-4c51-b7db-c19ada70d17d",
                 "restriction_type": "no-trucks"
               }
             ],
@@ -657,14 +662,14 @@
             "lane_status": "open"
           },
           {
-            "lane_id": "0db09c10-d61c-4846-87e7-90cefec16833",
-            "road_event_id": "d6f2ca31-bf5f-4dd7-889d-2f2a00fcb05d",
+            "lane_id": "01de38fe-3fc7-411e-87dd-63d190136a03",
+            "road_event_id": "81e91825-d2f4-4333-bdaf-b4887c40dc10",
             "lane_number": 2,
             "lane_edge_reference": "left",
             "lane_restrictions": [
               {
-                "lane_restriction_id": "b90f6a4e-b62d-41d6-a0d7-548439cd2f97",
-                "lane_id": "0db09c10-d61c-4846-87e7-90cefec16833",
+                "lane_restriction_id": "b7fa51d5-07e5-47c2-93d0-45f2b4a9ac4f",
+                "lane_id": "01de38fe-3fc7-411e-87dd-63d190136a03",
                 "restriction_type": "towing-prohibited"
               }
             ],
@@ -677,18 +682,13 @@
         "type": "LineString",
         "coordinates": [
           [
-            -104.6445946,
-            41.1500173,
+            -104.6445343,
+            41.1501038,
             1822
           ],
           [
-            -104.644481,
-            41.1501986,
-            1822
-          ],
-          [
-            -104.6444176,
-            41.1503765,
+            -104.6444496,
+            41.1502745,
             1822
           ],
           [

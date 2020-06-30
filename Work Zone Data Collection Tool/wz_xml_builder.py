@@ -797,7 +797,6 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 
         while kt < msgSegList[currSeg+1][2]:                            #end node #    
             #print ("kt (node), lane#:", kt, ln)
-
 ###
 #           First Get lane and WP status at the current node for the lane...
 ###
@@ -872,7 +871,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 #
 #               Check following logic for adding node attributes...
 ###
-                updatedTapers = False
+                # updatedTapers = False
                 if currLaneStat != prevLaneStat or currWPStat != prevWPStat or currLaneTaperStat != prevLaneTaperStat:
                     NodeLLE['nodeAttributes'] = {}
                     # xmlFile.write (11*tab+"<nodeAttributes>\n")               
@@ -891,7 +890,6 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
 ###
 
                     if currWPStat != prevWPStat:                        #WP status change
-                        print(currWPStat)
                         if currWPStat == 1:                             #start of wp
                             sLoc = 3
                             pP = {"true": None}
@@ -989,7 +987,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
                         if tLeft != None: NodeLLE['nodeAttributes']['taperLeft'] = tLeft
                         if tRight != None: NodeLLE['nodeAttributes']['taperRight'] = tRight
                         NodeLLE['nodeAttributes']['laneClosed'] = lClosed
-                        updatedTapers = True
+                        # updatedTapers = True
                         # xmlFile.write (12*tab+""+tLeft+"\n" + \
                         #                12*tab+""+tRight+"\n" + \
                         #                12*tab+""+lClosed+"\n")
@@ -1013,6 +1011,7 @@ def build_xml_WZC (xmlFile,speedLimit,laneWidth,laneStat,wpStat,arrayMapPt,RN,ms
                             NodeLLE['nodeAttributes'] = {}
                         if tLeft != None: NodeLLE['nodeAttributes']['taperLeft'] = tLeft
                         if tRight != None: NodeLLE['nodeAttributes']['taperRight'] = tRight
+                        prevLaneTaperStat = currLaneTaperStat
 
 ###
 #                   End of nodeAttributes...
