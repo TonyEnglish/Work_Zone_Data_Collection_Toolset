@@ -1012,7 +1012,8 @@ def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize
     
     # assemble the URL
     request =  "http://maps.google.com/maps/api/staticmap?" # base URL, append query params, separated by &
-    apiKey = 'AIzaSyB6C5lgal0QWlYqp9AS6LHtAqTG9fH9GPA' #'AIzaSyA4urVuj-2wiwNYeih1R_qL_hhXgtnQOjs' # 
+    apiKey = os.getenv('GOOGLE_MAPS_API_KEY')
+    print(apiKey)
     # if center and zoom  are not given, the map will show all marker locations
     request += "key=%s&" % apiKey
     if center != None:
