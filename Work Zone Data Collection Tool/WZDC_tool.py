@@ -982,7 +982,7 @@ def writeCSVFile (write_str):
 def displayStatusMsg(msgStr):
 
     xPos = marginLeft-80+45
-    yPos = 450
+    yPos = 410
     blankStr = ' '*190
     Text = Label(root,anchor='w', justify=LEFT, text=blankStr)
     Text.place(x=xPos,y=yPos)    
@@ -1395,7 +1395,7 @@ bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
 appMsgWin = Button(root, text='Application Message Window...                                             ',      \
                 font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
-appMsgWin.place(x=marginLeft-80+50, y=440)
+appMsgWin.place(x=marginLeft-80+50, y=400)
 overlayWidth = 710
 overlayx = marginLeft + (window_width - marginLeft)/2 - overlayWidth/2
 overlay = Label(root, text='Application will begin data collection\nwhen the starting location has been reached', bg='gray', font='Calibri 28')
