@@ -727,46 +727,49 @@ def getNMEA_String():
 #       --- Parse GGA String---
 #
 ###
+        try:
+            if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == '$GNGGA':
+                GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid)
 
-        if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == '$GNGGA':
-            GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid)
-
-            if GGA_out[3] == True:
-                GPSTime = GGA_out[0]
-                GPSSats = GGA_out[1]
-                GPSAlt  = GGA_out[2]
+                if GGA_out[3] == True:
+                    GPSTime = GGA_out[0]
+                    GPSSats = GGA_out[1]
+                    GPSAlt  = GGA_out[2]
+                pass
+                #print ('GGA: ', GPSTime, GPSSats,GPSAlt)
             pass
-            #print ('GGA: ', GPSTime, GPSSats,GPSAlt)
-        pass
 
-###
-#       --- Parse RMC ---
-###
+    ###
+    #       --- Parse RMC ---
+    ###
 
-        if NMEAData[0:6] == '$GPRMC':
-            RMC_out = parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid)
+            if NMEAData[0:6] == '$GPRMC':
+                RMC_out = parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid)
 
-            if RMC_out[5] == True:
-                GPSDate     = RMC_out[0]
-                GPSLat      = RMC_out[1]
-                GPSLon      = RMC_out[2]
-                GPSSpeed    = RMC_out[3]*(1852.0/3600.0)    #Knot = 1.852 km/hr, Convert to m/s
-                GPSHeading  = RMC_out[4]
+                if RMC_out[5] == True:
+                    GPSDate     = RMC_out[0]
+                    GPSLat      = RMC_out[1]
+                    GPSLon      = RMC_out[2]
+                    GPSSpeed    = RMC_out[3]*(1852.0/3600.0)    #Knot = 1.852 km/hr, Convert to m/s
+                    GPSHeading  = RMC_out[4]
+                pass
+                #print ('RMC Output:', RMC_out)
             pass
-            #print ('RMC Output:', RMC_out)
-        pass
-        
-###
-#       --- Parse GSA ---
-###
+            
+    ###
+    #       --- Parse GSA ---
+    ###
 
-        if NMEAData[0:6] == '$GPGSA':
-            GSA_out = parseGxGSA(NMEAData,GPSHdop,GSAValid)
-            if GSA_out[1] == True:
-                GPSHdop = GSA_out[0]
+            if NMEAData[0:6] == '$GPGSA':
+                GSA_out = parseGxGSA(NMEAData,GPSHdop,GSAValid)
+                if GSA_out[1] == True:
+                    GPSHdop = GSA_out[0]
+                pass
+                #print ('GSA Hdop:', GSA_out)
             pass
-            #print ('GSA Hdop:', GSA_out)
-        pass
+        except Exception as e:
+            logMsg('ERROR: GPS parsing failed. ' + str(e))
+            continue
 
         carPosLat = GPSLat
         carPosLon = GPSLon
