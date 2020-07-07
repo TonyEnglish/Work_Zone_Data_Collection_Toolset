@@ -530,14 +530,14 @@ def testGPSConnection(retry=False, *args):
     gpsFix = False
     gpsFound = False
     try:
-        ser = serial.Serial(port=tkPortVar.get()[0:5].strip(), baudrate=tkBaudVar.get(), timeout=1.1)
+        ser = serial.Serial(port=tkPortVar.get()[0:5].strip(), baudrate=tkBaudVar.get(), timeout=1.1, )
         sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
         
         NMEAData = sio.readline()
         if NMEAData: 
             for i in range(20):
                 NMEAData = sio.readline()
-                print(NMEAData)
+                # print(NMEAData)
                 if NMEAData[0:3] == '$GP':
                     gpsFound = True
                 if NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]:
@@ -652,9 +652,6 @@ def searchPorts():
 btnTestGps = Button(root, image = refreshImg, command=updatePortsDropdown)                                  # Label with car image , command=loadCloudContent
 btnTestGps.place(x=800, y=340)
 
-# btnTestGps = Button(root, text='Refresh', font='Helvetica 13',border=2,command=updatePortsDropdown, anchor=W)
-# btnTestGps.place(x=750,y=340)
-
 def on_closing():
     logFile.close()
     sys.exit(0)
@@ -662,7 +659,7 @@ def on_closing():
 window.protocol("WM_DELETE_WINDOW", on_closing)
 window.after(500, searchPorts)
 window.mainloop()
-
+  
 
 ################################################################################################################
 ###
@@ -975,7 +972,7 @@ def writeCSVFile (write_str):
 # Display message in status window
 def displayStatusMsg(msgStr):
 
-    xPos = 45
+    xPos = marginLeft-100+45
     yPos = 450
     blankStr = ' '*190
     Text = Label(root,anchor='w', justify=LEFT, text=blankStr)
@@ -999,7 +996,7 @@ def enableForm():
     bWP['state'] = NORMAL
 
 
-def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize="500x500", imgformat="jpeg",
+def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize="640x640", imgformat="jpeg",
                           maptype="roadmap", markers=None ):  
     """retrieve a map (image) from the static google maps server 
     
@@ -1010,10 +1007,13 @@ def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize
 &markers=color:blue|label:S|40.702147,-74.015794&sensor=false"""
    
     
+    if not internet_on():
+        messagebox.showerror('No Internet Connection', 'No internet conenction detected. Please reconnect to the internet to update the map')
+        return
+
     # assemble the URL
     request =  "http://maps.google.com/maps/api/staticmap?" # base URL, append query params, separated by &
     apiKey = os.getenv('GOOGLE_MAPS_API_KEY')
-    print(apiKey)
     # if center and zoom  are not given, the map will show all marker locations
     request += "key=%s&" % apiKey
     if center != None:
@@ -1038,8 +1038,7 @@ def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize
 
     request = request.rstrip('&')
     # #request += "mobile=false&"  # optional: mobile=true will assume the image is shown on a small screen (mobile device)
-    # request += "sensor=false"   # must be given, deals with getting loction from mobile device 
-    print(request)
+    # request += "sensor=false"   # must be given, deals with getting loction from mobile device
     
     urllib.request.urlretrieve(request, filename_wo_extension+"."+imgformat) # Option 1: save image directly to disk
 
@@ -1151,10 +1150,10 @@ vehPathDataFile = outDir + '/' + vehPathDataFileName
 #
 ############################################################################
 
-marginLeft = 600
-window_width = max(800, totalLanes*110+250+marginLeft)
-window.geometry(str(max(800, window_width))+'x500')
-root = Frame(width=max(800, window_width), height=700)
+marginLeft = 750
+window_width = max(1200, totalLanes*110+400+marginLeft)
+window.geometry(str(window_width)+'x750')
+root = Frame(width=window_width, height=750)
 root.place(x=0, y=0)
 # root.bind_all('<Key>', keyPress)                #key press event...
 
@@ -1169,10 +1168,18 @@ carlabel = Label(root, image = carImg)                                          
 workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))             # Workers present image
 userPositionImg = ImageTk.PhotoImage(Image.open('./images/blue-circle.png'))             # Workers present image
 
+plusImg = ImageTk.PhotoImage(Image.open('./images/plus.png'))
+minusImg = ImageTk.PhotoImage(Image.open('./images/minus.png'))
+
+arrowUpImg = ImageTk.PhotoImage(Image.open('./images/arrow_up.png'))
+arrowRightImg = ImageTk.PhotoImage(Image.open('./images/arrow_right.png'))
+arrowDownImg = ImageTk.PhotoImage(Image.open('./images/arrow_down.png'))
+arrowLeftImg = ImageTk.PhotoImage(Image.open('./images/arrow_left.png'))
+
 mapFileName = "google_map_example3"
 zoom = 10
-imgHeight = 350
-imgWidth = 500
+imgHeight = 640
+imgWidth = 640
 center = "40.4742350,-104.9692566"
 imgFormat = "png"
 vertBound = 0
@@ -1180,6 +1187,15 @@ horizBound = 0
 carPosLat = 0
 carPosLon = 0
 carPosHeading = 0
+markerHeight = 20
+markerWidth = 20
+
+# # 81.151417, -74.207792
+# wzStartLat = 81.151417
+# wzStartLon = -74.207792
+# # -78.388249, -85.216413
+# wzEndLat = -78.388249
+# wzEndLon = -85.216413
 
 marker_list = []
 marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|") # blue S at several zip code's centers
@@ -1194,16 +1210,17 @@ def getCurrentMapBounds():
     # GLOBE_WIDTH * e ^ (zoom * math.log(2)) = pixelWidth * 360 / angle
     scale = 360 / (GLOBE_WIDTH * math.e**(zoom * math.log(2)))
     horizBound = imgWidth * scale
-    vertBound = imgHeight * scale
+    vertBound = imgHeight * scale * math.cos(centerLat*math.pi/180) #.77 -78.388249  * math.cos(centerLat*math.pi/180)
+    # print(horizBound, vertBound, horizBound / vertBound)
 
 def getPixelLocation(lat, lon):
     x = (lon - centerLon) / (horizBound / 2)
-    y = (lat - centerLat) / (vertBound / 2)
-    if (x < -1 or x > 1) or (y < -1 or y > 1):
+    y = -(lat - centerLat) / (vertBound / 2) # / math.cos(lat*math.pi/180) * math.cos(centerLat*math.pi/180)
+    x = round((imgWidth/2) + x * (imgWidth/2) - markerWidth)
+    y = round((imgHeight/2) + y * (imgHeight/2) - markerHeight)
+    if (x < 0 or x > imgWidth) or (y < 0 or y > imgHeight):
         x = -1
         y = -1
-    x = round((imgWidth/2) + x * (imgWidth/2))
-    y = round((imgHeight/2) + y * (imgHeight/2))
     return x, y
 
 def calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight):
@@ -1213,30 +1230,26 @@ def calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight):
     angle = east - west
     if angle < 0:
         angle += 360
-    print(angle)
     zoomHoriz = round(math.log(pixelWidth * 360 / angle / GLOBE_WIDTH) / math.log(2)) - 1
-    print(zoomHoriz)
 
     angle = north - south
     if angle < 0:
         angle += 360
-    print(angle)
-    zoomVert = round(math.log(pixelHeight * 360 / angle / GLOBE_WIDTH) / math.log(2)) - 1
-    print(zoomVert)
+    zoomVert = round(math.log(pixelHeight * 360 / angle / GLOBE_WIDTH * math.cos(centerLat*math.pi/180)) / math.log(2)) - 1 # / math.cos(centerLat*math.pi/180)
 
-    zoom = min(zoomHoriz, zoomVert, ZOOM_MAX)
+    zoom = max(min(zoomHoriz, zoomVert, ZOOM_MAX), 0)
     getCurrentMapBounds()
+
+
+centerLat = (float(wzStartLat) + float(wzEndLat))/2
+centerLon = (float(wzStartLon) + float(wzEndLon))/2
+center = str(centerLat) + ',' + str(centerLon)
 
 north = max(float(wzStartLat), float(wzEndLat))
 south = min(float(wzStartLat), float(wzEndLat))
 east = max(float(wzStartLon), float(wzEndLon))
 west = min(float(wzStartLon), float(wzEndLon))
 calcZoomLevel(north, south, east, west, imgWidth, imgHeight)
-print(zoom)
-
-centerLat = (float(wzStartLat) + float(wzEndLat))/2
-centerLon = (float(wzStartLon) + float(wzEndLon))/2
-center = str(centerLat) + ',' + str(centerLon)
 
 get_static_google_map("google_map_example3", center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
 mapImg = ImageTk.PhotoImage(Image.open('./google_map_example3.png'))             # Workers present image
@@ -1273,7 +1286,7 @@ def moveMap(direct):
     global mapImg
     global mapLabel
 
-    fract = 1/10
+    fract = 1/5
     distanceVert = 0
     distanceHoriz = 0
     if direct == 'u':
@@ -1297,19 +1310,19 @@ def moveMap(direct):
 mapLabel = Label(root, image = mapImg)
 mapLabel.place(x=50, y=60)
 
-bZoomIn = Button(root, text='+', font='Helvetica 10', width=1, height=1, command=lambda:changeZoom(1))
-bZoomIn.place(x=400, y=60)
-bZoomOut = Button(root, text='-', font='Helvetica 10', width=1, height=1, command=lambda:changeZoom(-1))
-bZoomOut.place(x=400, y=90)
+bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
+bZoomIn.place(x=390, y=68)
+bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
+bZoomOut.place(x=390, y=102)
 
-bMoveUp = Button(root, text='^', font='Helvetica 10', width=1, height=1, command=lambda:moveMap("u"))
+bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
 bMoveUp.place(x=460, y=60)
-bMoveRight = Button(root, text='>', font='Helvetica 10', width=1, height=1, command=lambda:moveMap("r"))
-bMoveRight.place(x=480, y=80)
-bMoveDown = Button(root, text='|', font='Helvetica 10', width=1, height=1, command=lambda:moveMap("d"))
-bMoveDown.place(x=460, y=100)
-bMoveLeft = Button(root, text='<', font='Helvetica 10', width=1, height=1, command=lambda:moveMap("l"))
-bMoveLeft.place(x=440, y=80)
+bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
+bMoveRight.place(x=485, y=85)
+bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
+bMoveDown.place(x=460, y=110)
+bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
+bMoveLeft.place(x=435, y=85)
 
 carLabel = Label(root, image = userPositionImg, highlightthickness = 0, borderwidth = 0, width= 0, height = 0)
 
@@ -1318,9 +1331,14 @@ def updatePosition():
     x, y = getPixelLocation(carPosLat, carPosLon)
     carLabel.place(x=x + 50, y=y + 60)
 
-carPosLat = centerLat
-carPosLon = centerLon
-updatePosition()
+# carPosLat = 81.151417
+# carPosLon = -74.207792
+# TOP: 40.062904, -105.213702
+# RIGHT: 40.061771, -105.208810
+# Argentina Top Right: -37.282251, -63.597578
+# Antartica: -78.388249, -85.216413
+# 81.151417, -74.207792
+# updatePosition()
 
 # Initialize lane images
 for i in range(totalLanes):
@@ -1353,12 +1371,12 @@ bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISAB
 bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
 # Debug buttons, hidden by small frame
-bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
-bStart.place(x=100, y=510)
-bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
-bRef.place(x=250, y=510)
-bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
-bEnd.place(x=500, y=510)
+# bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
+# bStart.place(x=marginLeft-100+100, y=510)
+# bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
+# bRef.place(x=marginLeft-100+250, y=510)
+# bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
+# bEnd.place(x=marginLeft-100+500, y=510)
 
 ###
 #   Application Message Window...
@@ -1366,7 +1384,7 @@ bEnd.place(x=500, y=510)
 
 appMsgWin = Button(root, text='Application Message Window...                                             ',      \
                 font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
-appMsgWin.place(x=50, y=440)
+appMsgWin.place(x=marginLeft-100+50, y=440)
 
 overlayWidth = 710
 overlayx = window_width/2 - overlayWidth/2
@@ -1393,7 +1411,7 @@ gps_found = False
 first = True
 while not gps_found:
     try:
-        ser         = serial.Serial(port=commPort, baudrate=baudRate, timeout=1.1)               #open serial port
+        ser         = serial.Serial(port=commPort, baudrate=baudRate, timeout=1.1, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)               #open serial port
         msgStr      = '   Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
         displayStatusMsg(msgStr)                                                        #system ready
         gps_found = True
