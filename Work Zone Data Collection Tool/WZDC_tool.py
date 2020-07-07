@@ -937,7 +937,7 @@ def startDataLog():
 
     keyMarker = ['Data Log', dataLog]
 
-    # overlay.destroy()
+    overlay.destroy()
     enableForm()
 
     displayStatusMsg(markerStr)
@@ -1382,12 +1382,12 @@ bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISAB
 bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
 # Debug buttons, hidden by small frame
-bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
-bStart.place(x=marginLeft-100+100, y=510)
-bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
-bRef.place(x=marginLeft-100+250, y=510)
-bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
-bEnd.place(x=marginLeft-100+500, y=510)
+# bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
+# bStart.place(x=marginLeft-100+100, y=510)
+# bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
+# bRef.place(x=marginLeft-100+250, y=510)
+# bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
+# bEnd.place(x=marginLeft-100+500, y=510)
 
 ###
 #   Application Message Window...

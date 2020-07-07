@@ -248,6 +248,7 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
     Pnext = pathPt[i]
     totalDist = 0
     incrementDist = 0
+    taperingLane = 0
     insertMapPt(mapPt, pathPt, i-2, tLanes, laneWidth, dL, lcwpStat, distVec, laneTaperStat)
 
     while i < stopIndex:
@@ -259,50 +260,53 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
                     ln = laneStat[lnStat][1]-1
                     requiredNode = True                       #set to True
                     if incrDistLC: #other lane taper active, end other lane closure
-                        for lane in range(0, tLanes):
-                            if laneTaperStat[lane] != 0 and abs(lane - ln) <= 1:
-                                laneTaperStat[lane] = 0
+                        laneTaperStat[taperingLane] = 0
                     incrDistLC = True
                     distFromLC = 0
-                    lcwpStat[laneStat[lnStat][1]-1] = laneStat[lnStat][2]       #get value from laneStat 
+                    taperingLane = ln
+                    lcwpStat[taperingLane] = laneStat[lnStat][2]       #get value from laneStat 
                     laneTaperVal = 3
                     if tLanes != 1:
+                        print(ln)
+                        print(tLanes)
+                        print(lcwpStat)
                         if lcwpStat[ln] == 1: #Lane closure
                             if ln == 0 and lcwpStat[1] == 0: #Left lane, lane to right open
                                 laneTaperVal = 1
-                            elif ln == tLanes - 1 and lcwpStat[tLanes - 2] == 1: #Right lane, lane to left open
+                            elif ln == tLanes - 1 and lcwpStat[tLanes - 1] == 1: #Right lane, lane to left open
                                 laneTaperVal = 2
-                            elif ln != 0 and ln == tLanes - 1:
+                            elif ln != 0 and ln != tLanes - 1:
                                 leftLaneOpen = False
                                 if lcwpStat[ln-1] == 0: leftLaneOpen = True
                                 rightLaneOpen = False
                                 if lcwpStat[ln+1] == 0: rightLaneOpen = True
 
-                                if (leftLaneOpen and lcwpStat[ln+1] == 1): laneTaperVal = 2
-                                elif rightLaneOpen and lcwpStat[ln - 1] == 1: laneTaperVal = 1
-                                elif rightLaneOpen and leftLaneOpen: laneTaperVal = 4
+                                if rightLaneOpen and leftLaneOpen: laneTaperVal = 4
+                                elif leftLaneOpen: laneTaperVal = 2
+                                elif rightLaneOpen: laneTaperVal = 1
                         else:
                             if ln == 0 and lcwpStat[1] == 0: #Left lane, lane to right open
                                 laneTaperVal = 2
-                            elif ln == tLanes - 1 and lcwpStat[tLanes - 2] == 0: #Right lane, lane to left open
+                            elif ln == tLanes - 1 and lcwpStat[tLanes - 1] == 0: #Right lane, lane to left open
                                 laneTaperVal = 1
-                            elif ln != 0 and ln == tLanes - 1:
+                            elif ln != 0 and ln != tLanes - 1:
                                 leftLaneOpen = False
                                 if lcwpStat[ln-1] == 0: leftLaneOpen = True
                                 rightLaneOpen = False
                                 if lcwpStat[ln+1] == 0: rightLaneOpen = True
 
-                                if (leftLaneOpen and lcwpStat[ln+1] == 1): laneTaperVal = 1
-                                elif rightLaneOpen and lcwpStat[ln - 1] == 1: laneTaperVal = 2
-                                elif rightLaneOpen and leftLaneOpen: laneTaperVal = 4
-                    laneTaperStat[laneStat[lnStat][1] - 1] = laneTaperVal
+                                if rightLaneOpen and leftLaneOpen: laneTaperVal = 4
+                                elif leftLaneOpen: laneTaperVal = 1
+                                elif rightLaneOpen: laneTaperVal = 2
+                    laneTaperStat[taperingLane] = laneTaperVal
+                    print(laneTaperVal)
 
                     #laneTaperStat[laneStat[lnStat][1]-1] = 1       #get value from laneStat 
                 elif distFromLC >= taperLength:
                     requiredNode = True                       #set to True
                     incrDistLC = False
                     distFromLC = 0
-                    laneTaperStat[laneStat[lnStat][1]-1] = 0       #get value from laneStat 
+                    laneTaperStat[taperingLane] = 0       #get value from laneStat 
                 pass
             pass
 
