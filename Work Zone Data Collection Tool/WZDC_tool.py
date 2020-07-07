@@ -715,6 +715,8 @@ def getNMEA_String():
     i = 0
     isNearEnd = False
 
+    i = 1
+
     while (appRunning):                             #continue reading and processing NMEA string while TRUE
         NMEAData = sio.readline()                   #Read NMEA string from serial port COM7
         root.update()
@@ -771,10 +773,14 @@ def getNMEA_String():
             logMsg('ERROR: GPS parsing failed. ' + str(e))
             continue
 
-        carPosLat = GPSLat
-        carPosLon = GPSLon
-        carHeading = GPSHeading
-        updatePosition()
+        if (i % 10 == 0):
+            carPosLat = GPSLat
+            carPosLon = GPSLon
+            carHeading = GPSHeading
+            updatePosition()
+            i = 1
+        else:
+            i += 1
         
         if dataLog:
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
@@ -975,7 +981,7 @@ def writeCSVFile (write_str):
 # Display message in status window
 def displayStatusMsg(msgStr):
 
-    xPos = marginLeft-100+45
+    xPos = marginLeft-80+45
     yPos = 450
     blankStr = ' '*190
     Text = Label(root,anchor='w', justify=LEFT, text=blankStr)
@@ -1152,9 +1158,9 @@ vehPathDataFile = outDir + '/' + vehPathDataFileName
 # Setup data collection UI
 #
 ############################################################################
-
+# totalLanes = 8
 marginLeft = 750
-window_width = max(1200, totalLanes*110+400+marginLeft)
+window_width = max(1400, totalLanes*100+300+marginLeft)
 window.geometry(str(window_width)+'x750')
 root = Frame(width=window_width, height=750)
 root.place(x=0, y=0)
@@ -1179,6 +1185,8 @@ arrowRightImg = ImageTk.PhotoImage(Image.open('./images/arrow_right.png'))
 arrowDownImg = ImageTk.PhotoImage(Image.open('./images/arrow_down.png'))
 arrowLeftImg = ImageTk.PhotoImage(Image.open('./images/arrow_left.png'))
 
+shutil.copy('./images/map_failed.png', './google_map_example3.png')
+
 mapFileName = "google_map_example3"
 zoom = 10
 imgHeight = 640
@@ -1197,7 +1205,7 @@ markerWidth = 20
 # wzStartLat = 81.151417
 # wzStartLon = -74.207792
 # # -78.388249, -85.216413
-# wzEndLat = -78.388249
+# wzEndLat = -78.388249s
 # wzEndLon = -85.216413
 
 marker_list = []
@@ -1314,18 +1322,18 @@ mapLabel = Label(root, image = mapImg)
 mapLabel.place(x=50, y=60)
 
 bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
-bZoomIn.place(x=390, y=68)
+bZoomIn.place(x=540, y=68)
 bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
-bZoomOut.place(x=390, y=102)
+bZoomOut.place(x=540, y=102)
 
 bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
-bMoveUp.place(x=460, y=60)
+bMoveUp.place(x=610, y=60)
 bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
-bMoveRight.place(x=485, y=85)
+bMoveRight.place(x=635, y=85)
 bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
-bMoveDown.place(x=460, y=110)
+bMoveDown.place(x=610, y=110)
 bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
-bMoveLeft.place(x=435, y=85)
+bMoveLeft.place(x=585, y=85)
 
 carLabel = Label(root, image = userPositionImg, highlightthickness = 0, borderwidth = 0, width= 0, height = 0)
 
@@ -1387,12 +1395,11 @@ bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
 appMsgWin = Button(root, text='Application Message Window...                                             ',      \
                 font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
-appMsgWin.place(x=marginLeft-100+50, y=440)
-
+appMsgWin.place(x=marginLeft-80+50, y=440)
 overlayWidth = 710
-overlayx = window_width/2 - overlayWidth/2
-# overlay = Label(root, text='Application will begin data collection\nwhen the set starting location has been reached', bg='gray', font='Calibri 28')
-# overlay.place(x=overlayx, y=200)
+overlayx = marginLeft + (window_width - marginLeft)/2 - overlayWidth/2
+overlay = Label(root, text='Application will begin data collection\nwhen the starting location has been reached', bg='gray', font='Calibri 28')
+overlay.place(x=overlayx, y=200)
 
 # return overlay, bWP, lanes, laneLabels
 
