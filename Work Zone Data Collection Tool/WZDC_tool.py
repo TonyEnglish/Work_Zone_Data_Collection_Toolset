@@ -715,7 +715,7 @@ def getNMEA_String():
     i = 0
     isNearEnd = False
 
-    i = 1
+    # i = 1
 
     while (appRunning):                             #continue reading and processing NMEA string while TRUE
         NMEAData = sio.readline()                   #Read NMEA string from serial port COM7
@@ -773,14 +773,14 @@ def getNMEA_String():
             logMsg('ERROR: GPS parsing failed. ' + str(e))
             continue
 
-        if (i % 10 == 0):
-            carPosLat = GPSLat
-            carPosLon = GPSLon
-            carHeading = GPSHeading
-            updatePosition()
-            i = 1
-        else:
-            i += 1
+        # if (i % 10 == 0):
+        carPosLat = GPSLat
+        carPosLon = GPSLon
+        carHeading = GPSHeading
+        updatePosition()
+        #     i = 1
+        # else:
+        #     i += 1
         
         if dataLog:
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
@@ -1227,8 +1227,8 @@ def getCurrentMapBounds():
 def getPixelLocation(lat, lon):
     x = (lon - centerLon) / (horizBound / 2)
     y = -(lat - centerLat) / (vertBound / 2) # / math.cos(lat*math.pi/180) * math.cos(centerLat*math.pi/180)
-    x = round((imgWidth/2) + x * (imgWidth/2) - markerWidth)
-    y = round((imgHeight/2) + y * (imgHeight/2) - markerHeight)
+    x = round((imgWidth/2) + x * (imgWidth/2) - (markerWidth/2))
+    y = round((imgHeight/2) + y * (imgHeight/2) - (markerHeight/2))
     if (x < 0 or x > imgWidth) or (y < 0 or y > imgHeight):
         x = -1
         y = -1
@@ -1382,12 +1382,12 @@ bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISAB
 bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
 # Debug buttons, hidden by small frame
-# bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
-# bStart.place(x=marginLeft-100+100, y=510)
-# bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
-# bRef.place(x=marginLeft-100+250, y=510)
-# bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
-# bEnd.place(x=marginLeft-100+500, y=510)
+bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
+bStart.place(x=marginLeft-100+100, y=510)
+bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
+bRef.place(x=marginLeft-100+250, y=510)
+bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
+bEnd.place(x=marginLeft-100+500, y=510)
 
 ###
 #   Application Message Window...
