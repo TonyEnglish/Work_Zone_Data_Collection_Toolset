@@ -7,8 +7,7 @@ Tasks 6-7
 ![Tasks 6-7 Diagram](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/task_6_7_diagram_screenshot.jpg)
 
 # Work Zone Data Collection Tool
-
-The WZDC tool is an open source, standards based work zone capturing tool. Using a gps and a computer, a user can drive through a work zone and mark important elements of the work zone, including lane closures, speed limits and the presence of workers. This data is captured and output as RSM messages in xml and binary (uper) formats as well as a WZDx message. This tool was built alongside the TMC cloud website, which enables the creation of configuration files and the visualization of work zones. 
+The WZDC tool is an open source, standards based work zone capturing tool. Using a gps and a computer, a user can drive through a work zone and mark important elements of the work zone, including lane closures, speed limits and the presence of workers. This data is captured and output as RSM messages in xml and binary (uper) formats as well as a WZDx message. This tool was built alongside the TMC cloud website, which enables the creation of configuration files and the visualization of work zones. This tool is started by running the python file WZDC.py
 
 # Configuration File Loading and GPS Connection Test
 ![Config Loading UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/config_loading_ui_screenshot.jpg)
@@ -25,7 +24,6 @@ This is the data collection component. Data collection begins when a set startin
 After data collection is completed, message generation begins. The recorded path data (including lane closure/worker presence) is processed into an RSM (xml) message. This message is then converted into binary (UPER format). The xml message, along with some additional information included in the configuration file, is then converted into a WZDx message. These messages (and the CSV data file) are added to a ZIP archive. When the user has an internet conenction, they can initiate the upload to the cloud, where the messages are unzipped and organized. These messages are available to visualize, verify and publish on https://neaeraconsulting.com/V2x_Home.
 
 # Requirements
-
 Python 3.0
 - esptool
 - azure-storage-blob
@@ -33,7 +31,7 @@ Python 3.0
 - wheel
 - serial
 
-Java 1.8 or JDK 8
+Java 1.8 or JDK 8 (added to system path)
 
 # Updates
 5/22/2020
