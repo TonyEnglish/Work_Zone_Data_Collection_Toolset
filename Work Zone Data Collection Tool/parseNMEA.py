@@ -83,24 +83,20 @@ def parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid):
 #       Get time in GMT
 ###
 
-    try:
-        if int(s[GGAFIXQUAL]) > 0:  #Valid GPS data
-            GGAValid = True         #Set valid flag
 
-            GPSTime = s[GGAGMT][0:2]+":"+s[GGAGMT][2:4]+":"+s[GGAGMT][4:6]+":"+s[GGAGMT][7:9]    
-    ###
-    #       Get # of satellites        
-    ### 
-            GPSSats = int(s[GGASATS])
+    if int(s[GGAFIXQUAL]) > 0:  #Valid GPS data
+        GGAValid = True         #Set valid flag
 
-    ###        
-    #       Get altitude in meters
-    ###
-            GPSAlt      = float(s[GGAALT])
-    except Exception as e:
-        print(NMEAData)
-        print(s)
-        raise e
+        GPSTime = s[GGAGMT][0:2]+":"+s[GGAGMT][2:4]+":"+s[GGAGMT][4:6]+":"+s[GGAGMT][7:9]    
+###
+#       Get # of satellites        
+### 
+        GPSSats = int(s[GGASATS])
+
+###        
+#       Get altitude in meters
+###
+        GPSAlt      = float(s[GGAALT])
         
     return GPSTime,GPSSats,GPSAlt,GGAValid
 
@@ -156,8 +152,6 @@ def parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid):
 #       Check for RMCSTAT, process the following only if Valid...
 ###
     s = NMEAData.split(',')
-    if s[5] == "$GPRMC":
-        s = s[5:]
     if len(s) >= RMCDATE and s[RMCSTAT] == "A":     # Be sure it is there before using it
         RMCValid = True                             #Set valid flag
         GPSDate = '20' + s[RMCDATE][4:6]  + '/' + s[RMCDATE][2:4]  + '/' + s[RMCDATE][0:2]         
@@ -176,12 +170,7 @@ def parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid):
 ###
 #       Get longitude and convert to decimal degrees        
 ###       
-        try:
-            lng = float(s[RMCLON])
-        except Exception as e:
-            print(NMEAData)
-            print(s)
-            raise e
+        lng = float(s[RMCLON])
         p1  = int(lng/100.)
         lon = (p1+(lng-p1*100)/60.0)
         if s[RMCLONEW] == "W":
