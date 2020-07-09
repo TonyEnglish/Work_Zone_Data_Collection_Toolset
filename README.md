@@ -10,13 +10,13 @@ Tasks 6-7
 The WZDC tool is an open source, standards based work zone capturing tool. Using a gps and a computer, a user can drive through a work zone and mark important elements of the work zone, including lane closures, speed limits and the presence of workers. This data is captured and output as RSM messages in xml and binary (uper) formats as well as a WZDx message. This tool was built alongside the TMC cloud website, which enables the creation of configuration files and the visualization of work zones. This tool is started by running the python file WZDC.py
 
 # Configuration File Loading and GPS Connection Test
-![Config Loading UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/config_loading_ui_screenshot.jpg)
+![Config Loading UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/WZDC_tool_initialization_screen.jpg)
 This component of the application enables a user to load a configuration file and verify their GPS connection. This configuration file can be loaded from the Cloud or from a local directory. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator.
 The tool automatically scans usb COM ports for a GPS device. The baudrate and data rate can be configured if needed
 When a configuration file is loaded and a GPS connection is confirmed, data collection may begin
 
 # Data Collection/Acquisition
-![Data Colelction UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/data_collection_ui_screenshot.jpg)
+![Data Colelction UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/WZDC_tool_data_collection_screen.jpg)
 This is the data collection component. Data collection begins when a set starting location is reached and ends when the ending location is reached (both set in configuration file). A user can mark lane closures and the presence of workers. The user interface shows the current state of the work zone, including the vehicle lane (set in configuration file). All of the data collected is saved in a CSV path data file, which will be used for message generation
 
 # Message Generation and Upload to Cloud
