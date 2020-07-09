@@ -6,7 +6,7 @@
       <version>1</version>
       <commonContainer>
         <eventInfo>
-          <eventID>000070f3</eventID>
+          <eventID>0000532f</eventID>
           <msgSegmentInfo>
             <totalMsgSegments>1</totalMsgSegments>
             <thisSegmentNum>1</thisSegmentNum>
@@ -17,7 +17,7 @@
             <day>15</day>
             <hour>06</hour>
             <minute>00</minute>
-            <offset>0</offset>
+            <offset>-300</offset>
           </startDateTime>
           <endDateTime>
             <year>2020</year>
@@ -249,8 +249,8 @@
                     <NodeLLE>
                       <nodePoint>
                         <node-3Dabsolute>
-                          <lat>411474191</lat>
-                          <long>-1046504570</long>
+                          <lat>411473115</lat>
+                          <long>-1046510748</long>
                           <elevation>1831</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
@@ -263,8 +263,8 @@
                     <NodeLLE>
                       <nodePoint>
                         <node-3Dabsolute>
-                          <lat>411476101</lat>
-                          <long>-1046495110</long>
+                          <lat>411474875</lat>
+                          <long>-1046500933</long>
                           <elevation>1831</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
@@ -272,8 +272,17 @@
                     <NodeLLE>
                       <nodePoint>
                         <node-3Dabsolute>
-                          <lat>411477927</lat>
-                          <long>-1046487534</long>
+                          <lat>411476736</lat>
+                          <long>-1046492297</long>
+                          <elevation>1831</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>411478748</lat>
+                          <long>-1046484587</long>
                           <elevation>1831</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
@@ -403,6 +412,15 @@
                           <elevation>1823</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>411501367</lat>
+                          <long>-1046445544</long>
+                          <elevation>1823</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
                       <nodeAttributes>
                         <taperLeft>
                           <false/>
@@ -412,8 +430,8 @@
                     <NodeLLE>
                       <nodePoint>
                         <node-3Dabsolute>
-                          <lat>411502203</lat>
-                          <long>-1046445124</long>
+                          <lat>411503060</lat>
+                          <long>-1046444819</long>
                           <elevation>1824</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
@@ -498,8 +516,8 @@
                     <NodeLLE>
                       <nodePoint>
                         <node-3Dabsolute>
-                          <lat>411473876</lat>
-                          <long>-1046504471</long>
+                          <lat>411472798</lat>
+                          <long>-1046510661</long>
                           <elevation>1831</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
@@ -507,8 +525,8 @@
                     <NodeLLE>
                       <nodePoint>
                         <node-3Dabsolute>
-                          <lat>411475790</lat>
-                          <long>-1046494991</long>
+                          <lat>411474561</lat>
+                          <long>-1046500828</long>
                           <elevation>1831</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
@@ -516,8 +534,17 @@
                     <NodeLLE>
                       <nodePoint>
                         <node-3Dabsolute>
-                          <lat>411477621</lat>
-                          <long>-1046487391</long>
+                          <lat>411476426</lat>
+                          <long>-1046492171</long>
+                          <elevation>1831</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>411478445</lat>
+                          <long>-1046484438</long>
                           <elevation>1831</elevation>
                         </node-3Dabsolute>
                       </nodePoint>
@@ -643,8 +670,17 @@
                     <NodeLLE>
                       <nodePoint>
                         <node-3Dabsolute>
-                          <lat>411502100</lat>
-                          <long>-1046444716</long>
+                          <lat>411501235</lat>
+                          <long>-1046445151</long>
+                          <elevation>1823</elevation>
+                        </node-3Dabsolute>
+                      </nodePoint>
+                    </NodeLLE>
+                    <NodeLLE>
+                      <nodePoint>
+                        <node-3Dabsolute>
+                          <lat>411502983</lat>
+                          <long>-1046444401</long>
                           <elevation>1824</elevation>
                         </node-3Dabsolute>
                       </nodePoint>

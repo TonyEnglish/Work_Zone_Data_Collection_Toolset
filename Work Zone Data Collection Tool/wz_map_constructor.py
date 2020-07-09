@@ -124,9 +124,9 @@ def getChordLength(pt1, pt2):
 #   dataLane    lane on which the vehicle was driven for collecting vehicle path data
 ###
 
-def insertMapPt(mapPt, pathPt, elementPos, tLanes, laneWidth, dL, lcwpStat, distVec):
+def insertMapPt(mapPt, pathPt, elementPos, tLanes, laneWidth, dL, lcwpStat, distVec, laneTaperStat):
     
-    lla_ls_hwp  = [0]*((4*(tLanes))+3)                  #define llah list - 4 elements per node data point (lat,lon,alt,lo/lc)+heading+dist
+    lla_ls_hwp  = [0]*((5*(tLanes))+3)                  #define llah list - 4 elements per node data point (lat,lon,alt,lo/lc)+heading+dist
                                                         #LO/LC (0/1), WP (0/1) status added on 11/13/2017
 
     bearingPP = pathPt[elementPos][4]            #bearing (heading) of the path point
@@ -147,10 +147,11 @@ def insertMapPt(mapPt, pathPt, elementPos, tLanes, laneWidth, dL, lcwpStat, dist
         ##print (ln, lW)
 
         if ln == dL:                        #ln same as lane on which data was collected
-            lla_ls_hwp[ln*4+0] = latPP      #lat, lon, alt, lcloStat for the lane
-            lla_ls_hwp[ln*4+1] = lonPP
-            lla_ls_hwp[ln*4+2] = altPP
-            lla_ls_hwp[ln*4+3] = lcwpStat[ln]    
+            lla_ls_hwp[ln*5+0] = latPP      #lat, lon, alt, lcloStat for the lane
+            lla_ls_hwp[ln*5+1] = lonPP
+            lla_ls_hwp[ln*5+2] = altPP
+            lla_ls_hwp[ln*5+3] = lcwpStat[ln]
+            lla_ls_hwp[ln*5+4] = laneTaperStat[ln]
         pass
 
         if ln != dL:                        #Adjacent lanes only - not the data collected lane...
@@ -161,10 +162,11 @@ def insertMapPt(mapPt, pathPt, elementPos, tLanes, laneWidth, dL, lcwpStat, dist
             pass
 
             ll = getEndPoint(latPP,lonPP,bearing,lW)    #get lat/lon for the point which is laneWidth apart from the data collected lane
-            lla_ls_hwp[ln*4+0] = round(ll[0],8)         #computed lat of the adjacent lane...
-            lla_ls_hwp[ln*4+1] = round(ll[1],8)         #computed lon of the adjacent lane   
-            lla_ls_hwp[ln*4+2] = pathPt[elementPos][3]       #same altitude
-            lla_ls_hwp[ln*4+3] = lcwpStat[ln]           #lc/lo Status of the lane at the node point                       
+            lla_ls_hwp[ln*5+0] = round(ll[0],8)         #computed lat of the adjacent lane...
+            lla_ls_hwp[ln*5+1] = round(ll[1],8)         #computed lon of the adjacent lane   
+            lla_ls_hwp[ln*5+2] = pathPt[elementPos][3]       #same altitude
+            lla_ls_hwp[ln*5+3] = lcwpStat[ln]           #lc/lo Status of the lane at the node point                       
+            lla_ls_hwp[ln*5+4] = laneTaperStat[ln]           #lc/lo Status of the lane at the node point                       
                                                         #end of if lineType
         pass                                                #end of if ln!= dL   
 ###
@@ -180,10 +182,10 @@ def insertMapPt(mapPt, pathPt, elementPos, tLanes, laneWidth, dL, lcwpStat, dist
 #
 ###
         if ln == tLanes - 1:                        #if the current ln same as the last lane
-            lla_ls_hwp[ln*4+4] = bearingPP          #add heading in the table
-            lla_ls_hwp[ln*4+5] = lcwpStat[tLanes]   #add WP Status for the node in the table
-        ####lla_ls_hwp[ln*4+6] = int(dist)          #add computed distVec, distance in meters from prev. node point in the table for future use
-            lla_ls_hwp[ln*4+6] = int(distVec)       #add computed distVec, distance in meters from prev. node point in the table for future use
+            lla_ls_hwp[ln*5+5] = bearingPP          #add heading in the table
+            lla_ls_hwp[ln*5+6] = lcwpStat[tLanes]   #add WP Status for the node in the table
+        ####lla_ls_hwp[ln*5+7] = int(dist)          #add computed distVec, distance in meters from prev. node point in the table for future use
+            lla_ls_hwp[ln*5+7] = int(distVec)       #add computed distVec, distance in meters from prev. node point in the table for future use
             ##print ("bearingPP: ", refPt, bearingPP)
         pass                                        #end of if ln
                 
@@ -193,10 +195,9 @@ def insertMapPt(mapPt, pathPt, elementPos, tLanes, laneWidth, dL, lcwpStat, dist
 ###
 #           Store computed lat,lon,alt,lcloStat, for each node for each lane + last two elements in table heading and WP flag + distVec (dist from prev. node)
 ###
-
     mapPt.append(list(lla_ls_hwp))               #insert constructed lla_ls_hwp list for each node for each lane in mapPt array
 
-def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneStat,wpStat,dataLane,wzMapLen):
+def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList):
 
     
 ###
@@ -206,17 +207,23 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
     tLanes  = laneStat[0][0]                            #total number of lanes...
 
     lcwpStat    = [0]*(tLanes+1)                        #Temporary list to store status of each node for each lane + WP state for the node
+    laneTaperStat = [0]*(tLanes+1)                      #0 = no taper, 1 = taper-right, 2 = taper-left, 3=none, 4=either
     dL      = dataLane - 1                              #set lane number starting 0 as the left most lane                             
     # bearingRP   = pathPt[refPt][4]                      #bearing (heading) at the reference point
     # latRP       = pathPt[refPt][1]                      #lat/lon/alt    
     # lonRP       = pathPt[refPt][2]
     # altRP       = pathPt[refPt][3]
     # ctrHead     = pathPt[refPt][4]                      #current heading
+    dataFreq = 10.0
     distVec = 0
     stopIndex = 0
     startIndex = 0
     actualError = 0
-
+    distFromLC = 0
+    incrDistLC = False
+    taperLength = speedList[0]*(laneWidth + lanePad)*3.28084
+    if speedList[0] <= 40:
+        taperLength = ((laneWidth + lanePad)*3.28084*(speedList[0]**2)) / 60
     ALLOWABLEERROR = .5
     SMALLDELTAPHI = 0.01
     CHORDLENGTHTHRESHOLD = 500
@@ -224,8 +231,8 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
     if laneType == 1:
         if refPtIdx < 3:
             for i in range(0, refPtIdx):
-                insertMapPt(mapPt, pathPt, i, tLanes, laneWidth, dL, lcwpStat, distVec)
-                distVec += pathPt[i][0]/10
+                insertMapPt(mapPt, pathPt, i, tLanes, laneWidth, dL, lcwpStat, distVec, laneTaperStat)
+                distVec += pathPt[i][0]/dataFreq
                 # Rework to use actualChordLength
                 return
         else:
@@ -241,7 +248,8 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
     Pnext = pathPt[i]
     totalDist = 0
     incrementDist = 0
-    insertMapPt(mapPt, pathPt, i-2, tLanes, laneWidth, dL, lcwpStat, distVec)
+    taperingLane = 0
+    insertMapPt(mapPt, pathPt, i-2, tLanes, laneWidth, dL, lcwpStat, distVec, laneTaperStat)
 
     while i < stopIndex:
     # Step A
@@ -249,8 +257,56 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
         if laneType == 2:                                   #WZ Lane
             for lnStat in range(1, len(laneStat)):          #total number of lc/lo/wp are length of laneStat-1
                 if laneStat[lnStat][0] == i-1:            #got LC/LO location
+                    ln = laneStat[lnStat][1]-1
                     requiredNode = True                       #set to True
-                    lcwpStat[laneStat[lnStat][1]-1] = laneStat[lnStat][2]       #get value from laneStat 
+                    if incrDistLC: #other lane taper active, end other lane closure
+                        laneTaperStat[taperingLane] = 0
+                    incrDistLC = True
+                    distFromLC = 0
+                    taperingLane = ln
+                    lcwpStat[taperingLane] = laneStat[lnStat][2]       #get value from laneStat 
+                    laneTaperVal = 3
+                    if tLanes != 1:
+                        print(ln)
+                        print(tLanes)
+                        print(lcwpStat)
+                        if lcwpStat[ln] == 1: #Lane closure
+                            if ln == 0 and lcwpStat[1] == 0: #Left lane, lane to right open
+                                laneTaperVal = 1
+                            elif ln == tLanes - 1 and lcwpStat[tLanes - 1] == 1: #Right lane, lane to left open
+                                laneTaperVal = 2
+                            elif ln != 0 and ln != tLanes - 1:
+                                leftLaneOpen = False
+                                if lcwpStat[ln-1] == 0: leftLaneOpen = True
+                                rightLaneOpen = False
+                                if lcwpStat[ln+1] == 0: rightLaneOpen = True
+
+                                if rightLaneOpen and leftLaneOpen: laneTaperVal = 4
+                                elif leftLaneOpen: laneTaperVal = 2
+                                elif rightLaneOpen: laneTaperVal = 1
+                        else:
+                            if ln == 0 and lcwpStat[1] == 0: #Left lane, lane to right open
+                                laneTaperVal = 2
+                            elif ln == tLanes - 1 and lcwpStat[tLanes - 1] == 0: #Right lane, lane to left open
+                                laneTaperVal = 1
+                            elif ln != 0 and ln != tLanes - 1:
+                                leftLaneOpen = False
+                                if lcwpStat[ln-1] == 0: leftLaneOpen = True
+                                rightLaneOpen = False
+                                if lcwpStat[ln+1] == 0: rightLaneOpen = True
+
+                                if rightLaneOpen and leftLaneOpen: laneTaperVal = 4
+                                elif leftLaneOpen: laneTaperVal = 1
+                                elif rightLaneOpen: laneTaperVal = 2
+                    laneTaperStat[taperingLane] = laneTaperVal
+                    print(laneTaperVal)
+
+                    #laneTaperStat[laneStat[lnStat][1]-1] = 1       #get value from laneStat 
+                elif distFromLC >= taperLength:
+                    requiredNode = True                       #set to True
+                    incrDistLC = False
+                    distFromLC = 0
+                    laneTaperStat[taperingLane] = 0       #get value from laneStat 
                 pass
             pass
 
@@ -295,7 +351,7 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
         if actualError > ALLOWABLEERROR or requiredNode:
             incrementDist = actualChordLength
             totalDist += incrementDist
-            insertMapPt(mapPt, pathPt, i-1, tLanes, laneWidth, dL, lcwpStat, totalDist)
+            insertMapPt(mapPt, pathPt, i-1, tLanes, laneWidth, dL, lcwpStat, totalDist, laneTaperStat)
 
             Pstarting = pathPt[i-1]
             Pprevious = pathPt[i]
@@ -312,7 +368,10 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
         if i == stopIndex:
             incrementDist = actualChordLength
             totalDist += incrementDist
-            insertMapPt(mapPt, pathPt, i-1, tLanes, laneWidth, dL, lcwpStat, totalDist)
+            insertMapPt(mapPt, pathPt, i-1, tLanes, laneWidth, dL, lcwpStat, totalDist, laneTaperStat)
+
+        if incrDistLC:
+            distFromLC += (pathPt[i - 1][0] * 3.28084)/dataFreq
     # Step 9
         # Integrated into step 7
         
