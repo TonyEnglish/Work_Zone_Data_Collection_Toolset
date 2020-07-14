@@ -1,0 +1,667 @@
+{
+  "road_event_feed_info": {
+    "feed_info_id": "9fc51e28-ec0c-4318-99e2-c270e8551129",
+    "feed_update_date": "2020-07-09T13:20:58Z",
+    "metadata": {
+      "wz_location_method": "channel-device-method",
+      "lrs_type": "intepolative",
+      "location_verify_method": "GPS equipment accurate to 1 m",
+      "timestamp_metadata_update": "2020-07-09T07:13:09Z",
+      "contact_name": "Tony English",
+      "contact_email": "Tony@neaeraconsulting.com",
+      "issuing_organization": "Neaera Consulting"
+    },
+    "version": "2.0"
+  },
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "29d83c0a-55cb-405f-b289-09e48fa18950",
+        "feed_info_id": "9fc51e28-ec0c-4318-99e2-c270e8551129",
+        "subidentifier": "PXU40C",
+        "road_name": "I-25",
+        "road_number": "I-25",
+        "direction": "northbound",
+        "beginning_cross_street": "I-80",
+        "ending_cross_street": "Randall Ave.",
+        "beginning_milepost": 9,
+        "ending_milepost": 11,
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-01T05:00:00Z",
+        "end_date": "2020-09-30T07:00:00Z",
+        "start_date_accuracy": "verified",
+        "end_date_accuracy": "estimated",
+        "event_status": "active",
+        "total_num_lanes": 2,
+        "vehicle_impact": "all-lanes-open",
+        "workers_present": false,
+        "reduced_speed_limit": 45,
+        "description": "main-demo",
+        "restrictions": [
+          "reduced-width"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-07-09T13:16:06Z",
+        "creation_date": "2020-07-09T13:16:06Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "8cb06f80-5efb-4153-8720-5d969482aec4",
+            "road_event_id": "29d83c0a-55cb-405f-b289-09e48fa18950",
+            "type_of_work": "surface-work",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "f05b3409-9104-47ce-a0a8-d26847ca32a9",
+            "road_event_id": "29d83c0a-55cb-405f-b289-09e48fa18950",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "0ca4f0ec-3b5f-496d-a3ad-25031cc829d6",
+                "lane_id": "f05b3409-9104-47ce-a0a8-d26847ca32a9",
+                "restriction_type": "reduced-width",
+                "restriction_value": 12.0,
+                "restriction_units": "feet"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_id": "15113ea3-48a1-41d4-9458-b0fb4fc0fff3",
+            "road_event_id": "29d83c0a-55cb-405f-b289-09e48fa18950",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.8469176,
+            41.1256248,
+            1866
+          ],
+          [
+            -104.8456715,
+            41.1266901,
+            1866
+          ],
+          [
+            -104.8450588,
+            41.1272665,
+            1867
+          ],
+          [
+            -104.8444825,
+            41.1278621,
+            1868
+          ],
+          [
+            -104.8439368,
+            41.1284881,
+            1869
+          ],
+          [
+            -104.8434088,
+            41.129161,
+            1870
+          ],
+          [
+            -104.8429745,
+            41.1297798,
+            1870
+          ],
+          [
+            -104.8427018,
+            41.1302085,
+            1870
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "c6eb59b2-b79e-421d-8c19-889b032cc7b4",
+        "feed_info_id": "9fc51e28-ec0c-4318-99e2-c270e8551129",
+        "subidentifier": "PXU40C",
+        "road_name": "I-25",
+        "road_number": "I-25",
+        "direction": "northbound",
+        "beginning_cross_street": "I-80",
+        "ending_cross_street": "Randall Ave.",
+        "beginning_milepost": 9,
+        "ending_milepost": 11,
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-01T05:00:00Z",
+        "end_date": "2020-09-30T07:00:00Z",
+        "start_date_accuracy": "verified",
+        "end_date_accuracy": "estimated",
+        "event_status": "active",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 45,
+        "description": "main-demo",
+        "restrictions": [
+          "reduced-width"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-07-09T13:16:06Z",
+        "creation_date": "2020-07-09T13:16:06Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "8518e590-ae53-4525-9a48-06da25f9ecd0",
+            "road_event_id": "c6eb59b2-b79e-421d-8c19-889b032cc7b4",
+            "type_of_work": "surface-work",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "aa002d8e-8524-4c95-92f6-d6bc1616a786",
+            "road_event_id": "c6eb59b2-b79e-421d-8c19-889b032cc7b4",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "b5a7b9ad-2d97-4c11-b501-523b55060639",
+                "lane_id": "aa002d8e-8524-4c95-92f6-d6bc1616a786",
+                "restriction_type": "reduced-width",
+                "restriction_value": 12.0,
+                "restriction_units": "feet"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_id": "5eb70ee1-c123-462e-a933-ca1c9b85aed7",
+            "road_event_id": "c6eb59b2-b79e-421d-8c19-889b032cc7b4",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "merge-left"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.8427018,
+            41.1302085,
+            1870
+          ],
+          [
+            -104.8423301,
+            41.1308456,
+            1868
+          ],
+          [
+            -104.8419545,
+            41.1315926,
+            1866
+          ],
+          [
+            -104.8416961,
+            41.1321776,
+            1865
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "04f86333-7e12-4c77-904e-a510c8e7ac9e",
+        "feed_info_id": "9fc51e28-ec0c-4318-99e2-c270e8551129",
+        "subidentifier": "PXU40C",
+        "road_name": "I-25",
+        "road_number": "I-25",
+        "direction": "northbound",
+        "beginning_cross_street": "I-80",
+        "ending_cross_street": "Randall Ave.",
+        "beginning_milepost": 9,
+        "ending_milepost": 11,
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-01T05:00:00Z",
+        "end_date": "2020-09-30T07:00:00Z",
+        "start_date_accuracy": "verified",
+        "end_date_accuracy": "estimated",
+        "event_status": "active",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 45,
+        "description": "main-demo",
+        "restrictions": [
+          "reduced-width"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-07-09T13:16:06Z",
+        "creation_date": "2020-07-09T13:16:06Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "15982ab3-d9d4-4376-ada4-f7d9385b8aa1",
+            "road_event_id": "04f86333-7e12-4c77-904e-a510c8e7ac9e",
+            "type_of_work": "surface-work",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "f9d547ac-e519-42e1-a3e7-6113845b47ea",
+            "road_event_id": "04f86333-7e12-4c77-904e-a510c8e7ac9e",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "a144b287-afb1-4155-a9b0-ef25e3c6b44c",
+                "lane_id": "f9d547ac-e519-42e1-a3e7-6113845b47ea",
+                "restriction_type": "reduced-width",
+                "restriction_value": 12.0,
+                "restriction_units": "feet"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_id": "45032cce-2b61-47c4-9c40-d7c6b6d68f2f",
+            "road_event_id": "04f86333-7e12-4c77-904e-a510c8e7ac9e",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.8416961,
+            41.1321776,
+            1865
+          ],
+          [
+            -104.8414205,
+            41.132903,
+            1863
+          ],
+          [
+            -104.8411933,
+            41.133627,
+            1861
+          ],
+          [
+            -104.8410208,
+            41.1343405,
+            1860
+          ],
+          [
+            -104.8406046,
+            41.1364481,
+            1866
+          ],
+          [
+            -104.840543,
+            41.1367685,
+            1868
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "47d31256-7f10-4b1f-ade5-d3a264f755c3",
+        "feed_info_id": "9fc51e28-ec0c-4318-99e2-c270e8551129",
+        "subidentifier": "PXU40C",
+        "road_name": "I-25",
+        "road_number": "I-25",
+        "direction": "northbound",
+        "beginning_cross_street": "I-80",
+        "ending_cross_street": "Randall Ave.",
+        "beginning_milepost": 9,
+        "ending_milepost": 11,
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-01T05:00:00Z",
+        "end_date": "2020-09-30T07:00:00Z",
+        "start_date_accuracy": "verified",
+        "end_date_accuracy": "estimated",
+        "event_status": "active",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": true,
+        "reduced_speed_limit": 30,
+        "description": "main-demo",
+        "restrictions": [
+          "reduced-width"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-07-09T13:16:06Z",
+        "creation_date": "2020-07-09T13:16:06Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "253db4cc-10b6-4c0e-80e4-f63232cad54b",
+            "road_event_id": "47d31256-7f10-4b1f-ade5-d3a264f755c3",
+            "type_of_work": "surface-work",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "dac49c21-af41-4075-8850-65c52d58a6fc",
+            "road_event_id": "47d31256-7f10-4b1f-ade5-d3a264f755c3",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "8584230f-0c36-4d0c-9993-db744d8b6521",
+                "lane_id": "dac49c21-af41-4075-8850-65c52d58a6fc",
+                "restriction_type": "reduced-width",
+                "restriction_value": 12.0,
+                "restriction_units": "feet"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_id": "3fd59713-17e1-4213-b86e-7ee1d4eb10a4",
+            "road_event_id": "47d31256-7f10-4b1f-ade5-d3a264f755c3",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.840543,
+            41.1367685,
+            1868
+          ],
+          [
+            -104.8400173,
+            41.1394605,
+            1876
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "cec277f3-8b02-424e-9003-0684cc10449d",
+        "feed_info_id": "9fc51e28-ec0c-4318-99e2-c270e8551129",
+        "subidentifier": "PXU40C",
+        "road_name": "I-25",
+        "road_number": "I-25",
+        "direction": "northbound",
+        "beginning_cross_street": "I-80",
+        "ending_cross_street": "Randall Ave.",
+        "beginning_milepost": 9,
+        "ending_milepost": 11,
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-01T05:00:00Z",
+        "end_date": "2020-09-30T07:00:00Z",
+        "start_date_accuracy": "verified",
+        "end_date_accuracy": "estimated",
+        "event_status": "active",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 45,
+        "description": "main-demo",
+        "restrictions": [
+          "reduced-width"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-07-09T13:16:06Z",
+        "creation_date": "2020-07-09T13:16:06Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "0d3cba15-ae78-46aa-9a86-26bfda9d3486",
+            "road_event_id": "cec277f3-8b02-424e-9003-0684cc10449d",
+            "type_of_work": "surface-work",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "33b12da2-6e47-4bf8-952f-9c9c6b5cd38e",
+            "road_event_id": "cec277f3-8b02-424e-9003-0684cc10449d",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "82b9eccb-0f8d-44cc-af3b-3218ad0a7631",
+                "lane_id": "33b12da2-6e47-4bf8-952f-9c9c6b5cd38e",
+                "restriction_type": "reduced-width",
+                "restriction_value": 12.0,
+                "restriction_units": "feet"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_id": "aeef5dfd-31a1-4e9b-9ba6-a6e49b213092",
+            "road_event_id": "cec277f3-8b02-424e-9003-0684cc10449d",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "closed"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.8400173,
+            41.1394605,
+            1876
+          ],
+          [
+            -104.8398551,
+            41.1403126,
+            1877
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "ae5213ef-f779-4ed9-8f64-a6674c543376",
+        "feed_info_id": "9fc51e28-ec0c-4318-99e2-c270e8551129",
+        "subidentifier": "PXU40C",
+        "road_name": "I-25",
+        "road_number": "I-25",
+        "direction": "northbound",
+        "beginning_cross_street": "I-80",
+        "ending_cross_street": "Randall Ave.",
+        "beginning_milepost": 9,
+        "ending_milepost": 11,
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-01T05:00:00Z",
+        "end_date": "2020-09-30T07:00:00Z",
+        "start_date_accuracy": "verified",
+        "end_date_accuracy": "estimated",
+        "event_status": "active",
+        "total_num_lanes": 2,
+        "vehicle_impact": "some-lanes-closed",
+        "workers_present": false,
+        "reduced_speed_limit": 45,
+        "description": "main-demo",
+        "restrictions": [
+          "reduced-width"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-07-09T13:16:06Z",
+        "creation_date": "2020-07-09T13:16:06Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "1a227190-4d20-49ae-ab59-12c9c891b3fe",
+            "road_event_id": "ae5213ef-f779-4ed9-8f64-a6674c543376",
+            "type_of_work": "surface-work",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "ab4e1d59-1e3e-4cd5-bc23-f29994c5dcb5",
+            "road_event_id": "ae5213ef-f779-4ed9-8f64-a6674c543376",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "aa3893b8-fb56-475f-b43c-f0d967726ac3",
+                "lane_id": "ab4e1d59-1e3e-4cd5-bc23-f29994c5dcb5",
+                "restriction_type": "reduced-width",
+                "restriction_value": 12.0,
+                "restriction_units": "feet"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_id": "4881512a-809f-4b29-950d-007358d66bc1",
+            "road_event_id": "ae5213ef-f779-4ed9-8f64-a6674c543376",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "merge-right"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.8398551,
+            41.1403126,
+            1877
+          ],
+          [
+            -104.8394745,
+            41.1424049,
+            1874
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_event_id": "ec8438ed-a8b1-453f-a4fb-0d68b01e66c7",
+        "feed_info_id": "9fc51e28-ec0c-4318-99e2-c270e8551129",
+        "subidentifier": "PXU40C",
+        "road_name": "I-25",
+        "road_number": "I-25",
+        "direction": "northbound",
+        "beginning_cross_street": "I-80",
+        "ending_cross_street": "Randall Ave.",
+        "beginning_milepost": 9,
+        "ending_milepost": 11,
+        "beginning_accuracy": "estimated",
+        "ending_accuracy": "estimated",
+        "start_date": "2020-06-01T05:00:00Z",
+        "end_date": "2020-09-30T07:00:00Z",
+        "start_date_accuracy": "verified",
+        "end_date_accuracy": "estimated",
+        "event_status": "active",
+        "total_num_lanes": 2,
+        "vehicle_impact": "all-lanes-open",
+        "workers_present": false,
+        "reduced_speed_limit": 45,
+        "description": "main-demo",
+        "restrictions": [
+          "reduced-width"
+        ],
+        "issuing_organization": "Neaera Consulting",
+        "update_date": "2020-07-09T13:16:06Z",
+        "creation_date": "2020-07-09T13:16:06Z",
+        "types_of_work": [
+          {
+            "types_of_work_id": "004ce3e2-243a-4a5f-b795-c2b9ade3414d",
+            "road_event_id": "ec8438ed-a8b1-453f-a4fb-0d68b01e66c7",
+            "type_of_work": "surface-work",
+            "is_architectural_change": false
+          }
+        ],
+        "lanes": [
+          {
+            "lane_id": "a91f4996-0641-499d-9311-cf524c136164",
+            "road_event_id": "ec8438ed-a8b1-453f-a4fb-0d68b01e66c7",
+            "lane_number": 1,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [
+              {
+                "lane_restriction_id": "230005f5-985f-4e5b-b57c-cab9431b3aa2",
+                "lane_id": "a91f4996-0641-499d-9311-cf524c136164",
+                "restriction_type": "reduced-width",
+                "restriction_value": 12.0,
+                "restriction_units": "feet"
+              }
+            ],
+            "lane_type": "left-lane",
+            "lane_status": "open"
+          },
+          {
+            "lane_id": "49d054ac-5b0f-4012-a905-29399232c5d5",
+            "road_event_id": "ec8438ed-a8b1-453f-a4fb-0d68b01e66c7",
+            "lane_number": 2,
+            "lane_edge_reference": "left",
+            "lane_restrictions": [],
+            "lane_type": "right-lane",
+            "lane_status": "open"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.8394745,
+            41.1424049,
+            1874
+          ],
+          [
+            -104.8393778,
+            41.1429028,
+            1873
+          ]
+        ]
+      }
+    }
+  ]
+}
