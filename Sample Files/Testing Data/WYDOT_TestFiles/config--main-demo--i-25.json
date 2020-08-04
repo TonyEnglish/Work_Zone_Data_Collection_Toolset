@@ -1,0 +1,92 @@
+{
+  "DateCreated": "2020-07-09T07:13:09Z",
+  "FeedInfoID": "9fc51e28-ec0c-4318-99e2-c270e8551129",
+  "GeneralInfo": {
+    "Description": "main-demo",
+    "RoadName": "I-25",
+    "RoadNumber": "I-25",
+    "Direction": "northbound",
+    "BeginningCrossStreet": "I-80",
+    "EndingCrossStreet": "Randall Ave.",
+    "BeginningMilePost": 9,
+    "EndingMilePost": 11,
+    "EventStatus": "active"
+  },
+  "TypesOfWork": [
+    {
+      "Is_Architectural_Change": false,
+      "WorkType": "surface-work"
+    }
+  ],
+  "LaneInfo": {
+    "NumberOfLanes": 2,
+    "AverageLaneWidth": 3.6,
+    "ApproachLanePadding": 0.0,
+    "WorkzoneLanePadding": 0.0,
+    "VehiclePathDataLane": 1,
+    "Lanes": [
+      {
+        "LaneNumber": 1,
+        "LaneType": "left-lane",
+        "LaneRestrictions": [
+          {
+            "RestrictionValue": 12.0,
+            "RestrictionType": "reduced-width",
+            "RestrictionUnits": "feet"
+          }
+        ]
+      },
+      {
+        "LaneNumber": 2,
+        "LaneType": "right-lane",
+        "LaneRestrictions": []
+      }
+    ]
+  },
+  "SpeedLimits": {
+    "NormalSpeed": 65,
+    "ReferencePointSpeed": 45,
+    "WorkersPresentSpeed": 30
+  },
+  "CauseCodes": {
+    "CauseCode": 3,
+    "SubCauseCode": 0
+  },
+  "Schedule": {
+    "StartDate": "2020-06-01T05:00:00Z",
+    "StartDateAccuracy": "verified",
+    "EndDate": "2020-09-30T07:00:00Z",
+    "EndDateAccuracy": "estimated",
+    "DaysOfWeek": [
+      "Mon",
+      "Tues",
+      "Wed",
+      "Thurs",
+      "Fri"
+    ]
+  },
+  "Location": {
+    "BeginningLocation": {
+      "Lat": 41.12555689107603,
+      "Lon": -104.8469053948364,
+      "Elev": null
+    },
+    "BeginningAccuracy": "estimated",
+    "EndingLocation": {
+      "Lat": 41.142861744963639,
+      "Lon": -104.83932614298543,
+      "Elev": null
+    },
+    "EndingAccuracy": "estimated"
+  },
+  "metadata": {
+    "wz_location_method": "channel-device-method",
+    "lrs_type": "intepolative",
+    "location_verify_method": "GPS equipment accurate to 1 m",
+    "datafeed_frequency_update": "",
+    "timestamp_metadata_update": "2020-07-09T07:13:09Z",
+    "contact_name": "Tony English",
+    "contact_email": "Tony@neaeraconsulting.com",
+    "issuing_organization": "Neaera Consulting"
+  }
+}

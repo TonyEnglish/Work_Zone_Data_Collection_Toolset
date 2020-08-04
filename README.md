@@ -34,6 +34,13 @@ Python 3.0
 Java 1.8 or JDK 8 (added to system path)
 
 # Updates
+7/9/2020
+- Updated generation of lane tapers
+  - Lane tapering length based on https://mutcd.fhwa.dot.gov/htm/2009/part6/part6c.htm (Table 6C-4)
+- Added live map to data collection UI
+  - Map displays current location as well as the start and end locations of the work zone
+  - Map utilizes static pictures, and it can be utilized while offline (after the initial map is downloaded)
+
 5/22/2020
 - Upgraded GPS data compression based on J2945/1
   - Now utilizes radius of curvature error computation detailed in J2945/1 (option 1)
