@@ -273,12 +273,14 @@ def set_config_description(config_file):
 
 # Move on to data collection/acquisition
 def launch_WZ_veh_path_data_acq():
+    global needsImage
     global configUpdated
     global manualDetection
 
     if v.get() == 2:
         manualDetection = True
         configUpdated = True
+        needsImage = True
 
     root.destroy()
     window.quit()
@@ -378,6 +380,7 @@ window.geometry('1300x500')
 root = Frame(width=1300, height=500)
 root.place(x=0, y=0)
 
+needsImage = False
 configUpdated = False
 manualDetection = False
 
@@ -2038,6 +2041,7 @@ loading_label.place(x=60, y=120)
 logMsg('*** Running Message Builder and Export ***')
 
 def updateConfigImage():
+    global needsImage
     global wzConfig
     global center
 
@@ -2060,6 +2064,7 @@ def updateConfigImage():
         get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
         with open(mapFileName, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read()).decode()
+        needsImage = False
 
     wzConfig['ImageInfo']['Zoom'] = zoom
     wzConfig['ImageInfo']['Center']['Lat'] = centerLat
@@ -2101,7 +2106,10 @@ def create_messages_and_zip():
             name = 'path-data--' + name_id + '.csv'
         elif '.json' in filename.lower():
             if configUpdated:
-                name = 'config--' + name_id + '-updated.json'
+                if needsImage:
+                    name = 'config--' + name_id + '-updated-needsimage.json'
+                else:
+                    name = 'config--' + name_id + '-updated.json'
             else:
                 name = 'config--' + name_id + '.json'
         elif '.xml' in filename.lower():
