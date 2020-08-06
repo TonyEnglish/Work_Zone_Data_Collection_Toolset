@@ -267,9 +267,6 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
                     lcwpStat[taperingLane] = laneStat[lnStat][2]       #get value from laneStat 
                     laneTaperVal = 3
                     if tLanes != 1:
-                        print(ln)
-                        print(tLanes)
-                        print(lcwpStat)
                         if lcwpStat[ln] == 1: #Lane closure
                             if ln == 0 and lcwpStat[1] == 0: #Left lane, lane to right open
                                 laneTaperVal = 1
@@ -299,7 +296,6 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
                                 elif leftLaneOpen: laneTaperVal = 1
                                 elif rightLaneOpen: laneTaperVal = 2
                     laneTaperStat[taperingLane] = laneTaperVal
-                    print(laneTaperVal)
 
                     #laneTaperStat[laneStat[lnStat][1]-1] = 1       #get value from laneStat 
                 elif distFromLC >= taperLength:

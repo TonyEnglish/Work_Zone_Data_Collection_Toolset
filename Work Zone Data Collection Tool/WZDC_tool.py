@@ -20,6 +20,7 @@ import  csv                                     #CSV file read/write
 import  serial.tools.list_ports                      #used to enumerate COMM ports
 from    serial import SerialException           #serial port exception
 import  pynmea2
+import  base64
 
 import  zipfile
 import  xmltodict                                       #dict to xml converter
@@ -152,6 +153,19 @@ def getConfigVars():
     global  contactEmail
     global  issuingOrganization
 
+    global  mapImageZoom
+    global  mapImageCenterLat
+    global  mapImageCenterLon
+    global  mapImageMarkers
+    global  marker_list
+    global  mapImageMapType
+    global  mapImageHeight
+    global  mapImageWidth
+    global  mapImageFormat
+    global  mapImageString
+
+    global  mapFailed
+
 
     sampleFreq              = 10
     
@@ -209,10 +223,39 @@ def getConfigVars():
     contactName             = wzConfig['metadata']['contact_name']
     contactEmail            = wzConfig['metadata']['contact_email']
     issuingOrganization     = wzConfig['metadata']['issuing_organization']
+
+    mapImageZoom            = wzConfig['ImageInfo']['Zoom']
+    mapImageCenterLat       = wzConfig['ImageInfo']['Center']['Lat']
+    mapImageCenterLon       = wzConfig['ImageInfo']['Center']['Lon']
+    mapImageMarkers         = wzConfig['ImageInfo']['Markers'] # Markers:List of {Name, Color, Location {Lat, Lon, ?Elev}}
+    marker_list = []
+    for marker in mapImageMarkers:
+        marker_list.append("markers=color:" + marker['Color'].lower() + "|label:" + marker['Name'] + "|" + str(marker['Location']['Lat']) + "," + str(marker['Location']['Lon']) + "|")
+    mapImageMapType         = wzConfig['ImageInfo']['MapType']
+    mapImageHeight          = wzConfig['ImageInfo']['Height']
+    mapImageWidth           = wzConfig['ImageInfo']['Width']
+    mapImageFormat          = wzConfig['ImageInfo']['Format']
+    mapImageString          = wzConfig['ImageInfo']['ImageString']
+
+    if mapImageString:
+        try:
+            fh = open(mapFileName, "wb")
+            fh.write(base64.b64decode(mapImageString))
+            fh.close()
+            mapFailed = False
+        except:
+            shutil.copy('./images/map_failed.png', mapFileName)
+            mapFailed = True
+    else:
+        shutil.copy('./images/map_failed.png', mapFileName)
+        mapFailed = True
  
 # Set description box in UI from config file
 def set_config_description(config_file):
     global isConfigReady
+    global autoRadioButton
+    global manualRadioButton
+
     if config_file:
         startDate_split = wzStartDate.split('/')
         start_date = startDate_split[0] + '/' + startDate_split[1] + '/' + startDate_split[2]
@@ -225,12 +268,36 @@ def set_config_description(config_file):
         msg['fg'] = 'black'
         isConfigReady = True
         updateMainButton()
+        
+        if wzStartLat and wzEndLat:
+            autoRadioButton['state'] = NORMAL
+            # v.set(1)
+        else:
+            autoRadioButton['state'] = DISABLED
+            v.set(2)
     else:
         msg['text'] = 'NO CONFIGURATION FILE SELECTED'
         msg['fg'] = 'red'
 
 # Move on to data collection/acquisition
 def launch_WZ_veh_path_data_acq():
+    global needsImage
+    global configUpdated
+    global manualDetection
+    global wzStartLat
+    global wzStartLon
+    global wzEndLat
+    global wzEndLon
+
+    if v.get() == 2:
+        manualDetection = True
+        configUpdated = True
+        needsImage = True
+        wzStartLat = 0
+        wzStartLon = 0
+        wzEndLat = 0
+        wzEndLon = 0
+
     root.destroy()
     window.quit()
 
@@ -329,6 +396,11 @@ window.geometry('1300x500')
 root = Frame(width=1300, height=500)
 root.place(x=0, y=0)
 
+needsImage = False
+configUpdated = False
+manualDetection = False
+mapFailed = False
+
 ###
 #   WZ config parser object....
 ###
@@ -374,7 +446,7 @@ local_config_path = ''
 isConfigReady = False
 
 lbl_top = Label(root, text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
-lbl_top.place(x=300, y=20)
+lbl_top.place(x=550, y=10)
 
 msg = Label(root, text='NO CONFIGURATION FILE SELECTED',bg='slategray1', fg='red',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
 msg.place(x=100, y=80)
@@ -394,6 +466,7 @@ else:
     logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
 
 download_file_path = './Config Files/local_config.json'
+mapFileName = "./mapImage.png"
 
 def loadCloudContent():
     global blob_service_client
@@ -501,23 +574,41 @@ def loadCloudContent():
             wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
             wzConfig_file_name.place(x=220,y=290)
 
-
 refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))                                         # Car image
 refreshButton = Button(root, image = refreshImg, command=loadCloudContent)                                  # Label with car image , command=loadCloudContent
 refreshButton.place(x=50, y=200)
 
+radioHeight = 210
+Label(root, text='Beginning and Ending of Work Zone Locations', font='Helvetica 12 bold', padx=10, pady=10).place(x=800,y=radioHeight)
+v = IntVar()
+
+autoRadioButton = Radiobutton(root, text="Automatic Detection (Recommended)", variable=v, value=1) #, indicatoron=0
+manualRadioButton = Radiobutton(root, text="Manual Detection", variable=v, value=2)
+v.set(1)
+autoRadioButton.place(x=850, y=radioHeight+35)
+manualRadioButton.place(x=850, y=radioHeight+60)
+
+
+notes = '''Automatic detection uses the locations from the configuration file for the starting
+and ending locations of data collection. Manual detection allows you to
+manually start and end data collection. The manually set locations will be
+set as the the automatic locations next time the work zone is mapped'''
+notes_label = Label(root, text=notes,justify=CENTER, bg='slategray1',anchor=W, font=('Helvetica', 10))
+notes_label.place(x=760, y=radioHeight+85)
+
 loadCloudContent()
 
-instructions = '''This is the configuration file selection component of the 
-Work Zone Data Collection tool. To use the tool,
-select a file from the list of punlished configuration files and
-select 'Download Config'. When the correct configuration file
-is selected and shown in the description box, select the
-'Begin Data Collection' button to start data acquisition.
-The data acquisition component does not require an internet connection
-and will not record data until the set starting location is reached.'''
-instr_label = Label(root, text=instructions,justify=CENTER, bg='slategray1',anchor=W,padx=10,pady=10, font=('Calibri', 12))
-instr_label.place(x=700, y=100)
+# instructions = '''This is the initialization component of the Work Zone Data Collection tool.
+# To begin collecting data, first load a configuration file and verify
+# your GPS connection. You may load a configuration file from the 
+# connection. from the list of published configuration
+# files and load the file, or select a local configuration file. When
+# the correct configuration file is selected and shown in the description
+# box, select the 'Begin Data Collection' button to start data acquisition.
+# The data acquisition component does not require an internet connection
+# and will not record data until the set starting location is reached.'''
+# instr_label = Label(root, text=instructions,justify=CENTER, bg='slategray1',anchor=W,padx=10,pady=10, font=('Calibri', 12))
+# instr_label.place(x=700, y=30)
 
 btnBegin = Button(root, text='Begin Data\nCollection', font='Helvetica 14',border=2,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
 btnBegin.place(x=570,y=390)
@@ -534,7 +625,7 @@ def testGPSConnection(retry=False, *args):
         sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
         
         NMEAData = sio.readline()
-        if NMEAData: 
+        if NMEAData:
             for i in range(20):
                 NMEAData = sio.readline()
                 # print(NMEAData)
@@ -546,15 +637,9 @@ def testGPSConnection(retry=False, *args):
                 elif NMEAData[0:6] == '$GPGGA' and NMEAData.split(',')[2]:
                     gpsFix = True
                     break
-                # print(NMEAData)
-                # if not NMEAData: break
-                # msg = pynmea2.parse(NMEAData)
-                # print(repr(msg))
     except:
         return False
-    # pattern = re.compile('\$?GP[a-zA-Z]{3,},([a-zA-Z0-9\.]*,)+([a-zA-Z0-9]{1,2}\*[a-zA-Z0-9]{1,2})')
-    if gpsFound: # Beginning of NMEA String
-        # if NMEAData[0:6] == '$GPTXT' or NMEAData[0:6] == '$GPGSA':
+    if gpsFound:
         if gpsFix:
             commLabel['text']   = 'GPS DEVICE FOUND'
             commLabel['fg']     = 'green'
@@ -564,27 +649,22 @@ def testGPSConnection(retry=False, *args):
         else:
             commLabel['text']   = 'INVALID GPS POSITION'
             commLabel['fg']     = 'orange'
-            return True
-            # commLabel['bg']     = 'yellow'
-
-    # if retry:
-    #     isGPSReady = testGPSConnection()
-    #     return isGPSReady
+            return TRUE
     else:
-        # print('Not NMEA')
-        btnBegin['state']   = 'disabled'                    #enable the start button for map building...
+        btnBegin['state']   = 'disabled'
         btnBegin['bg']     = '#F0F0F0'
         commLabel['text']   = 'GPS DEVICE NOT FOUND'
         commLabel['fg']     = 'red'
         isGPSReady = False
         return False
 
+gpsHeight = 75
 def showSerialDropdowns():
     serialButton.destroy()
-    baudLabel.place(x=850, y=370)
-    baudPopupMenu.place(x=850, y=390)
-    dataLabel.place(x=950, y=370)
-    dataPopupMenu.place(x=950, y=390)
+    baudLabel.place(x=850, y=gpsHeight+60)
+    baudPopupMenu.place(x=850, y=gpsHeight+80)
+    dataLabel.place(x=950, y=gpsHeight+60)
+    dataPopupMenu.place(x=950, y=gpsHeight+80)
 
 # Set baud rate and data rate labels
 baudLabel = Label(root, text='Baud Rate (bps)')
@@ -603,14 +683,14 @@ tkDataVar.set('10') #default is first comm port
 dataPopupMenu = OptionMenu(root, tkDataVar, *dataRates)
 # baudPopupMenu.place(x=950, y=390)
 serialButton = Button(root, text='Show Advanced Serial Settings', command=showSerialDropdowns)
-serialButton.place(x=850, y=370)
+serialButton.place(x=850, y=gpsHeight+60)
 
 ports = serial.tools.list_ports.comports(include_links=False)
 if not ports: ports = ['NO DEVICES FOUND']
 
 # Frame for COMM port options
 mainframe = Frame(root)
-mainframe.place(x=850, y=310)
+mainframe.place(x=850, y=gpsHeight)
 mainframe.columnconfigure(0, weight=1)
 mainframe.rowconfigure(0, weight=1)
 
@@ -650,7 +730,7 @@ def searchPorts():
 
 # refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))                                         # Car image
 btnTestGps = Button(root, image = refreshImg, command=updatePortsDropdown)                                  # Label with car image , command=loadCloudContent
-btnTestGps.place(x=800, y=340)
+btnTestGps.place(x=800, y=gpsHeight+30)
 
 def on_closing():
     logFile.close()
@@ -773,14 +853,10 @@ def getNMEA_String():
             logMsg('ERROR: GPS parsing failed. ' + str(e))
             continue
 
-        # if (i % 10 == 0):
         carPosLat = GPSLat
         carPosLon = GPSLon
         carHeading = GPSHeading
         updatePosition()
-        #     i = 1
-        # else:
-        #     i += 1
         
         if dataLog:
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
@@ -871,15 +947,12 @@ def laneClicked(lane):
         laneLabels[lane]['fg'] = 'green'
         laneLabels[lane]['text'] = 'OPEN'
         laneLabels[lane].place(x=marginLeft+22 + (lane-1)*110, y=100)
-        # laneSymbols[lane] = Label(image = laneClosedImg)
-        # laneSymbols[lane].place(x=marginLeft+13 + (lane-1)*110, y=120)
     else:
         lanes[lane]['bg']   = 'gray92'
         lanes[lane]['fg']   = 'red3'
         laneLabels[lane]['fg'] = 'red3'
         laneLabels[lane]['text'] = 'CLOSED'
         laneLabels[lane].place(x=marginLeft+10 + (lane-1)*110, y=100)
-        # laneSymbols[lane].destroy()
 
     if not gotRefPt:                       #if ref pt has not been marked yet
         lc = lc + '+RP'                         #lc + ref. pt
@@ -972,6 +1045,65 @@ def markRefPt():
 
         displayStatusMsg(markerStr)
 
+def markStartPt():
+    global wzConfig
+    global wzStartLat
+    global wzStartLon
+
+    bStart['state'] = DISABLED
+
+    wzConfig['Location']['BeginningLocation']['Lat'] = GPSLat
+    wzConfig['Location']['BeginningLocation']['Lon'] = GPSLon
+    wzStartLat = GPSLat
+    wzStartLon = GPSLon
+
+    markerStr = '   *** Starting Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
+    logMsg('*** Starting Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
+    displayStatusMsg(markerStr)
+
+    startDataLog()
+
+def markEndPt():
+    global wzConfig
+    global wzEndLat
+    global wzEndLon
+
+    wzConfig['Location']['EndingLocation']['Lat'] = GPSLat
+    wzConfig['Location']['EndingLocation']['Lon'] = GPSLon
+    wzEndLat = GPSLat
+    wzEndLon = GPSLon
+
+
+    centerLat = (float(wzStartLat) + float(wzEndLat))/2
+    centerLon = (float(wzStartLon) + float(wzEndLon))/2
+    center = str(centerLat) + ',' + str(centerLon)
+
+    north = max(float(wzStartLat), float(wzEndLat))
+    south = min(float(wzStartLat), float(wzEndLat))
+    east = max(float(wzStartLon), float(wzEndLon))
+    west = min(float(wzStartLon), float(wzEndLon))
+    calcZoomLevel(north, south, east, west, imgWidth, imgHeight)
+
+    wzConfig['ImageInfo']['Zoom'] = zoom
+    wzConfig['ImageInfo']['Center']['Lat'] = centerLat
+    wzConfig['ImageInfo']['Center']['Lon'] = centerLon
+    markers = []
+    markers.append({'Name': 'Start', 'Color': 'Green', 'Location': {'Lat': wzStartLat, 'Lon': wzStartLon, 'Elev': None}})
+    markers.append({'Name': 'End', 'Color': 'Red', 'Location': {'Lat': wzEndLat, 'Lon': wzEndLon, 'Elev': None}})
+    wzConfig['ImageInfo']['Markers'] = markers
+    wzConfig['ImageInfo']['MapType'] = mapImageMapType
+    wzConfig['ImageInfo']['Height'] = mapImageHeight
+    wzConfig['ImageInfo']['Width'] = mapImageWidth
+    wzConfig['ImageInfo']['Format'] = mapImageFormat
+    wzConfig['ImageInfo']['ImageString'] = ""
+
+
+    markerStr = '   *** Ending Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
+    logMsg('*** Ending Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
+    displayStatusMsg(markerStr)
+
+    stopDataLog()
+
 # Write line to CSV data vile
 def writeCSVFile (write_str):
     global writeData                            #file handle
@@ -1014,7 +1146,7 @@ def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize
         Creates a request string with a URL like this:
         http://maps.google.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=14&size=512x512&maptype=roadmap
 &markers=color:blue|label:S|40.702147,-74.015794&sensor=false"""
-   
+    
     
     if not internet_on():
         messagebox.showerror('No Internet Connection', 'No internet conenction detected. Please reconnect to the internet to update the map')
@@ -1027,18 +1159,13 @@ def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize
     request += "key=%s&" % apiKey
     if center != None:
         request += "center=%s&" % center
-        #request += "center=%s&" % "40.714728, -73.998672"   # latitude and longitude (up to 6-digits)
-        #request += "center=%s&" % "50011" # could also be a zipcode,
-        #request += "center=%s&" % "Brooklyn+Bridge,New+York,NY"  # or a search term 
-    if center != None:
+    if zoom != None:
         request += "zoom=%i&" % zoom  # zoom 0 (all of the world scale ) to 22 (single buildings scale)
-
 
     request += "size=%ix%i&" % (imgsize)  # tuple of ints, up to 640 by 640
     request += "format=%s&" % imgformat
     request += "bearing=90&"
     # request += "maptype=%s&" % maptype  # roadmap, satellite, hybrid, terrain
-    # request += "visible=%s" % "Cambridge"
 
     # add markers (location and style)
     if markers != None:
@@ -1048,8 +1175,10 @@ def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize
     request = request.rstrip('&')
     # #request += "mobile=false&"  # optional: mobile=true will assume the image is shown on a small screen (mobile device)
     # request += "sensor=false"   # must be given, deals with getting loction from mobile device
-    
-    urllib.request.urlretrieve(request, filename_wo_extension+"."+imgformat) # Option 1: save image directly to disk
+    try:
+        urllib.request.urlretrieve(request, filename_wo_extension)
+    except exception as e:
+        messagebox.showerror('Error Retrieving Map Image', 'Error retrieving map image: ' + str(e))
 
 GPSRate     = 10                                #GPS data rate in Hz
 GPSDate     = ''                                #GPS Date
@@ -1175,7 +1304,7 @@ laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))     
 carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))                                         # Car image
 carlabel = Label(root, image = carImg)                                                                  # Label with car image
 workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))             # Workers present image
-userPositionImg = ImageTk.PhotoImage(Image.open('./images/blue-circle.png'))             # Workers present image
+userPositionImg = ImageTk.PhotoImage(Image.open('./images/blue-circle.png'))                            # Workers present image
 
 plusImg = ImageTk.PhotoImage(Image.open('./images/plus.png'))
 minusImg = ImageTk.PhotoImage(Image.open('./images/minus.png'))
@@ -1185,9 +1314,9 @@ arrowRightImg = ImageTk.PhotoImage(Image.open('./images/arrow_right.png'))
 arrowDownImg = ImageTk.PhotoImage(Image.open('./images/arrow_down.png'))
 arrowLeftImg = ImageTk.PhotoImage(Image.open('./images/arrow_left.png'))
 
-shutil.copy('./images/map_failed.png', './google_map_example3.png')
 
-mapFileName = "google_map_example3"
+mapFileName = "./mapImage.png"
+
 zoom = 10
 imgHeight = 640
 imgWidth = 640
@@ -1201,28 +1330,21 @@ carPosHeading = 0
 markerHeight = 20
 markerWidth = 20
 
-# # 81.151417, -74.207792
-# wzStartLat = 81.151417
-# wzStartLon = -74.207792
-# # -78.388249, -85.216413
-# wzEndLat = -78.388249s
-# wzEndLon = -85.216413
-
 marker_list = []
-marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|") # blue S at several zip code's centers
-marker_list.append("markers=color:red|label:End|" + str(wzEndLat) + "," + str(wzEndLon) + "|") # blue S at several zip code's centers
+marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|")
+marker_list.append("markers=color:red|label:End|" + str(wzEndLat) + "," + str(wzEndLon) + "|")
 
 def getCurrentMapBounds():
     global horizBound
     global vertBound
-    GLOBE_WIDTH = 256
-    # zoom = math.log(pixelWidth * 360 / angle / GLOBE_WIDTH) / math.log(2)
 
+    # zoom = math.log(pixelWidth * 360 / angle / GLOBE_WIDTH) / math.log(2)
     # GLOBE_WIDTH * e ^ (zoom * math.log(2)) = pixelWidth * 360 / angle
+
+    GLOBE_WIDTH = 256
     scale = 360 / (GLOBE_WIDTH * math.e**(zoom * math.log(2)))
     horizBound = imgWidth * scale
     vertBound = imgHeight * scale * math.cos(centerLat*math.pi/180) #.77 -78.388249  * math.cos(centerLat*math.pi/180)
-    # print(horizBound, vertBound, horizBound / vertBound)
 
 def getPixelLocation(lat, lon):
     x = (lon - centerLon) / (horizBound / 2)
@@ -1236,6 +1358,8 @@ def getPixelLocation(lat, lon):
 
 def calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight):
     global zoom
+    global centerLat
+
     GLOBE_WIDTH = 256
     ZOOM_MAX = 21
     angle = east - west
@@ -1244,26 +1368,57 @@ def calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight):
     zoomHoriz = round(math.log(pixelWidth * 360 / angle / GLOBE_WIDTH) / math.log(2)) - 1
 
     angle = north - south
+    centerLat = (north + south) / 2
     if angle < 0:
         angle += 360
-    zoomVert = round(math.log(pixelHeight * 360 / angle / GLOBE_WIDTH * math.cos(centerLat*math.pi/180)) / math.log(2)) - 1 # / math.cos(centerLat*math.pi/180)
+    zoomVert = round(math.log(pixelHeight * 360 / angle / GLOBE_WIDTH * math.cos(centerLat*math.pi/180)) / math.log(2)) - 1
 
     zoom = max(min(zoomHoriz, zoomVert, ZOOM_MAX), 0)
     getCurrentMapBounds()
 
 
-centerLat = (float(wzStartLat) + float(wzEndLat))/2
-centerLon = (float(wzStartLon) + float(wzEndLon))/2
-center = str(centerLat) + ',' + str(centerLon)
+### Center Location
+# If center coordinates present in configuration file, write center to global vars
+if mapImageCenterLat and mapImageCenterLon:
+    centerLat = float(mapImageCenterLat)
+    centerLon = float(mapImageCenterLon)
+    center = str(centerLat) + ',' + str(centerLon)
+# If center coordinates not present and automatic detection, recalculate center based on coordinates
+elif not manualDetection:
+    centerLat = (float(wzStartLat) + float(wzEndLat))/2
+    centerLon = (float(wzStartLon) + float(wzEndLon))/2
+    center = str(centerLat) + ',' + str(centerLon)
+# If center coordinates not present and manual detection, do nothing
 
-north = max(float(wzStartLat), float(wzEndLat))
-south = min(float(wzStartLat), float(wzEndLat))
-east = max(float(wzStartLon), float(wzEndLon))
-west = min(float(wzStartLon), float(wzEndLon))
-calcZoomLevel(north, south, east, west, imgWidth, imgHeight)
 
-get_static_google_map("google_map_example3", center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
-mapImg = ImageTk.PhotoImage(Image.open('./google_map_example3.png'))             # Workers present image
+### Zoom Level
+# If zoom level set in configuration file, write zoom to global var
+if mapImageZoom:
+    zoom = int(mapImageZoom)
+    getCurrentMapBounds()
+# If zoom level not set and automatic detection, recalculate zoom level
+elif not manualDetection:
+    north = max(float(wzStartLat), float(wzEndLat))
+    south = min(float(wzStartLat), float(wzEndLat))
+    east = max(float(wzStartLon), float(wzEndLon))
+    west = min(float(wzStartLon), float(wzEndLon))
+    calcZoomLevel(north, south, east, west, imgWidth, imgHeight)
+# If zoom level not set and manual detection, do nothing
+
+
+### Map Image
+# If manual detection, set image to map_failed
+if manualDetection: #No map image to load
+    shutil.copy('./images/map_failed.png', mapFileName)
+    mapFailed = True
+# If automatic detection, attempt to load image
+else:
+    # If internet on, load cloud image
+    if internet_on():
+        get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
+        mapFailed = False
+    # If no internet, leave image as is (This image was set from the configuration file ImageString)
+mapImg = ImageTk.PhotoImage(Image.open(mapFileName))
 
 # Exit data collection loop and quit
 def end_application():
@@ -1284,8 +1439,8 @@ def changeZoom(incr):
     global zoom
     global mapLabel
     zoom += incr
-    get_static_google_map("google_map_example3", center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
-    mapImg = ImageTk.PhotoImage(Image.open('./google_map_example3.png'))             # Workers present image
+    get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
+    mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
     mapLabel.configure(image = mapImg)
     getCurrentMapBounds()
     updatePosition()
@@ -1312,44 +1467,38 @@ def moveMap(direct):
     centerLon += distanceHoriz
     center = str(centerLat) + ',' + str(centerLon)
 
-    get_static_google_map("google_map_example3", center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
-    mapImg = ImageTk.PhotoImage(Image.open('./google_map_example3.png'))             # Workers present image
+    get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
+    mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
     mapLabel.configure(image = mapImg)
     updatePosition()
-    # print("moving " + direct)
 
 mapLabel = Label(root, image = mapImg)
 mapLabel.place(x=50, y=60)
 
-bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
-bZoomIn.place(x=540, y=68)
-bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
-bZoomOut.place(x=540, y=102)
+if not manualDetection:
+    bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
+    bZoomIn.place(x=540, y=68)
+    bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
+    bZoomOut.place(x=540, y=102)
 
-bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
-bMoveUp.place(x=610, y=60)
-bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
-bMoveRight.place(x=635, y=85)
-bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
-bMoveDown.place(x=610, y=110)
-bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
-bMoveLeft.place(x=585, y=85)
+    bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
+    bMoveUp.place(x=610, y=60)
+    bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
+    bMoveRight.place(x=635, y=85)
+    bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
+    bMoveDown.place(x=610, y=110)
+    bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
+    bMoveLeft.place(x=585, y=85)
 
 carLabel = Label(root, image = userPositionImg, highlightthickness = 0, borderwidth = 0, width= 0, height = 0)
 
 def updatePosition():
     global carLabel
-    x, y = getPixelLocation(carPosLat, carPosLon)
-    carLabel.place(x=x + 50, y=y + 60)
-
-# carPosLat = 81.151417
-# carPosLon = -74.207792
-# TOP: 40.062904, -105.213702
-# RIGHT: 40.061771, -105.208810
-# Argentina Top Right: -37.282251, -63.597578
-# Antartica: -78.388249, -85.216413
-# 81.151417, -74.207792
-# updatePosition()
+    if not mapFailed:
+        x, y = getPixelLocation(carPosLat, carPosLon)
+        carLabel.place(x=x + 50, y=y + 60)
+    else:
+        carLabel.place(x=-1 + 50, y=-1 + 60)
 
 # Initialize lane images
 for i in range(totalLanes):
@@ -1366,7 +1515,6 @@ for i in range(totalLanes):
         laneLines[i+1] = Label(root, image = laneLine)
         laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
 
-
 # This is required because otherwise the lane command laneClicked(lane #) cannot be set in a for loop
 def createButton(id):
     laneBtn = Button(root, text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
@@ -1381,13 +1529,12 @@ for i in range(1, totalLanes+1):
 bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
 bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
-# Debug buttons, hidden by small frame
-# bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
-# bStart.place(x=marginLeft-100+100, y=510)
-# bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
-# bRef.place(x=marginLeft-100+250, y=510)
-# bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
-# bEnd.place(x=marginLeft-100+500, y=510)
+
+if manualDetection:
+    bStart = Button(root, text='Mark Start of\nWork Zone', font='Helvetica 10', padx=5, bg='green', fg='white', command=markStartPt)
+    bStart.place(x=marginLeft-100+150, y=510)
+    bEnd = Button(root, text='Mark End of\nWork Zone', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=markEndPt)
+    bEnd.place(x=marginLeft-100+450, y=510)
 
 ###
 #   Application Message Window...
@@ -1399,6 +1546,8 @@ appMsgWin.place(x=marginLeft-80+50, y=400)
 overlayWidth = 710
 overlayx = marginLeft + (window_width - marginLeft)/2 - overlayWidth/2
 overlay = Label(root, text='Application will begin data collection\nwhen the starting location has been reached', bg='gray', font='Calibri 28')
+if manualDetection:
+    overlay['text'] = 'Application will begin data collection\nwhen the starting location is marked'
 overlay.place(x=overlayx, y=200)
 
 # return overlay, bWP, lanes, laneLabels
@@ -1908,12 +2057,51 @@ loading_label.place(x=60, y=120)
 ###############################################################################################
 logMsg('*** Running Message Builder and Export ***')
 
+def updateConfigImage():
+    global needsImage
+    global wzConfig
+    global center
+
+    centerLat = (float(wzStartLat) + float(wzEndLat))/2
+    centerLon = (float(wzStartLon) + float(wzEndLon))/2
+    center = str(centerLat) + ',' + str(centerLon)
+    
+    north = max(float(wzStartLat), float(wzEndLat))
+    south = min(float(wzStartLat), float(wzEndLat))
+    east = max(float(wzStartLon), float(wzEndLon))
+    west = min(float(wzStartLon), float(wzEndLon))
+    calcZoomLevel(north, south, east, west, imgWidth, imgHeight)
+
+    marker_list = []
+    marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|")
+    marker_list.append("markers=color:red|label:End|" + str(wzEndLat) + "," + str(wzEndLon) + "|")
+
+    encoded_string = ''
+    if internet_on():
+        get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
+        with open(mapFileName, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode()
+        needsImage = False
+
+    wzConfig['ImageInfo']['Zoom'] = zoom
+    wzConfig['ImageInfo']['Center']['Lat'] = centerLat
+    wzConfig['ImageInfo']['Center']['Lon'] = centerLon
+    wzConfig['ImageInfo']['ImageString'] = str(encoded_string)
+
+    cfg = open(local_config_path, 'w')
+    cfg.write(json.dumps(wzConfig, indent='  '))
+    cfg.close()
+
 # Create zip archive of messages
 def create_messages_and_zip():
     global zip_name
     global name_id
     global blob_service_client
     global container_name
+
+    if manualDetection:
+        updateConfigImage()
+
     build_all_messages()
     files_list.append(vehPathDataFile)
     files_list.append(local_config_path)
@@ -1934,7 +2122,13 @@ def create_messages_and_zip():
         if '.csv' in filename.lower():
             name = 'path-data--' + name_id + '.csv'
         elif '.json' in filename.lower():
-            name = 'config--' + name_id + '.json'
+            if configUpdated:
+                if needsImage:
+                    name = 'config--' + name_id + '-updated-needsimage.json'
+                else:
+                    name = 'config--' + name_id + '-updated.json'
+            else:
+                name = 'config--' + name_id + '.json'
         elif '.xml' in filename.lower():
             number = name[name.rfind('-')+1:name.rfind('.')]
             name = 'rsm-xml--' + name_id + '--' + number + '.xml'
