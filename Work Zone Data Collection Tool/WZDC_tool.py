@@ -236,9 +236,12 @@ def getConfigVars():
     mapImageString          = wzConfig['ImageInfo']['ImageString']
 
     if mapImageString:
-        fh = open(mapFileName, "wb")
-        fh.write(base64.b64decode(mapImageString))
-        fh.close()
+        try:
+            fh = open(mapFileName, "wb")
+            fh.write(base64.b64decode(mapImageString))
+            fh.close()
+        except:
+            shutil.copy('./images/map_failed.png', mapFileName)
     else:
         shutil.copy('./images/map_failed.png', mapFileName)
  
@@ -261,9 +264,9 @@ def set_config_description(config_file):
         isConfigReady = True
         updateMainButton()
         
-        if wzStartLat:
+        if wzStartLat and wzEndLat:
             autoRadioButton['state'] = NORMAL
-            v.set(1)
+            # v.set(1)
         else:
             autoRadioButton['state'] = DISABLED
             v.set(2)
@@ -276,11 +279,19 @@ def launch_WZ_veh_path_data_acq():
     global needsImage
     global configUpdated
     global manualDetection
+    global wzStartLat
+    global wzStartLon
+    global wzEndLat
+    global wzEndLon
 
     if v.get() == 2:
         manualDetection = True
         configUpdated = True
         needsImage = True
+        wzStartLat = 0
+        wzStartLon = 0
+        wzEndLat = 0
+        wzEndLon = 0
 
     root.destroy()
     window.quit()
@@ -1129,7 +1140,7 @@ def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize
         Creates a request string with a URL like this:
         http://maps.google.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=14&size=512x512&maptype=roadmap
 &markers=color:blue|label:S|40.702147,-74.015794&sensor=false"""
-   
+    
     
     if not internet_on():
         messagebox.showerror('No Internet Connection', 'No internet conenction detected. Please reconnect to the internet to update the map')
@@ -1144,7 +1155,6 @@ def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize
         request += "center=%s&" % center
     if zoom != None:
         request += "zoom=%i&" % zoom  # zoom 0 (all of the world scale ) to 22 (single buildings scale)
-
 
     request += "size=%ix%i&" % (imgsize)  # tuple of ints, up to 640 by 640
     request += "format=%s&" % imgformat
@@ -1360,6 +1370,7 @@ def calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight):
     zoom = max(min(zoomHoriz, zoomVert, ZOOM_MAX), 0)
     getCurrentMapBounds()
 
+
 ### Center Location
 # If center coordinates present in configuration file, write center to global vars
 if mapImageCenterLat and mapImageCenterLon:
@@ -1372,6 +1383,7 @@ elif not manualDetection:
     centerLon = (float(wzStartLon) + float(wzEndLon))/2
     center = str(centerLat) + ',' + str(centerLon)
 # If center coordinates not present and manual detection, do nothing
+
 
 ### Zoom Level
 # If zoom level set in configuration file, write zoom to global var
@@ -1386,6 +1398,7 @@ elif not manualDetection:
     west = min(float(wzStartLon), float(wzEndLon))
     calcZoomLevel(north, south, east, west, imgWidth, imgHeight)
 # If zoom level not set and manual detection, do nothing
+
 
 ### Map Image
 # If manual detection, set image to map_failed
@@ -1454,19 +1467,20 @@ def moveMap(direct):
 mapLabel = Label(root, image = mapImg)
 mapLabel.place(x=50, y=60)
 
-bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
-bZoomIn.place(x=540, y=68)
-bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
-bZoomOut.place(x=540, y=102)
+if not manualDetection:
+    bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
+    bZoomIn.place(x=540, y=68)
+    bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
+    bZoomOut.place(x=540, y=102)
 
-bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
-bMoveUp.place(x=610, y=60)
-bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
-bMoveRight.place(x=635, y=85)
-bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
-bMoveDown.place(x=610, y=110)
-bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
-bMoveLeft.place(x=585, y=85)
+    bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
+    bMoveUp.place(x=610, y=60)
+    bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
+    bMoveRight.place(x=635, y=85)
+    bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
+    bMoveDown.place(x=610, y=110)
+    bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
+    bMoveLeft.place(x=585, y=85)
 
 carLabel = Label(root, image = userPositionImg, highlightthickness = 0, borderwidth = 0, width= 0, height = 0)
 
@@ -1504,19 +1518,11 @@ for i in range(1, totalLanes+1):
 bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
 bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
 
-# Debug buttons, hidden by small frame
-# bStart = Button(root, text='Manually Start\nApplication', font='Helvetica 10', padx=5, bg='green', fg='white', command=startDataLog)
-# bStart.place(x=marginLeft-100+100, y=510)
-# bRef = Button(root, text='Manually Mark\nRef Pt', font='Helvetica 10', padx=5, bg='green', fg='white', command=markRefPt)
-# bRef.place(x=marginLeft-100+250, y=510)
-# bEnd = Button(root, text='Manually End\nApplication', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=stopDataLog)
-# bEnd.place(x=marginLeft-100+500, y=510)
-
 
 if manualDetection:
-    bStart = Button(root, text='Manually Start\nData Collection', font='Helvetica 10', padx=5, bg='green', fg='white', command=markStartPt)
+    bStart = Button(root, text='Mark Start of\nWork Zone', font='Helvetica 10', padx=5, bg='green', fg='white', command=markStartPt)
     bStart.place(x=marginLeft-100+150, y=510)
-    bEnd = Button(root, text='Manually End\nData Collection', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=markEndPt)
+    bEnd = Button(root, text='Mark End of\nWork Zone', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=markEndPt)
     bEnd.place(x=marginLeft-100+450, y=510)
 
 ###
