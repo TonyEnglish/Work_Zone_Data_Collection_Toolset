@@ -164,6 +164,8 @@ def getConfigVars():
     global  mapImageFormat
     global  mapImageString
 
+    global  mapFailed
+
 
     sampleFreq              = 10
     
@@ -240,10 +242,13 @@ def getConfigVars():
             fh = open(mapFileName, "wb")
             fh.write(base64.b64decode(mapImageString))
             fh.close()
+            mapFailed = False
         except:
             shutil.copy('./images/map_failed.png', mapFileName)
+            mapFailed = True
     else:
         shutil.copy('./images/map_failed.png', mapFileName)
+        mapFailed = True
  
 # Set description box in UI from config file
 def set_config_description(config_file):
@@ -394,6 +399,7 @@ root.place(x=0, y=0)
 needsImage = False
 configUpdated = False
 manualDetection = False
+mapFailed = False
 
 ###
 #   WZ config parser object....
@@ -1404,11 +1410,13 @@ elif not manualDetection:
 # If manual detection, set image to map_failed
 if manualDetection: #No map image to load
     shutil.copy('./images/map_failed.png', mapFileName)
+    mapFailed = True
 # If automatic detection, attempt to load image
 else:
     # If internet on, load cloud image
     if internet_on():
         get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
+        mapFailed = False
     # If no internet, leave image as is (This image was set from the configuration file ImageString)
 mapImg = ImageTk.PhotoImage(Image.open(mapFileName))
 
@@ -1486,8 +1494,11 @@ carLabel = Label(root, image = userPositionImg, highlightthickness = 0, borderwi
 
 def updatePosition():
     global carLabel
-    x, y = getPixelLocation(carPosLat, carPosLon)
-    carLabel.place(x=x + 50, y=y + 60)
+    if not mapFailed:
+        x, y = getPixelLocation(carPosLat, carPosLon)
+        carLabel.place(x=x + 50, y=y + 60)
+    else:
+        carLabel.place(x=-1 + 50, y=-1 + 60)
 
 # Initialize lane images
 for i in range(totalLanes):
