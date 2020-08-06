@@ -34,6 +34,14 @@ Python 3.0
 Java 1.8 or JDK 8 (added to system path)
 
 # Updates
+8/6/2020
+- Added map images to Data Acquisition
+  - Map image integrated into configuration file
+  - Map can be loaded without internet connection
+- Manual detection of start/end location
+  - Allows user to mark start and end location manually (instead of marking GPS locations in TMC website)
+  - Manually marked locations are saved as automatic detection locations after data collection
+
 7/9/2020
 - Updated generation of lane tapers
   - Lane tapering length based on https://mutcd.fhwa.dot.gov/htm/2009/part6/part6c.htm (Table 6C-4)
