@@ -197,7 +197,7 @@ def insertMapPt(mapPt, pathPt, elementPos, tLanes, laneWidth, dL, lcwpStat, dist
 ###
     mapPt.append(list(lla_ls_hwp))               #insert constructed lla_ls_hwp list for each node for each lane in mapPt array
 
-def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList):
+def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList,dataFreq):
 
     
 ###
@@ -222,9 +222,11 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
     distFromLC = 0
     incrDistLC = False
     taperLength = speedList[0]*(laneWidth + lanePad)*3.28084
+
     if speedList[0] <= 40:
         taperLength = ((laneWidth + lanePad)*3.28084*(speedList[0]**2)) / 60
-    ALLOWABLEERROR = .5
+
+    ALLOWABLEERROR = 1
     SMALLDELTAPHI = 0.01
     CHORDLENGTHTHRESHOLD = 500
     MAXESTIMATEDRADIUS = 8388607 #7FFFFF
