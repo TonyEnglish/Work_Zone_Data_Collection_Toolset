@@ -23,6 +23,7 @@ Requires:
   - pynmea2
   - xmltodict
   - requests
+- Environment Variables (Contact Tony English at Tony@neaeraconsulting.com for more information)
 
 # Usage
 The WZDC tool is a python-based tool that utilizes a user interface. Steps for starting and running the tool are listed below and are described in further detail here: [POC Toolset User Guide](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/POC%20Toolset%20User%20Guide.pdf)
