@@ -1,19 +1,5 @@
 # V2X Manual Data Collection
 
-# README Outline:
-* Project Description
-* Prerequisites
-* Usage
-	* Building
-	* Testing
-	* Execution
-* Additional Notes
-* Version History and Retention
-* License
-* Contributions
-* Contact Information
-* Acknowledgements
-
 # Project Description
 
 This project is an open source, proof of concept work zone data collection tool. The purpose of this tool is to allow a construction manager and an IOO user to map work zones and distribute generated map messages to third parties. 
@@ -39,7 +25,7 @@ Requires:
   - requests
 
 # Usage
-The WZDC tool is a python-based tool that utilizes a user interface. Steps for starting and running the tool are listed below and are described in further detail in *here*
+The WZDC tool is a python-based tool that utilizes a user interface. Steps for starting and running the tool are listed below and are described in further detail here: [POC Toolset User Guide](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/POC%20Toolset%20User%20Guide.pdf)
 
 ## Building
 No building/compiling is required for this tool.
@@ -74,7 +60,7 @@ After data collection is completed, message generation begins. The recorded path
 # Additional Notes
 This toolset was developed as a proof of concept and is not able to provide a full solution for all types of work zones. Future work may expand the functionality of the tool to address more work zone types and add other features such as authentication or a mobile app version of the tool.
 
-This tool functions alongside a POC TMC website (https://neaeraconsulting.com/V2x_Home). Instructions for utilizing this website are located *here*
+This tool functions alongside a POC TMC website (https://neaeraconsulting.com/V2x_Home). Instructions for utilizing this website are located here: [POC Toolset User Guide](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/POC%20Toolset%20User%20Guide.pdf)
 
 # Version History and Retention
 *Required - A statement of the status of the source code (prototype, alpha, beta, release, etc.), how often users can expect activity on this repository, and a version/release history in the form of a CHANGELOG file. Additionally, include a retention statement that specifies how long this repository will remain publicly accessible*
@@ -85,15 +71,15 @@ Example:
 
 **Release Frequency:** This project is updated approximately once every 2 weeks
 
-**Release History: See [CHANGELOG.md](CHANGELOG.md)**
+**Release History: See [CHANGELOG.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/CHANGELOG.md)**
 
 **Retention:** This project will remain publicly accessible for a minimum of five years (until at least 06/15/2025).
 
 # License
-This project is licensed under the Creative Commons 1.0 Universal (CC0 1.0) License - see the [License.MD](https://github.com/usdot-jpo-codehub/codehub-readme-template/blob/master/LICENSE) for more details. 
+This project is licensed under the Creative Commons 1.0 Universal (CC0 1.0) License - see the [License.MD](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/LICENSE.md) for more details. 
 
 # Contributions
-Please read [CONTRIBUTING.md](https://github.com/usdot-jpo-codehub/codehub-readme-template/blob/master/Contributing.MD) for details on our Code of Conduct, the process for submitting pull requests to us, and how contributions will be released.
+Please read [CONTRIBUTING.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/CONTRIBUTING.md) for details on our Code of Conduct, the process for submitting pull requests to us, and how contributions will be released.
 
 # Contact Information
 Contact Name: Tony English
