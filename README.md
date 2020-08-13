@@ -34,25 +34,25 @@ No building/compiling is required for this tool.
 There are currently no test cases for this proof of concept tool.
 
 ## Execution
-Step 1: Run the WZDC script (from the Work Zone Data Collection Folder):
+### Step 1: Run the WZDC script (from the Work Zone Data Collection Folder):
 ```
 python WZDC_tool.py
 ```
 
-Step 2: Load configuration file and confirm GPS connection
+### Step 2: Load configuration file and confirm GPS connection
 ![Config Loading UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/WZDC_tool_initialization_screen.jpg)
 This component of the application enables a user to load a configuration file and verify their GPS connection. This configuration file can be loaded from the Cloud or from a local directory. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator.
 The tool automatically scans usb COM ports for a GPS device. The baudrate and data rate can be configured if needed
 When a configuration file is loaded and a GPS connection is confirmed, data collection may begin
 
-Step 3: Map work zone
+### Step 3: Map work zone
 ![Data Colelction UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/WZDC_tool_automatic_data_collection_screen.jpg)
 This is the data collection component. Data collection begins when a set starting location is reached and ends when the ending location is reached (both set in configuration file). A user can mark lane closures and the presence of workers. The user interface shows the current state of the work zone, including the vehicle lane (set in configuration file). All of the data collected is saved in a CSV path data file, which will be used for message generation
 
 ![Data Colelction UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/WZDC_tool_manual_data_collection_screen.jpg)
 This is the Manual Detection mode of the data collection component. In this mode, data collection starts when the user presses the 'Mark Start of Work Zone' button. Data collection ends when the user presses the 'Mark End of Work Zone' button. These locations are saved as the automatic start/end locations for use the next time that work zone is mapped. 
 
-Step 4: Upload generated messages to the cloud
+### Step 4: Upload generated messages to the cloud
 ![Upload UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/upload_ui_screenshot.jpg)
 After data collection is completed, message generation begins. The recorded path data (including lane closure/worker presence) is processed into an RSM (xml) message. This message is then converted into binary (UPER format). The xml message, along with some additional information included in the configuration file, is then converted into a WZDx message. These messages (and the CSV data file) are added to a ZIP archive. When the user has an internet conenction, they can initiate the upload to the cloud, where the messages are unzipped and organized. These messages are available to visualize, verify and publish on https://neaeraconsulting.com/V2x_Home.
 
@@ -73,7 +73,7 @@ Example:
 
 **Release History: See [CHANGELOG.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/CHANGELOG.md)**
 
-**Retention:** This project will remain publicly accessible for a minimum of five years (until at least 06/15/2025).
+**Retention:** This project will remain publicly accessible for a minimum of five years (until at least 08/15/2025).
 
 # License
 This project is licensed under the Creative Commons 1.0 Universal (CC0 1.0) License - see the [License.MD](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/LICENSE.md) for more details. 
@@ -87,9 +87,6 @@ Contact Information: tony@neaeraconsulting.com, (888)-888-8888
 
 # Acknowledgements
 To track how this government-funded code is used, we request that if you decide to build additional software using this code please acknowledge its Digital Object Identifier in your software's README/documentation.
-
-
-
 
 
 # Abbreviations
