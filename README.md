@@ -3,7 +3,7 @@
 # Project Description
 
 This project is an open source, proof of concept work zone data collection tool. The purpose of this tool is to allow a construction manager and an IOO user to map work zones and distribute generated map messages to third parties. 
-This project is part of a larger V2X work zone data collection project, funded by ICF. This repository is the result of tasks 6-7.
+This project is part of a larger V2X work zone data collection project, funded by ICF. This repository is the result of tasks 6-7, The Development and Demonstration of Proof-of-Concept of an Integrated Work Zone Mapping Toolset.
 
 ![Tasks 6-7 Diagram](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/POC_WZ_Toolset.jpg)
 
