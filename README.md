@@ -64,31 +64,40 @@ This toolset was developed as a proof of concept and is not able to provide a fu
 This tool functions alongside a POC TMC website (https://neaeraconsulting.com/V2x_Home). Instructions for utilizing this website are located here: [POC Toolset User Guide](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/POC%20Toolset%20User%20Guide.pdf)
 
 # Version History and Retention
-*Required - A statement of the status of the source code (prototype, alpha, beta, release, etc.), how often users can expect activity on this repository, and a version/release history in the form of a CHANGELOG file. Additionally, include a retention statement that specifies how long this repository will remain publicly accessible*
-
-Example:
 
 **Status:** prototype
 
 **Release Frequency:** This project is updated approximately once every 2 weeks
 
-**Release History: See [CHANGELOG.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/CHANGELOG.md)**
+**Release History:** See [CHANGELOG.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/CHANGELOG.md)
 
 **Retention:** This project will remain publicly accessible for a minimum of five years (until at least 08/15/2025).
 
 # License
-This project is licensed under the Creative Commons 1.0 Universal (CC0 1.0) License - see the [License.MD](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/LICENSE.md) for more details. 
+This project is licensed under the CMIT License - see the [License.MD](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/LICENSE.md) for more details. 
 
 # Contributions
-Please read [CONTRIBUTING.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/CONTRIBUTING.md) for details on our Code of Conduct, the process for submitting pull requests to us, and how contributions will be released.
+Instructions are listed below, please read [CONTRIBUTING.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/CONTRIBUTING.md) for more details.
+
+- Report bugs and request features via [Github Issues](https://github.com/TonyEnglish/V2X-manual-data-collection/issues).
+- [Email us](mailto://tony@neaeraconsulting.com) your ideas on how to improve this proof of concept toolset.
+- Create a [Github pull request](https://github.com/TonyEnglish/V2X-manual-data-collection/pulls) with new functionality or fixing a bug.
+- Triage tickets and review update-tickets created by other users.
+
+## Guidelines
+- Issues
+  - Create issues using the SMART goals outline (Specific, Measurable, Actionable, Realistic and Time-Aware)
+- PR (Pull Requests)
+  - Create all pull requests from the master branch
+  - Create small, narrowly focused PRs
+  - Maintain a clean commit history so that they are easier to review
 
 # Contact Information
 Contact Name: Tony English
-Contact Information: tony@neaeraconsulting.com, (888)-888-8888
+Contact Information: [tony@neaeraconsulting.com](mailto://tony@neaeraconsulting.com)
 
 # Acknowledgements
 To track how this government-funded code is used, we request that if you decide to build additional software using this code please acknowledge its Digital Object Identifier in your software's README/documentation.
-
 
 # Abbreviations
 
