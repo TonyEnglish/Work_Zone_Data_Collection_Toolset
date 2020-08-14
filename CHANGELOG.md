@@ -1,4 +1,8 @@
 # Updates
+8/14/2020
+- Updating README to comply with ITS Codehub standards
+- Adding LICENSE, CONTRIBUTING and CHANGELOG files
+
 8/6/2020
 - Added map images to configuration file
 - Manual detection of start/end location
