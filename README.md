@@ -3,7 +3,7 @@
 # Project Description
 
 This project is an open source, proof of concept work zone data collection tool. The purpose of this tool is to allow a construction manager and an IOO user to map work zones and distribute generated map messages to third parties. 
-This project is part of a larger V2X work zone data collection project, funded by ICF. This repository is the result of tasks 6-7, The Development and Demonstration of Proof-of-Concept of an Integrated Work Zone Mapping Toolset.
+This project is part of a larger V2X work zone data collection project, funded by ICF. This repository is the result of tasks 6-7 of that 7 part project, the purpose of which is: Development and Demonstration of Proof-of-Concept of an Integrated Work Zone Mapping Toolset.
 
 ![Tasks 6-7 Diagram](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/POC_WZ_Toolset.jpg)
 
@@ -74,7 +74,7 @@ This tool functions alongside a POC TMC website (https://neaeraconsulting.com/V2
 **Retention:** This project will remain publicly accessible for a minimum of five years (until at least 08/15/2025).
 
 # License
-This project is licensed under the CMIT License - see the [License.MD](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/LICENSE.md) for more details. 
+This project is licensed under the CMIT License - see the [License.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/LICENSE.md) for more details. 
 
 # Contributions
 Instructions are listed below, please read [CONTRIBUTING.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/CONTRIBUTING.md) for more details.
