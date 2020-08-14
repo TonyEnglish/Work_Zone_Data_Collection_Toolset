@@ -47,10 +47,10 @@ The tool automatically scans usb COM ports for a GPS device. The baudrate and da
 When a configuration file is loaded and a GPS connection is confirmed, data collection may begin
 
 ### Step 3: Map work zone
-![Data Colelction UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/WZDC_tool_automatic_data_collection_screen.jpg)
+![Data Colelction UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/WZDC_tool_automatic_data_collection_screen.JPG)
 This is the data collection component. Data collection begins when a set starting location is reached and ends when the ending location is reached (both set in configuration file). A user can mark lane closures and the presence of workers. The user interface shows the current state of the work zone, including the vehicle lane (set in configuration file). All of the data collected is saved in a CSV path data file, which will be used for message generation
 
-![Data Colelction UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/WZDC_tool_manual_data_collection_screen.jpg)
+![Data Colelction UI](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/WZDC_tool_manual_data_collection_screen.JPG)
 This is the Manual Detection mode of the data collection component. In this mode, data collection starts when the user presses the 'Mark Start of Work Zone' button. Data collection ends when the user presses the 'Mark End of Work Zone' button. These locations are saved as the automatic start/end locations for use the next time that work zone is mapped. 
 
 ### Step 4: Upload generated messages to the cloud
