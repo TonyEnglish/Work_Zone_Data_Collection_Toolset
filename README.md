@@ -26,7 +26,7 @@ Requires:
 - Environment Variables (Contact Tony English at Tony@neaeraconsulting.com for more information)
 
 # Usage
-The WZDC tool is a python-based tool that utilizes a user interface. Steps for starting and running the tool are listed below and are described in further detail here: [POC Toolset User Guide](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/POC%20Toolset%20User%20Guide.pdf)
+The WZDC tool is a python-based tool that utilizes a user interface. Steps for starting and running the tool are listed below and are described in further detail here: [POC Toolset User Guide](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/POC%20Toolset%20User%20Guide.pdf)
 
 ## Building
 No building/compiling is required for this tool.
@@ -61,7 +61,7 @@ After data collection is completed, message generation begins. The recorded path
 # Additional Notes
 This toolset was developed as a proof of concept and is not able to provide a full solution for all types of work zones. Future work may expand the functionality of the tool to address more work zone types and add other features such as authentication or a mobile app version of the tool.
 
-This tool functions alongside a POC TMC website (https://neaeraconsulting.com/V2x_Home). Instructions for utilizing this website are located here: [POC Toolset User Guide](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/POC%20Toolset%20User%20Guide.pdf)
+This tool functions alongside a POC TMC website (https://neaeraconsulting.com/V2x_Home). Instructions for utilizing this website are located here: [POC Toolset User Guide](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/POC%20Toolset%20User%20Guide.pdf)
 
 # Version History and Retention
 
@@ -69,15 +69,15 @@ This tool functions alongside a POC TMC website (https://neaeraconsulting.com/V2
 
 **Release Frequency:** This project is updated approximately once every 2 weeks
 
-**Release History:** See [CHANGELOG.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/CHANGELOG.md)
+**Release History:** See [CHANGELOG.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/CHANGELOG.md)
 
 **Retention:** This project will remain publicly accessible for a minimum of five years (until at least 08/15/2025).
 
 # License
-This project is licensed under the CMIT License - see the [License.MD](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/LICENSE.md) for more details. 
+This project is licensed under the CMIT License - see the [License.MD](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/LICENSE.md) for more details. 
 
 # Contributions
-Instructions are listed below, please read [CONTRIBUTING.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/develop/CONTRIBUTING.md) for more details.
+Instructions are listed below, please read [CONTRIBUTING.md](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/CONTRIBUTING.md) for more details.
 
 - Report bugs and request features via [Github Issues](https://github.com/TonyEnglish/V2X-manual-data-collection/issues).
 - [Email us](mailto://tony@neaeraconsulting.com) your ideas on how to improve this proof of concept toolset.
