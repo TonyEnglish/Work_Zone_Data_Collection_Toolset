@@ -19,7 +19,6 @@ import  string                                  #string functions
 import  csv                                     #CSV file read/write
 import  serial.tools.list_ports                      #used to enumerate COMM ports
 from    serial import SerialException           #serial port exception
-import  pynmea2
 import  base64
 
 import  zipfile

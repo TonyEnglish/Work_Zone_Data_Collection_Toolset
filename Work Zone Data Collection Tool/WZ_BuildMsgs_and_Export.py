@@ -72,11 +72,6 @@ from rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
 from wz_msg_segmentation    import buildMsgSegNodeList  #msg segmentation node list builder
 
 
-from tkinter                import *   
-from tkinter                import messagebox
-from tkinter                import filedialog
-
-
 ###
 #   Following to get user input for WZ config file name and display output for user...
 ### ---------------------------------------------------------------------------------------------------------------------
@@ -185,11 +180,9 @@ def getConfigVars():
 #   Following are global variables are later used by other functions/methods...
 ###
 
-    # global  vehPathDataFile                                 #collected vehicle path data file
-    global  sampleFreq                                      #GPS sampling freq.
-
+    # WZDx Feed Info ID
     global  feed_info_id
-
+    
     # General Information
     global  wzDesc                                          #WZ Description
     global  roadName
@@ -239,6 +232,7 @@ def getConfigVars():
     global  wzEndLon                                       #wz end time
     global  endingAccuracy
     
+    # WZDx Metadata
     global  wzLocationMethod
     global  lrsType
     global  locationVerifyMethod
@@ -248,12 +242,20 @@ def getConfigVars():
     global  contactEmail
     global  issuingOrganization
 
-    global vehPathDataFile
+    # Image Info
+    global  mapImageZoom
+    global  mapImageCenterLat
+    global  mapImageCenterLon
+    global  mapImageMarkers
+    global  marker_list
+    global  mapImageMapType
+    global  mapImageHeight
+    global  mapImageWidth
+    global  mapImageFormat
+    global  mapImageString
 
-    vehPathDataFile = './WZ_VehPathData/path-data--demo-test-1-north--i-25.csv'
-
-    sampleFreq              = 10
-
+    global  mapFailed
+    
     feed_info_id            = wzConfig['FeedInfoID']
 
     wzDesc                  = wzConfig['GeneralInfo']['Description']
@@ -309,6 +311,19 @@ def getConfigVars():
     contactEmail            = wzConfig['metadata']['contact_email']
     issuingOrganization     = wzConfig['metadata']['issuing_organization']
 
+    mapImageZoom            = wzConfig['ImageInfo']['Zoom']
+    mapImageCenterLat       = wzConfig['ImageInfo']['Center']['Lat']
+    mapImageCenterLon       = wzConfig['ImageInfo']['Center']['Lon']
+    mapImageMarkers         = wzConfig['ImageInfo']['Markers'] # Markers:List of {Name, Color, Location {Lat, Lon, ?Elev}}
+    marker_list = []
+    for marker in mapImageMarkers:
+        marker_list.append("markers=color:" + marker['Color'].lower() + "|label:" + marker['Name'] + "|" + str(marker['Location']['Lat']) + "," + str(marker['Location']['Lon']) + "|")
+    mapImageMapType         = wzConfig['ImageInfo']['MapType']
+    mapImageHeight          = wzConfig['ImageInfo']['Height']
+    mapImageWidth           = wzConfig['ImageInfo']['Width']
+    mapImageFormat          = wzConfig['ImageInfo']['Format']
+    mapImageString          = wzConfig['ImageInfo']['ImageString']
+
 ###
 #   ------------------------- End of getConfigVars -----------------------
 #
@@ -356,7 +371,7 @@ def build_messages():
     wzStart     = wzStartDate.split('/') + wzStartTime.split(':')
     wzEnd       = wzEndDate.split('/')   + wzEndTime.split(':')
 
-    timeOffset  = -300                                      #UTC time offset in minutes for Eastern Time Zone
+    timeOffset  = 0                                     #UTC time offset in minutes for Eastern Time Zone
     hTolerance  = 20                                        #applicable heading tolerance set to 20 degrees (+/- 20deg?)
 
     roadWidth   = totalLanes*laneWidth*100                  #roadWidth in cm
@@ -462,6 +477,7 @@ def build_messages():
         #pass
 
         #logMsg('\t ---Segment#: '+str(currSeg)+'Start Node#: '+str(startNode)+'\n\t\t New Ref. Pt: '+str(newRefPt))
+        logMsg('Segment#: '+str(currSeg)+'Start Node#: '+str(startNode)+'\n\t\t New Ref. Pt: '+str(newRefPt))
 
 ###
 #       WZ length, LC characteristic, workers present, etc. 
@@ -490,15 +506,12 @@ def build_messages():
         rsm_xml = xmltodict.unparse(rsm, short_empty_elements=True, pretty=True, indent='  ')
         xmlFile.write(rsm_xml)
 
-###
-#   Done, finito, close files
-###   
-
         xmlFile.close()
+
         subprocess.call(['java', '-jar', './CVMsgBuilder v1.4 distribution/dist_xmltouper/CVMsgBuilder_xmltouper_v8.jar', str(xml_outFile), str(uper_outFile)],stdout=devnull)
         if not os.path.exists(uper_outFile) or os.stat(uper_outFile).st_size == 0:
             logMsg('ERROR: RSM UPER conversion FAILED, ensure that you have java installed (>=1.8 or jdk>=8) and added to your system path')
-            messagebox.showerror('RSM Binary conversion FAILED', 'RSM Binary (UPER) conversion failed\nEnsure that you have java installed (version>=1.8 or jdk>=8) and added to your system path\nThen run WZ_BuildMsgs_and_Export.pyw')
+            print('RSM Binary conversion FAILED', 'RSM Binary (UPER) conversion failed\nEnsure that you have java installed (version>=1.8 or jdk>=8) and added to your system path\nThen run WZ_BuildMsgs_and_Export.pyw')
             logMsg('Exiting Application')
             logFile.close()
             sys.exit(0)
@@ -560,12 +573,25 @@ def startMainProcess():
     global  wzLen                                                   #work zone length in meters
     global  wzMapLen                                                #Mapped approach and wz lane length in meters
     global  appHeading                                              #approach heading
+    global  sampleFreq
 
     global  msgSegList                                              #WZ message segmentation list
 ##  global  wzMapBuiltSuccess                                       #WZ map built successful or not flag
 ##  wzMapBuiltSuccess = False                                       #Default set to False                                  
-    
-    totRows = len(list(csv.reader(open(vehPathDataFile)))) - 1      ###total records or lines in file
+    csvList = list(csv.reader(open(vehPathDataFile)))
+
+    timeRegex = '[0-9]{2}(:[0-9]{2}){3}'
+    time1 = re.search(timeRegex, str(csvList[1])).group(0)
+    time2 = re.search(timeRegex, str(csvList[2])).group(0)
+    diffmSec = (int(time2[9:11]) - int(time1[9:11])) / 100
+    diffSec = int(time2[6:8]) - int(time1[6:8])
+    sampleFreq = 1/(diffSec + diffmSec)
+    if sampleFreq < 1 or sampleFreq > 10:
+        sampleFreq = 10
+    print(sampleFreq)
+
+    totRows = len(csvList) - 1      ###total records or lines in file
+    csvList = []
 
     logMsg('*** - '+wzDesc+' - ***')    
     logMsg('--- Processing Input File: '+vehPathDataFile+', Total input lines: '+str(totRows))
@@ -630,7 +656,7 @@ def startMainProcess():
 
     wzMapLen = [0,0]                                    #both approach and wz mapped length
     laneType = 1                                        #approach lanes
-    getLanePt(laneType,pathPt,appMapPt,laneWidth,lanePadApp,refPtIdx,appMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList)
+    getLanePt(laneType,pathPt,appMapPt,laneWidth,lanePadApp,refPtIdx,appMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList,sampleFreq)
 
     logMsg(' --- Mapped Approach Lanes: '+str(int(wzMapLen[0]))+' meters')
 
@@ -643,7 +669,7 @@ def startMainProcess():
 ###
     
     laneType    = 2                                     #wz lanes
-    getLanePt(laneType,pathPt,wzMapPt,laneWidth,lanePadWZ,refPtIdx,wzMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList)
+    getLanePt(laneType,pathPt,wzMapPt,laneWidth,lanePadWZ,refPtIdx,wzMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList,sampleFreq)
 
     logMsg(' --- Mapped Work zone Lanes: '+str(int(wzMapLen[1]))+' meters')
 
@@ -698,7 +724,7 @@ def startMainProcess():
         logMsg('\tNodes per approach lane: '+str(ANPL)+' > allowed max nodes per lane: ' +str(MNPL)+' to stay within message payload size\n\t')
         logMsg('\tThe 1st message segment must be able to include all nodes for approach lane')
         logMsg('\tReduce length of vehicle path data for approach lane to no more than 1km and try again')
-        messagebox.showerror('MESSAGE SEGMENTATION ERROR', 'Reduce length of vehicle path data for approach lane to no more than 1km and try again')
+        print('MESSAGE SEGMENTATION ERROR', 'Reduce length of vehicle path data for approach lane to no more than 1km and try again')
         # TODO: Fix this error/make this never happen. throw away some data from start of approach region?
         logFile.close()
         sys.exit(0)
@@ -762,25 +788,17 @@ def uploadArchive():
             blob_client.upload_blob(data, overwrite=True)
         logMsg('Closing log file in Message Builder and Export')
         logFile.close()
-        messagebox.showinfo('Upload Successful', 'Data upload successful! Please navigate to\nhttp://www.neaeraconsulting.com/V2x_Verification\nto view and verify the mapped workzone.\nYou will find your data under\n' + name_id)
+        print('Upload Successful', 'Data upload successful! Please navigate to\nhttp://www.neaeraconsulting.com/V2x_Verification\nto view and verify the mapped workzone.\nYou will find your data under\n' + name_id)
         sys.exit(0)
 
     else:
         logMsg('Attempted uploadArchive, no internet connection detected')
-        messagebox.showerror('No Internet Cnnection', 'No internet connection detected\nConnect and try again')
+        print('No Internet Cnnection', 'No internet connection detected\nConnect and try again')
 
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
 ##
 
-root = Tk()
-root.title('Work Zone Data Export and Upload')
-root.geometry('400x300')
-
-
-###
-#   WZ config parser object....
-###
 
 wzConfig        = {}
 
@@ -862,21 +880,22 @@ logFileName = './data_collection_log.txt'
 logFile = ''
 
 
-load_config = Button(text='Upload Data\nFiles', font='Helvetica 20', padx=5,bg='green',command=uploadArchive)
-load_config.place(x=100, y=100)
-
 ##############################################################################################
 #
 # ---------------------------- Automatically Export Files ------------------------------------
 #
 ###############################################################################################
-local_config_path = './Config Files/ACTIVE_CONFIG.json'
+
+wzID = 'sample-work-zone--white-rock-cir'
+vehPathDataFile = './WZ_VehPathData/path-data--' + wzID + '.csv'
+local_config_path = './Config Files/config--' + wzID + '.json'
 
 openLog()
 logMsg('*** Running Message Builder and Export ***')
 
 logMsg('Loading configuration file from local path: ' + local_config_path)
 inputFileDialog(local_config_path)
+print(wzDesc)
 startMainProcess()
 files_list.append(vehPathDataFile)
 files_list.append(local_config_path)
@@ -925,4 +944,4 @@ blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 # container_client = blob_service_client.get_container_client('unzippedworkzonedatauploads')
 container_name = 'workzonedatauploads'
 
-root.mainloop()
+uploadArchive()
