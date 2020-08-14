@@ -19,7 +19,6 @@ import  string                                  #string functions
 import  csv                                     #CSV file read/write
 import  serial.tools.list_ports                      #used to enumerate COMM ports
 from    serial import SerialException           #serial port exception
-import  pynmea2
 import  base64
 
 import  zipfile
@@ -90,9 +89,7 @@ def getConfigVars():
 #   Following are global variables are later used by other functions/methods...
 ###
 
-    # global  vehPathDataFile                                 #collected vehicle path data file
-    global  sampleFreq                                      #GPS sampling freq.
-
+    # WZDx Feed Info ID
     global  feed_info_id
     
     # General Information
@@ -144,6 +141,7 @@ def getConfigVars():
     global  wzEndLon                                       #wz end time
     global  endingAccuracy
     
+    # WZDx Metadata
     global  wzLocationMethod
     global  lrsType
     global  locationVerifyMethod
@@ -153,6 +151,7 @@ def getConfigVars():
     global  contactEmail
     global  issuingOrganization
 
+    # Image Info
     global  mapImageZoom
     global  mapImageCenterLat
     global  mapImageCenterLon
@@ -165,9 +164,6 @@ def getConfigVars():
     global  mapImageString
 
     global  mapFailed
-
-
-    sampleFreq              = 10
     
     feed_info_id            = wzConfig['FeedInfoID']
 
@@ -289,6 +285,7 @@ def launch_WZ_veh_path_data_acq():
     global wzEndLat
     global wzEndLon
 
+    # If mamual detection:
     if v.get() == 2:
         manualDetection = True
         configUpdated = True
@@ -668,20 +665,16 @@ def showSerialDropdowns():
 
 # Set baud rate and data rate labels
 baudLabel = Label(root, text='Baud Rate (bps)')
-# baudLabel.place(x=850, y=370)
 baudRates = ['4800', '9600', '19200', '57600', '115200']
 tkBaudVar = StringVar(window)
-tkBaudVar.set('115200') #default is first comm port
+tkBaudVar.set('115200') #default is 10 Hz, 115200bps
 baudPopupMenu = OptionMenu(root, tkBaudVar, *baudRates)
-# baudPopupMenu.place(x=850, y=390)
 
 dataLabel = Label(root, text='Data Rate (Hz)')
-# baudLabel.place(x=950, y=370)
 dataRates = ['1', '2', '5', '10']
 tkDataVar = StringVar(window)
-tkDataVar.set('10') #default is first comm port
+tkDataVar.set('10') #default is 10 Hz, 115200bps
 dataPopupMenu = OptionMenu(root, tkDataVar, *dataRates)
-# baudPopupMenu.place(x=950, y=390)
 serialButton = Button(root, text='Show Advanced Serial Settings', command=showSerialDropdowns)
 serialButton.place(x=850, y=gpsHeight+60)
 
@@ -701,7 +694,6 @@ tkPortVar = StringVar(window)
 popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
 commLabel.pack()
 popupMenu.pack()
-# tkvar.trace('w', commSelect)
 
 # Update COMM ports popup menu and search for GPS device
 def updatePortsDropdown():
@@ -1287,7 +1279,7 @@ vehPathDataFile = outDir + '/' + vehPathDataFileName
 # Setup data collection UI
 #
 ############################################################################
-# totalLanes = 8
+
 marginLeft = 750
 window_width = max(1400, totalLanes*100+300+marginLeft)
 window.geometry(str(window_width)+'x750')
@@ -1330,10 +1322,12 @@ carPosHeading = 0
 markerHeight = 20
 markerWidth = 20
 
-marker_list = []
-marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|")
-marker_list.append("markers=color:red|label:End|" + str(wzEndLat) + "," + str(wzEndLon) + "|")
+if not marker_list:
+    marker_list = []
+    marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|")
+    marker_list.append("markers=color:red|label:End|" + str(wzEndLat) + "," + str(wzEndLon) + "|")
 
+# Calculate map bounds from google maps zoom level
 def getCurrentMapBounds():
     global horizBound
     global vertBound
@@ -1346,6 +1340,7 @@ def getCurrentMapBounds():
     horizBound = imgWidth * scale
     vertBound = imgHeight * scale * math.cos(centerLat*math.pi/180) #.77 -78.388249  * math.cos(centerLat*math.pi/180)
 
+# Caculate pixel location on screen from bounds (Linear Interpolation)
 def getPixelLocation(lat, lon):
     x = (lon - centerLon) / (horizBound / 2)
     y = -(lat - centerLat) / (vertBound / 2) # / math.cos(lat*math.pi/180) * math.cos(centerLat*math.pi/180)
@@ -1356,6 +1351,7 @@ def getPixelLocation(lat, lon):
         y = -1
     return x, y
 
+# Calculate google maps zoom level to fit a rectangle
 def calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight):
     global zoom
     global centerLat
@@ -1427,13 +1423,14 @@ def end_application():
     logFile.close()
     sys.exit(0)
 
-# def setupVehPathDataAcqUI(root, window_width, totalLanes, dataLane, marginLeft, laneLine, carlabel, laneClicked, workersPresentClicked):
+# Initialize UI lane variables
 lanes = [0]*(totalLanes+1)
 laneBoxes = [0]*(totalLanes+1)
 laneLabels = [0]*(totalLanes+1)
 laneSymbols = [0]*(totalLanes+1)
 laneLines = [0]*(totalLanes+1)
 
+# Zoom in or out by 1 unit
 def changeZoom(incr):
     global mapImg
     global zoom
@@ -1445,6 +1442,7 @@ def changeZoom(incr):
     getCurrentMapBounds()
     updatePosition()
 
+# Move 1/5 of the screen size based on direct
 def moveMap(direct):
     global centerLat
     global centerLon
@@ -1475,6 +1473,7 @@ def moveMap(direct):
 mapLabel = Label(root, image = mapImg)
 mapLabel.place(x=50, y=60)
 
+# If manual detection, no map to move so do not place buttons
 if not manualDetection:
     bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
     bZoomIn.place(x=540, y=68)
@@ -1492,6 +1491,7 @@ if not manualDetection:
 
 carLabel = Label(root, image = userPositionImg, highlightthickness = 0, borderwidth = 0, width= 0, height = 0)
 
+# Update position of marker on screen
 def updatePosition():
     global carLabel
     if not mapFailed:
@@ -1877,7 +1877,7 @@ def build_all_messages():
 ###
 
     atRefPoint  = [0,0,0]                                           #temporary list to hold return values from function below 
-    buildVehPathData_LaneStat(vehPathDataFile,totalLanes,pathPt,laneStat,wpStat,refPoint,atRefPoint,sampleFreq)
+    buildVehPathData_LaneStat(vehPathDataFile,totalLanes,pathPt,laneStat,wpStat,refPoint,atRefPoint,dataRate)
 
     refPtIdx    = atRefPoint[0]
     wzLen       = atRefPoint[1]
@@ -1928,7 +1928,7 @@ def build_all_messages():
 
     wzMapLen = [0,0]                                    #both approach and wz mapped length
     laneType = 1                                        #approach lanes
-    getLanePt(laneType,pathPt,appMapPt,laneWidth,lanePadApp,refPtIdx,appMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList)
+    getLanePt(laneType,pathPt,appMapPt,laneWidth,lanePadApp,refPtIdx,appMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList,dataRate)
 
     logMsg(' --- Mapped Approach Lanes: '+str(int(wzMapLen[0]))+' meters')
 
@@ -1941,7 +1941,7 @@ def build_all_messages():
 ###
     
     laneType    = 2                                     #wz lanes
-    getLanePt(laneType,pathPt,wzMapPt,laneWidth,lanePadWZ,refPtIdx,wzMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList)
+    getLanePt(laneType,pathPt,wzMapPt,laneWidth,lanePadWZ,refPtIdx,wzMapPtDist,laneStat,wpStat,dataLane,wzMapLen,speedList,dataRate)
 
     logMsg(' --- Mapped Work zone Lanes: '+str(int(wzMapLen[1]))+' meters')
 
