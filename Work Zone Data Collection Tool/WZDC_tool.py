@@ -453,13 +453,16 @@ msg.place(x=100, y=80)
 # Retrieve zure cloud connection string from environment variable
 connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
 connect_str = os.getenv(connect_str_env_var)
+has_azure_connection = False
 if not connect_str:
-    logMsg('ERROR: Failed to load connection string from environment variable: ' + connect_str_env_var)
-    logFile.close()
-    messagebox.showerror('Unable to retrieve azure credentials', 'Unable to Retrieve Azure Credentials:\nTo enable cloud connection, configure your \
-    \nenvironment variables and restart your command window')
-    sys.exit(0)
+    has_azure_connection = False
+    logMsg('Error: Failed to load connection string from environment variable: ' + connect_str_env_var)
+    # logFile.close()
+    # messagebox.showerror('Unable to retrieve azure credentials', 'Unable to Retrieve Azure Credentials:\nTo enable cloud connection, configure your \
+    # \nenvironment variables and restart your command window')
+    # sys.exit(0)
 else:
+    has_azure_connection = True
     logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
 
 download_file_path = './Config Files/local_config.json'
@@ -496,7 +499,7 @@ def loadCloudContent():
 
 
     # If internet connection detected, load cloud config files
-    if internet_on():
+    if internet_on() and has_azure_connection:
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
         container_name = 'publishedconfigfiles'
         container_client = blob_service_client.get_container_client(container_name)
@@ -555,8 +558,23 @@ def loadCloudContent():
             wzConfig_file = StringVar()
             wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
             wzConfig_file_name.place(x=220,y=390)
-    else:
+    elif not internet_on:
         config_label_or = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
+        config_label_or.place(x=150, y=200)
+
+        diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+        diag_wzConfig_file.place(x=115,y=280)
+
+        # wzConfig_file = StringVar()
+        try:
+            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+            wzConfig_file_name.place(x=220,y=290)
+        except:
+            wzConfig_file = StringVar()
+            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+            wzConfig_file_name.place(x=220,y=290)
+    else:
+        config_label_or = Label(root, text='No azure connection string detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
         config_label_or.place(x=150, y=200)
 
         diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
@@ -1129,48 +1147,48 @@ def enableForm():
     bWP['state'] = NORMAL
 
 
-def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize="640x640", imgformat="jpeg",
-                          maptype="roadmap", markers=None ):  
-    """retrieve a map (image) from the static google maps server 
+# def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize="640x640", imgformat="jpeg",
+#                           maptype="roadmap", markers=None ):  
+#     """retrieve a map (image) from the static google maps server 
     
-     See: http://code.google.com/apis/maps/documentation/staticmaps/
+#      See: http://code.google.com/apis/maps/documentation/staticmaps/
         
-        Creates a request string with a URL like this:
-        http://maps.google.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=14&size=512x512&maptype=roadmap
-&markers=color:blue|label:S|40.702147,-74.015794&sensor=false"""
+#         Creates a request string with a URL like this:
+#         http://maps.google.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=14&size=512x512&maptype=roadmap
+# &markers=color:blue|label:S|40.702147,-74.015794&sensor=false"""
     
     
-    if not internet_on():
-        messagebox.showerror('No Internet Connection', 'No internet conenction detected. Please reconnect to the internet to update the map')
-        return
+#     if not internet_on():
+#         messagebox.showerror('No Internet Connection', 'No internet conenction detected. Please reconnect to the internet to update the map')
+#         return
 
-    # assemble the URL
-    request =  "http://maps.google.com/maps/api/staticmap?" # base URL, append query params, separated by &
-    apiKey = os.getenv('GOOGLE_MAPS_API_KEY')
-    # if center and zoom  are not given, the map will show all marker locations
-    request += "key=%s&" % apiKey
-    if center != None:
-        request += "center=%s&" % center
-    if zoom != None:
-        request += "zoom=%i&" % zoom  # zoom 0 (all of the world scale ) to 22 (single buildings scale)
+#     # assemble the URL
+#     request =  "http://maps.google.com/maps/api/staticmap?" # base URL, append query params, separated by &
+#     apiKey = os.getenv('GOOGLE_MAPS_API_KEY')
+#     # if center and zoom  are not given, the map will show all marker locations
+#     request += "key=%s&" % apiKey
+#     if center != None:
+#         request += "center=%s&" % center
+#     if zoom != None:
+#         request += "zoom=%i&" % zoom  # zoom 0 (all of the world scale ) to 22 (single buildings scale)
 
-    request += "size=%ix%i&" % (imgsize)  # tuple of ints, up to 640 by 640
-    request += "format=%s&" % imgformat
-    request += "bearing=90&"
-    # request += "maptype=%s&" % maptype  # roadmap, satellite, hybrid, terrain
+#     request += "size=%ix%i&" % (imgsize)  # tuple of ints, up to 640 by 640
+#     request += "format=%s&" % imgformat
+#     request += "bearing=90&"
+#     # request += "maptype=%s&" % maptype  # roadmap, satellite, hybrid, terrain
 
-    # add markers (location and style)
-    if markers != None:
-        for marker in markers:
-                request += "%s&" % marker
+#     # add markers (location and style)
+#     if markers != None:
+#         for marker in markers:
+#                 request += "%s&" % marker
 
-    request = request.rstrip('&')
-    # #request += "mobile=false&"  # optional: mobile=true will assume the image is shown on a small screen (mobile device)
-    # request += "sensor=false"   # must be given, deals with getting loction from mobile device
-    try:
-        urllib.request.urlretrieve(request, filename_wo_extension)
-    except exception as e:
-        messagebox.showerror('Error Retrieving Map Image', 'Error retrieving map image: ' + str(e))
+#     request = request.rstrip('&')
+#     # #request += "mobile=false&"  # optional: mobile=true will assume the image is shown on a small screen (mobile device)
+#     # request += "sensor=false"   # must be given, deals with getting loction from mobile device
+#     try:
+#         urllib.request.urlretrieve(request, filename_wo_extension)
+#     except exception as e:
+#         messagebox.showerror('Error Retrieving Map Image', 'Error retrieving map image: ' + str(e))
 
 GPSRate     = 10                                #GPS data rate in Hz
 GPSDate     = ''                                #GPS Date
@@ -1408,11 +1426,11 @@ if manualDetection: #No map image to load
     shutil.copy('./images/map_failed.png', mapFileName)
     mapFailed = True
 # If automatic detection, attempt to load image
-else:
-    # If internet on, load cloud image
-    if internet_on():
-        get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
-        mapFailed = False
+# else:
+#     # If internet on, load cloud image
+#     if internet_on():
+#         get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
+#         mapFailed = False
     # If no internet, leave image as is (This image was set from the configuration file ImageString)
 mapImg = ImageTk.PhotoImage(Image.open(mapFileName))
 
@@ -1431,63 +1449,63 @@ laneSymbols = [0]*(totalLanes+1)
 laneLines = [0]*(totalLanes+1)
 
 # Zoom in or out by 1 unit
-def changeZoom(incr):
-    global mapImg
-    global zoom
-    global mapLabel
-    zoom += incr
-    get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
-    mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
-    mapLabel.configure(image = mapImg)
-    getCurrentMapBounds()
-    updatePosition()
+# def changeZoom(incr):
+#     global mapImg
+#     global zoom
+#     global mapLabel
+#     zoom += incr
+#     get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
+#     mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
+#     mapLabel.configure(image = mapImg)
+#     getCurrentMapBounds()
+#     updatePosition()
 
-# Move 1/5 of the screen size based on direct
-def moveMap(direct):
-    global centerLat
-    global centerLon
-    global center
-    global mapImg
-    global mapLabel
+# # Move 1/5 of the screen size based on direct
+# def moveMap(direct):
+#     global centerLat
+#     global centerLon
+#     global center
+#     global mapImg
+#     global mapLabel
 
-    fract = 1/5
-    distanceVert = 0
-    distanceHoriz = 0
-    if direct == 'u':
-        distanceVert = vertBound*fract
-    elif direct == 'd':
-        distanceVert = -vertBound*fract
-    elif direct == 'r':
-        distanceHoriz = horizBound*fract
-    elif direct == 'l':
-        distanceHoriz = -horizBound*fract
-    centerLat += distanceVert
-    centerLon += distanceHoriz
-    center = str(centerLat) + ',' + str(centerLon)
+#     fract = 1/5
+#     distanceVert = 0
+#     distanceHoriz = 0
+#     if direct == 'u':
+#         distanceVert = vertBound*fract
+#     elif direct == 'd':
+#         distanceVert = -vertBound*fract
+#     elif direct == 'r':
+#         distanceHoriz = horizBound*fract
+#     elif direct == 'l':
+#         distanceHoriz = -horizBound*fract
+#     centerLat += distanceVert
+#     centerLon += distanceHoriz
+#     center = str(centerLat) + ',' + str(centerLon)
 
-    get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
-    mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
-    mapLabel.configure(image = mapImg)
-    updatePosition()
+#     get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
+#     mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
+#     mapLabel.configure(image = mapImg)
+#     updatePosition()
 
 mapLabel = Label(root, image = mapImg)
 mapLabel.place(x=50, y=60)
 
 # If manual detection, no map to move so do not place buttons
-if not manualDetection:
-    bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
-    bZoomIn.place(x=540, y=68)
-    bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
-    bZoomOut.place(x=540, y=102)
+# if not manualDetection:
+#     bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
+#     bZoomIn.place(x=540, y=68)
+#     bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
+#     bZoomOut.place(x=540, y=102)
 
-    bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
-    bMoveUp.place(x=610, y=60)
-    bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
-    bMoveRight.place(x=635, y=85)
-    bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
-    bMoveDown.place(x=610, y=110)
-    bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
-    bMoveLeft.place(x=585, y=85)
+#     bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
+#     bMoveUp.place(x=610, y=60)
+#     bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
+#     bMoveRight.place(x=635, y=85)
+#     bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
+#     bMoveDown.place(x=610, y=110)
+#     bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
+#     bMoveLeft.place(x=585, y=85)
 
 carLabel = Label(root, image = userPositionImg, highlightthickness = 0, borderwidth = 0, width= 0, height = 0)
 
@@ -2076,17 +2094,17 @@ def updateConfigImage():
     marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|")
     marker_list.append("markers=color:red|label:End|" + str(wzEndLat) + "," + str(wzEndLon) + "|")
 
-    encoded_string = ''
-    if internet_on():
-        get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
-        with open(mapFileName, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode()
-        needsImage = False
+    # encoded_string = ''
+    # if internet_on():
+    #     get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
+    #     with open(mapFileName, "rb") as image_file:
+    #         encoded_string = base64.b64encode(image_file.read()).decode()
+    #     needsImage = False
 
     wzConfig['ImageInfo']['Zoom'] = zoom
     wzConfig['ImageInfo']['Center']['Lat'] = centerLat
     wzConfig['ImageInfo']['Center']['Lon'] = centerLon
-    wzConfig['ImageInfo']['ImageString'] = str(encoded_string)
+    wzConfig['ImageInfo']['ImageString'] = ''
 
     cfg = open(local_config_path, 'w')
     cfg.write(json.dumps(wzConfig, indent='  '))
@@ -2147,14 +2165,17 @@ def create_messages_and_zip():
 
     logMsg('Removing local configuration file: ' + local_config_path)
 
-    connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
-    connect_str = os.getenv(connect_str_env_var)
-    logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
-    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-    container_name = 'workzonedatauploads'
-    load_config['bg'] = 'green'
-    load_config['state']= NORMAL
-    loading_label.destroy()
+    # connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
+    # connect_str = os.getenv(connect_str_env_var)
+    if has_azure_connection:
+        logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+        container_name = 'workzonedatauploads'
+        load_config['bg'] = 'green'
+        load_config['state']= NORMAL
+        loading_label.destroy()
+    else:
+
 
 root.after(500, create_messages_and_zip)
 
