@@ -885,7 +885,7 @@ def getNMEA_String():
         # Automatically start/end data collection
         if dataLog:
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
-            if distanceToEndPt < 20 and distanceToEndPt > prevDistance and gotRefPt: #Leaving Workzone
+            if distanceToEndPt < 20 and distanceToEndPt > prevDistance and gotRefPt and not manualDetection: #Leaving Workzone
                 logMsg('-------- Exiting Work Zone (by location, distance=' + str(distanceToEndPt) + ') -------')
                 stopDataLog()
                 #appRunning = False
@@ -902,7 +902,7 @@ def getNMEA_String():
 
         else:
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if distanceToStartPt < 50: #Entering Workzone
+            if distanceToStartPt < 50 and not manualDetection: #Entering Workzone
                 logMsg('-------- Entering Work Zone (by location, distance=' + str(distanceToStartPt) + ') -------')
                 startDataLog()
                 prevDistance = distanceToStartPt
