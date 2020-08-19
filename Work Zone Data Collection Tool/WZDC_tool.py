@@ -54,9 +54,11 @@ from    wz_msg_segmentation     import buildMsgSegNodeList  #msg segmentation no
 # Load local configuration file
 def inputFileDialog():
     global local_config_path
+    global local_updated_config_path
     filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.json")])
     if len(filename): 
         local_config_path = filename
+        local_updated_config_path = local_config_path.replace('.json', '_updated.json')
         logMsg('Reading configuration file')
         try:
             configRead()
@@ -308,6 +310,7 @@ def downloadBlob(local_blob_path, blobName):
 # Download configuration file from Azure blob storage and read file
 def downloadConfig():
     global local_config_path
+    global local_updated_config_path
     blobName = listbox.get(listbox.curselection())
     logMsg('Blob selected to download: ' + blobName)
 
@@ -335,6 +338,7 @@ def downloadConfig():
 
     local_blob_path = configDirectory + '/' + blobName
     local_config_path = local_blob_path
+    local_updated_config_path = local_config_path.replace('.json', '_updated.json')
 
     downloadBlob(local_blob_path, blob_full_name)
 
@@ -440,6 +444,7 @@ except Exception as e:
 
 configDirectory = './Config Files'
 local_config_path = ''
+local_updated_config_path = ''
 isConfigReady = False
 
 lbl_top = Label(root, text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
@@ -458,6 +463,7 @@ if not connect_str:
     has_azure_connection = False
     logMsg('Error: Failed to load connection string from environment variable: ' + connect_str_env_var)
     # logFile.close()
+
     # messagebox.showerror('Unable to retrieve azure credentials', 'Unable to Retrieve Azure Credentials:\nTo enable cloud connection, configure your \
     # \nenvironment variables and restart your command window')
     # sys.exit(0)
@@ -467,6 +473,7 @@ else:
 
 download_file_path = './Config Files/local_config.json'
 mapFileName = "./mapImage.png"
+refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))
 
 def loadCloudContent():
     global blob_service_client
@@ -559,8 +566,8 @@ def loadCloudContent():
             wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
             wzConfig_file_name.place(x=220,y=390)
     elif not internet_on:
-        config_label_or = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
-        config_label_or.place(x=150, y=200)
+        config_label_error = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
+        config_label_error.place(x=150, y=200)
 
         diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
         diag_wzConfig_file.place(x=115,y=280)
@@ -573,25 +580,24 @@ def loadCloudContent():
             wzConfig_file = StringVar()
             wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
             wzConfig_file_name.place(x=220,y=290)
+
+        refreshButton = Button(root, image = refreshImg, command=loadCloudContent)
+        refreshButton.place(x=50, y=200)
     else:
-        config_label_or = Label(root, text='No azure connection string detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
-        config_label_or.place(x=150, y=200)
+        # config_label_error = Label(root, text='No azure connection string detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
+        # config_label_error.place(x=150, y=200)
 
         diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
-        diag_wzConfig_file.place(x=115,y=280)
+        diag_wzConfig_file.place(x=115,y=210)
 
         # wzConfig_file = StringVar()
         try:
             wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-            wzConfig_file_name.place(x=220,y=290)
+            wzConfig_file_name.place(x=220,y=220)
         except:
             wzConfig_file = StringVar()
             wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-            wzConfig_file_name.place(x=220,y=290)
-
-refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))                                         # Car image
-refreshButton = Button(root, image = refreshImg, command=loadCloudContent)                                  # Label with car image , command=loadCloudContent
-refreshButton.place(x=50, y=200)
+            wzConfig_file_name.place(x=220,y=220)
 
 radioHeight = 210
 Label(root, text='Beginning and Ending of Work Zone Locations', font='Helvetica 12 bold', padx=10, pady=10).place(x=800,y=radioHeight)
@@ -646,12 +652,21 @@ def testGPSConnection(retry=False, *args):
                 # print(NMEAData)
                 if NMEAData[0:3] == '$GP':
                     gpsFound = True
-                if NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]:
-                    gpsFix = True
-                    break
-                elif NMEAData[0:6] == '$GPGGA' and NMEAData.split(',')[2]:
-                    gpsFix = True
-                    break
+                    if NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]:
+                        gpsFix = True
+                        break
+                    elif NMEAData[0:6] == '$GPGGA' and NMEAData.split(',')[2]:
+                        gpsFix = True
+                        break
+
+                elif NMEAData[0:3] == '$GN':
+                    gpsFound = True
+                    if NMEAData[0:6] == '$GNVTG' and NMEAData.split(',')[1]:
+                        gpsFix = True
+                        break
+                    elif NMEAData[0:6] == '$GNGGA' and NMEAData.split(',')[2]:
+                        gpsFix = True
+                        break
     except:
         return False
     if gpsFound:
@@ -822,7 +837,6 @@ def getNMEA_String():
         try:
             if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == '$GNGGA':
                 GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid)
-
                 if GGA_out[3] == True:
                     GPSTime = GGA_out[0]
                     GPSSats = GGA_out[1]
@@ -835,9 +849,8 @@ def getNMEA_String():
     #       --- Parse RMC ---
     ###
 
-            if NMEAData[0:6] == '$GPRMC':
+            if NMEAData[0:6] == '$GPRMC' or NMEAData[0:6] == '$GNRMC':
                 RMC_out = parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid)
-
                 if RMC_out[5] == True:
                     GPSDate     = RMC_out[0]
                     GPSLat      = RMC_out[1]
@@ -852,7 +865,7 @@ def getNMEA_String():
     #       --- Parse GSA ---
     ###
 
-            if NMEAData[0:6] == '$GPGSA':
+            if NMEAData[0:6] == '$GPGSA' or NMEAData[0:6] == '$GNGSA':
                 GSA_out = parseGxGSA(NMEAData,GPSHdop,GSAValid)
                 if GSA_out[1] == True:
                     GPSHdop = GSA_out[0]
@@ -863,14 +876,16 @@ def getNMEA_String():
             logMsg('ERROR: GPS parsing failed. ' + str(e))
             continue
 
+        # Update marker position on map
         carPosLat = GPSLat
         carPosLon = GPSLon
         carHeading = GPSHeading
         updatePosition()
         
+        # Automatically start/end data collection
         if dataLog:
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
-            if distanceToEndPt < 20 and distanceToEndPt > prevDistance: #Leaving Workzone
+            if distanceToEndPt < 20 and distanceToEndPt > prevDistance and gotRefPt: #Leaving Workzone
                 logMsg('-------- Exiting Work Zone (by location, distance=' + str(distanceToEndPt) + ') -------')
                 stopDataLog()
                 #appRunning = False
@@ -1061,6 +1076,7 @@ def markStartPt():
     global wzStartLon
 
     bStart['state'] = DISABLED
+    bStart['bg'] = 'gray92'
 
     wzConfig['Location']['BeginningLocation']['Lat'] = GPSLat
     wzConfig['Location']['BeginningLocation']['Lon'] = GPSLon
@@ -2063,8 +2079,9 @@ window.geometry('400x300')
 root = Frame(width=400, height=300)
 root.place(x=0, y=0)
 
-load_config = Button(root, text='Upload Data\nFiles', state=DISABLED, font='Helvetica 20', padx=5,command=uploadArchive)
-load_config.place(x=100, y=100)
+if has_azure_connection:
+    load_config = Button(root, text='Upload Data\nFiles', state=DISABLED, font='Helvetica 20', padx=5,command=uploadArchive)
+    load_config.place(x=100, y=100)
 
 loading_label = Label(root, text='Processing Data', font='Helvetica 28', bg='gray', padx=5)
 loading_label.place(x=60, y=120)
@@ -2106,7 +2123,7 @@ def updateConfigImage():
     wzConfig['ImageInfo']['Center']['Lon'] = centerLon
     wzConfig['ImageInfo']['ImageString'] = ''
 
-    cfg = open(local_config_path, 'w')
+    cfg = open(local_updated_config_path, 'w')
     cfg.write(json.dumps(wzConfig, indent='  '))
     cfg.close()
 
@@ -2122,7 +2139,10 @@ def create_messages_and_zip():
 
     build_all_messages()
     files_list.append(vehPathDataFile)
-    files_list.append(local_config_path)
+    if configUpdated:
+        files_list.append(local_updated_config_path)
+    else:
+        files_list.append(local_config_path)
 
     description = wzDesc.lower().strip().replace(' ', '-')
     road_name = roadName.lower().strip().replace(' ', '-')
@@ -2163,7 +2183,9 @@ def create_messages_and_zip():
     # close the Zip File
     zipObj.close()
 
-    logMsg('Removing local configuration file: ' + local_config_path)
+    # logMsg('Removing local configuration file: ' + local_config_path)
+    if configUpdated:
+        os.remove(local_updated_config_path)
 
     # connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
     # connect_str = os.getenv(connect_str_env_var)
@@ -2171,11 +2193,16 @@ def create_messages_and_zip():
         logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
         container_name = 'workzonedatauploads'
+
         load_config['bg'] = 'green'
         load_config['state']= NORMAL
         loading_label.destroy()
     else:
-
+        logMsg('Closing log file in Message Builder and Export')
+        logFile.close()
+        messagebox.showinfo('Upload Generated Messages', 'Message generation complete. Please upload the\ngenerated ZIP file: ' + zip_name + '\nto https://neaeraconsulting.com/V2X_Upload')
+        sys.exit(0)
+        
 
 root.after(500, create_messages_and_zip)
 
