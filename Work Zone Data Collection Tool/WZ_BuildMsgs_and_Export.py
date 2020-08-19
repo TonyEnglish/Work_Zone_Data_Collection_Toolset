@@ -26,7 +26,7 @@
 #
 ###
 
-import  os.path
+import os.path
 import sys
 import subprocess
 

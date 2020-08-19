@@ -54,9 +54,11 @@ from    wz_msg_segmentation     import buildMsgSegNodeList  #msg segmentation no
 # Load local configuration file
 def inputFileDialog():
     global local_config_path
+    global local_updated_config_path
     filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.json")])
     if len(filename): 
         local_config_path = filename
+        local_updated_config_path = local_config_path.replace('.json', '_updated.json')
         logMsg('Reading configuration file')
         try:
             configRead()
@@ -308,6 +310,7 @@ def downloadBlob(local_blob_path, blobName):
 # Download configuration file from Azure blob storage and read file
 def downloadConfig():
     global local_config_path
+    global local_updated_config_path
     blobName = listbox.get(listbox.curselection())
     logMsg('Blob selected to download: ' + blobName)
 
@@ -335,6 +338,7 @@ def downloadConfig():
 
     local_blob_path = configDirectory + '/' + blobName
     local_config_path = local_blob_path
+    local_updated_config_path = local_config_path.replace('.json', '_updated.json')
 
     downloadBlob(local_blob_path, blob_full_name)
 
@@ -440,6 +444,7 @@ except Exception as e:
 
 configDirectory = './Config Files'
 local_config_path = ''
+local_updated_config_path = ''
 isConfigReady = False
 
 lbl_top = Label(root, text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
@@ -453,17 +458,22 @@ msg.place(x=100, y=80)
 # Retrieve zure cloud connection string from environment variable
 connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
 connect_str = os.getenv(connect_str_env_var)
+has_azure_connection = False
 if not connect_str:
-    logMsg('ERROR: Failed to load connection string from environment variable: ' + connect_str_env_var)
-    logFile.close()
-    messagebox.showerror('Unable to retrieve azure credentials', 'Unable to Retrieve Azure Credentials:\nTo enable cloud connection, configure your \
-    \nenvironment variables and restart your command window')
-    sys.exit(0)
+    has_azure_connection = False
+    logMsg('Error: Failed to load connection string from environment variable: ' + connect_str_env_var)
+    # logFile.close()
+
+    # messagebox.showerror('Unable to retrieve azure credentials', 'Unable to Retrieve Azure Credentials:\nTo enable cloud connection, configure your \
+    # \nenvironment variables and restart your command window')
+    # sys.exit(0)
 else:
+    has_azure_connection = True
     logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
 
 download_file_path = './Config Files/local_config.json'
 mapFileName = "./mapImage.png"
+refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))
 
 def loadCloudContent():
     global blob_service_client
@@ -496,7 +506,7 @@ def loadCloudContent():
 
 
     # If internet connection detected, load cloud config files
-    if internet_on():
+    if internet_on() and has_azure_connection:
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
         container_name = 'publishedconfigfiles'
         container_client = blob_service_client.get_container_client(container_name)
@@ -555,9 +565,9 @@ def loadCloudContent():
             wzConfig_file = StringVar()
             wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
             wzConfig_file_name.place(x=220,y=390)
-    else:
-        config_label_or = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
-        config_label_or.place(x=150, y=200)
+    elif not internet_on:
+        config_label_error = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
+        config_label_error.place(x=150, y=200)
 
         diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
         diag_wzConfig_file.place(x=115,y=280)
@@ -571,9 +581,23 @@ def loadCloudContent():
             wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
             wzConfig_file_name.place(x=220,y=290)
 
-refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))                                         # Car image
-refreshButton = Button(root, image = refreshImg, command=loadCloudContent)                                  # Label with car image , command=loadCloudContent
-refreshButton.place(x=50, y=200)
+        refreshButton = Button(root, image = refreshImg, command=loadCloudContent)
+        refreshButton.place(x=50, y=200)
+    else:
+        # config_label_error = Label(root, text='No azure connection string detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
+        # config_label_error.place(x=150, y=200)
+
+        diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+        diag_wzConfig_file.place(x=115,y=210)
+
+        # wzConfig_file = StringVar()
+        try:
+            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+            wzConfig_file_name.place(x=220,y=220)
+        except:
+            wzConfig_file = StringVar()
+            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
+            wzConfig_file_name.place(x=220,y=220)
 
 radioHeight = 210
 Label(root, text='Beginning and Ending of Work Zone Locations', font='Helvetica 12 bold', padx=10, pady=10).place(x=800,y=radioHeight)
@@ -628,12 +652,21 @@ def testGPSConnection(retry=False, *args):
                 # print(NMEAData)
                 if NMEAData[0:3] == '$GP':
                     gpsFound = True
-                if NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]:
-                    gpsFix = True
-                    break
-                elif NMEAData[0:6] == '$GPGGA' and NMEAData.split(',')[2]:
-                    gpsFix = True
-                    break
+                    if NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]:
+                        gpsFix = True
+                        break
+                    elif NMEAData[0:6] == '$GPGGA' and NMEAData.split(',')[2]:
+                        gpsFix = True
+                        break
+
+                elif NMEAData[0:3] == '$GN':
+                    gpsFound = True
+                    if NMEAData[0:6] == '$GNVTG' and NMEAData.split(',')[1]:
+                        gpsFix = True
+                        break
+                    elif NMEAData[0:6] == '$GNGGA' and NMEAData.split(',')[2]:
+                        gpsFix = True
+                        break
     except:
         return False
     if gpsFound:
@@ -804,7 +837,6 @@ def getNMEA_String():
         try:
             if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == '$GNGGA':
                 GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid)
-
                 if GGA_out[3] == True:
                     GPSTime = GGA_out[0]
                     GPSSats = GGA_out[1]
@@ -817,9 +849,8 @@ def getNMEA_String():
     #       --- Parse RMC ---
     ###
 
-            if NMEAData[0:6] == '$GPRMC':
+            if NMEAData[0:6] == '$GPRMC' or NMEAData[0:6] == '$GNRMC':
                 RMC_out = parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid)
-
                 if RMC_out[5] == True:
                     GPSDate     = RMC_out[0]
                     GPSLat      = RMC_out[1]
@@ -834,7 +865,7 @@ def getNMEA_String():
     #       --- Parse GSA ---
     ###
 
-            if NMEAData[0:6] == '$GPGSA':
+            if NMEAData[0:6] == '$GPGSA' or NMEAData[0:6] == '$GNGSA':
                 GSA_out = parseGxGSA(NMEAData,GPSHdop,GSAValid)
                 if GSA_out[1] == True:
                     GPSHdop = GSA_out[0]
@@ -845,14 +876,16 @@ def getNMEA_String():
             logMsg('ERROR: GPS parsing failed. ' + str(e))
             continue
 
+        # Update marker position on map
         carPosLat = GPSLat
         carPosLon = GPSLon
         carHeading = GPSHeading
         updatePosition()
         
+        # Automatically start/end data collection
         if dataLog:
             distanceToEndPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
-            if distanceToEndPt < 20 and distanceToEndPt > prevDistance: #Leaving Workzone
+            if distanceToEndPt < 20 and distanceToEndPt > prevDistance and gotRefPt and not manualDetection: #Leaving Workzone
                 logMsg('-------- Exiting Work Zone (by location, distance=' + str(distanceToEndPt) + ') -------')
                 stopDataLog()
                 #appRunning = False
@@ -869,7 +902,7 @@ def getNMEA_String():
 
         else:
             distanceToStartPt = round(gps_distance(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if distanceToStartPt < 50: #Entering Workzone
+            if distanceToStartPt < 50 and not manualDetection: #Entering Workzone
                 logMsg('-------- Entering Work Zone (by location, distance=' + str(distanceToStartPt) + ') -------')
                 startDataLog()
                 prevDistance = distanceToStartPt
@@ -1043,6 +1076,7 @@ def markStartPt():
     global wzStartLon
 
     bStart['state'] = DISABLED
+    bStart['bg'] = 'gray92'
 
     wzConfig['Location']['BeginningLocation']['Lat'] = GPSLat
     wzConfig['Location']['BeginningLocation']['Lon'] = GPSLon
@@ -1129,48 +1163,48 @@ def enableForm():
     bWP['state'] = NORMAL
 
 
-def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize="640x640", imgformat="jpeg",
-                          maptype="roadmap", markers=None ):  
-    """retrieve a map (image) from the static google maps server 
+# def get_static_google_map(filename_wo_extension, center=None, zoom=None, imgsize="640x640", imgformat="jpeg",
+#                           maptype="roadmap", markers=None ):  
+#     """retrieve a map (image) from the static google maps server 
     
-     See: http://code.google.com/apis/maps/documentation/staticmaps/
+#      See: http://code.google.com/apis/maps/documentation/staticmaps/
         
-        Creates a request string with a URL like this:
-        http://maps.google.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=14&size=512x512&maptype=roadmap
-&markers=color:blue|label:S|40.702147,-74.015794&sensor=false"""
+#         Creates a request string with a URL like this:
+#         http://maps.google.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=14&size=512x512&maptype=roadmap
+# &markers=color:blue|label:S|40.702147,-74.015794&sensor=false"""
     
     
-    if not internet_on():
-        messagebox.showerror('No Internet Connection', 'No internet conenction detected. Please reconnect to the internet to update the map')
-        return
+#     if not internet_on():
+#         messagebox.showerror('No Internet Connection', 'No internet conenction detected. Please reconnect to the internet to update the map')
+#         return
 
-    # assemble the URL
-    request =  "http://maps.google.com/maps/api/staticmap?" # base URL, append query params, separated by &
-    apiKey = os.getenv('GOOGLE_MAPS_API_KEY')
-    # if center and zoom  are not given, the map will show all marker locations
-    request += "key=%s&" % apiKey
-    if center != None:
-        request += "center=%s&" % center
-    if zoom != None:
-        request += "zoom=%i&" % zoom  # zoom 0 (all of the world scale ) to 22 (single buildings scale)
+#     # assemble the URL
+#     request =  "http://maps.google.com/maps/api/staticmap?" # base URL, append query params, separated by &
+#     apiKey = os.getenv('GOOGLE_MAPS_API_KEY')
+#     # if center and zoom  are not given, the map will show all marker locations
+#     request += "key=%s&" % apiKey
+#     if center != None:
+#         request += "center=%s&" % center
+#     if zoom != None:
+#         request += "zoom=%i&" % zoom  # zoom 0 (all of the world scale ) to 22 (single buildings scale)
 
-    request += "size=%ix%i&" % (imgsize)  # tuple of ints, up to 640 by 640
-    request += "format=%s&" % imgformat
-    request += "bearing=90&"
-    # request += "maptype=%s&" % maptype  # roadmap, satellite, hybrid, terrain
+#     request += "size=%ix%i&" % (imgsize)  # tuple of ints, up to 640 by 640
+#     request += "format=%s&" % imgformat
+#     request += "bearing=90&"
+#     # request += "maptype=%s&" % maptype  # roadmap, satellite, hybrid, terrain
 
-    # add markers (location and style)
-    if markers != None:
-        for marker in markers:
-                request += "%s&" % marker
+#     # add markers (location and style)
+#     if markers != None:
+#         for marker in markers:
+#                 request += "%s&" % marker
 
-    request = request.rstrip('&')
-    # #request += "mobile=false&"  # optional: mobile=true will assume the image is shown on a small screen (mobile device)
-    # request += "sensor=false"   # must be given, deals with getting loction from mobile device
-    try:
-        urllib.request.urlretrieve(request, filename_wo_extension)
-    except exception as e:
-        messagebox.showerror('Error Retrieving Map Image', 'Error retrieving map image: ' + str(e))
+#     request = request.rstrip('&')
+#     # #request += "mobile=false&"  # optional: mobile=true will assume the image is shown on a small screen (mobile device)
+#     # request += "sensor=false"   # must be given, deals with getting loction from mobile device
+#     try:
+#         urllib.request.urlretrieve(request, filename_wo_extension)
+#     except exception as e:
+#         messagebox.showerror('Error Retrieving Map Image', 'Error retrieving map image: ' + str(e))
 
 GPSRate     = 10                                #GPS data rate in Hz
 GPSDate     = ''                                #GPS Date
@@ -1408,11 +1442,11 @@ if manualDetection: #No map image to load
     shutil.copy('./images/map_failed.png', mapFileName)
     mapFailed = True
 # If automatic detection, attempt to load image
-else:
-    # If internet on, load cloud image
-    if internet_on():
-        get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
-        mapFailed = False
+# else:
+#     # If internet on, load cloud image
+#     if internet_on():
+#         get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
+#         mapFailed = False
     # If no internet, leave image as is (This image was set from the configuration file ImageString)
 mapImg = ImageTk.PhotoImage(Image.open(mapFileName))
 
@@ -1431,63 +1465,63 @@ laneSymbols = [0]*(totalLanes+1)
 laneLines = [0]*(totalLanes+1)
 
 # Zoom in or out by 1 unit
-def changeZoom(incr):
-    global mapImg
-    global zoom
-    global mapLabel
-    zoom += incr
-    get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
-    mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
-    mapLabel.configure(image = mapImg)
-    getCurrentMapBounds()
-    updatePosition()
+# def changeZoom(incr):
+#     global mapImg
+#     global zoom
+#     global mapLabel
+#     zoom += incr
+#     get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
+#     mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
+#     mapLabel.configure(image = mapImg)
+#     getCurrentMapBounds()
+#     updatePosition()
 
-# Move 1/5 of the screen size based on direct
-def moveMap(direct):
-    global centerLat
-    global centerLon
-    global center
-    global mapImg
-    global mapLabel
+# # Move 1/5 of the screen size based on direct
+# def moveMap(direct):
+#     global centerLat
+#     global centerLon
+#     global center
+#     global mapImg
+#     global mapLabel
 
-    fract = 1/5
-    distanceVert = 0
-    distanceHoriz = 0
-    if direct == 'u':
-        distanceVert = vertBound*fract
-    elif direct == 'd':
-        distanceVert = -vertBound*fract
-    elif direct == 'r':
-        distanceHoriz = horizBound*fract
-    elif direct == 'l':
-        distanceHoriz = -horizBound*fract
-    centerLat += distanceVert
-    centerLon += distanceHoriz
-    center = str(centerLat) + ',' + str(centerLon)
+#     fract = 1/5
+#     distanceVert = 0
+#     distanceHoriz = 0
+#     if direct == 'u':
+#         distanceVert = vertBound*fract
+#     elif direct == 'd':
+#         distanceVert = -vertBound*fract
+#     elif direct == 'r':
+#         distanceHoriz = horizBound*fract
+#     elif direct == 'l':
+#         distanceHoriz = -horizBound*fract
+#     centerLat += distanceVert
+#     centerLon += distanceHoriz
+#     center = str(centerLat) + ',' + str(centerLon)
 
-    get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
-    mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
-    mapLabel.configure(image = mapImg)
-    updatePosition()
+#     get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
+#     mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
+#     mapLabel.configure(image = mapImg)
+#     updatePosition()
 
 mapLabel = Label(root, image = mapImg)
 mapLabel.place(x=50, y=60)
 
 # If manual detection, no map to move so do not place buttons
-if not manualDetection:
-    bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
-    bZoomIn.place(x=540, y=68)
-    bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
-    bZoomOut.place(x=540, y=102)
+# if not manualDetection:
+#     bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
+#     bZoomIn.place(x=540, y=68)
+#     bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
+#     bZoomOut.place(x=540, y=102)
 
-    bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
-    bMoveUp.place(x=610, y=60)
-    bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
-    bMoveRight.place(x=635, y=85)
-    bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
-    bMoveDown.place(x=610, y=110)
-    bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
-    bMoveLeft.place(x=585, y=85)
+#     bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
+#     bMoveUp.place(x=610, y=60)
+#     bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
+#     bMoveRight.place(x=635, y=85)
+#     bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
+#     bMoveDown.place(x=610, y=110)
+#     bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
+#     bMoveLeft.place(x=585, y=85)
 
 carLabel = Label(root, image = userPositionImg, highlightthickness = 0, borderwidth = 0, width= 0, height = 0)
 
@@ -2045,8 +2079,9 @@ window.geometry('400x300')
 root = Frame(width=400, height=300)
 root.place(x=0, y=0)
 
-load_config = Button(root, text='Upload Data\nFiles', state=DISABLED, font='Helvetica 20', padx=5,command=uploadArchive)
-load_config.place(x=100, y=100)
+if has_azure_connection:
+    load_config = Button(root, text='Upload Data\nFiles', state=DISABLED, font='Helvetica 20', padx=5,command=uploadArchive)
+    load_config.place(x=100, y=100)
 
 loading_label = Label(root, text='Processing Data', font='Helvetica 28', bg='gray', padx=5)
 loading_label.place(x=60, y=120)
@@ -2076,19 +2111,19 @@ def updateConfigImage():
     marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|")
     marker_list.append("markers=color:red|label:End|" + str(wzEndLat) + "," + str(wzEndLon) + "|")
 
-    encoded_string = ''
-    if internet_on():
-        get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
-        with open(mapFileName, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode()
-        needsImage = False
+    # encoded_string = ''
+    # if internet_on():
+    #     get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
+    #     with open(mapFileName, "rb") as image_file:
+    #         encoded_string = base64.b64encode(image_file.read()).decode()
+    #     needsImage = False
 
     wzConfig['ImageInfo']['Zoom'] = zoom
     wzConfig['ImageInfo']['Center']['Lat'] = centerLat
     wzConfig['ImageInfo']['Center']['Lon'] = centerLon
-    wzConfig['ImageInfo']['ImageString'] = str(encoded_string)
+    wzConfig['ImageInfo']['ImageString'] = ''
 
-    cfg = open(local_config_path, 'w')
+    cfg = open(local_updated_config_path, 'w')
     cfg.write(json.dumps(wzConfig, indent='  '))
     cfg.close()
 
@@ -2104,7 +2139,10 @@ def create_messages_and_zip():
 
     build_all_messages()
     files_list.append(vehPathDataFile)
-    files_list.append(local_config_path)
+    if configUpdated:
+        files_list.append(local_updated_config_path)
+    else:
+        files_list.append(local_config_path)
 
     description = wzDesc.lower().strip().replace(' ', '-')
     road_name = roadName.lower().strip().replace(' ', '-')
@@ -2145,16 +2183,26 @@ def create_messages_and_zip():
     # close the Zip File
     zipObj.close()
 
-    logMsg('Removing local configuration file: ' + local_config_path)
+    # logMsg('Removing local configuration file: ' + local_config_path)
+    if configUpdated:
+        os.remove(local_updated_config_path)
 
-    connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
-    connect_str = os.getenv(connect_str_env_var)
-    logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
-    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-    container_name = 'workzonedatauploads'
-    load_config['bg'] = 'green'
-    load_config['state']= NORMAL
-    loading_label.destroy()
+    # connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
+    # connect_str = os.getenv(connect_str_env_var)
+    if has_azure_connection:
+        logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+        container_name = 'workzonedatauploads'
+
+        load_config['bg'] = 'green'
+        load_config['state']= NORMAL
+        loading_label.destroy()
+    else:
+        logMsg('Closing log file in Message Builder and Export')
+        logFile.close()
+        messagebox.showinfo('Upload Generated Messages', 'Message generation complete. Please upload the\ngenerated ZIP file: ' + zip_name + '\nto https://neaeraconsulting.com/V2X_Upload')
+        sys.exit(0)
+        
 
 root.after(500, create_messages_and_zip)
 
