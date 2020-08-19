@@ -1,4 +1,13 @@
 # Updates
+8/19/2020
+- Added PDFs of completed documentation
+  - V2X POC Interface Control Document
+  - V2X POC System Engineering Report
+  - V2X POC Test Case Results Report
+- Additional Features
+  - Removed requirement for environment variables (Azure connection string and google maps API key)
+  - Support for $GN NMEA sentences
+
 8/14/2020
 - Updating README to comply with ITS Codehub standards
 - Adding LICENSE, CONTRIBUTING and CHANGELOG files
