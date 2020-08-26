@@ -121,6 +121,8 @@ Contact Information: [tony@neaeraconsulting.com](mailto://tony@neaeraconsulting.
 
 To track how this government-funded code is used, we request that if you decide to build additional software using this code please acknowledge its Digital Object Identifier in your software's README/documentation.
 
+Digital Object Identifier: https://doi.org/10.21949/1519288
+
 ## Abbreviations
 
 CAMP tool: Crash Avoidance Metrics Partnership
