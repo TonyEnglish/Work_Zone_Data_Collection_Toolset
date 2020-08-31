@@ -34,6 +34,7 @@ import subprocess
 #     Open and read csv file...    
 ###
 
+import  re
 import  csv                                             #csv file processor
 import  datetime                                        #Date and Time methods...
 import  time                                            #do I need time???
