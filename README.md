@@ -1,3 +1,5 @@
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=coverage)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
+
 # V2X Manual Data Collection
 
 ## Project Description
