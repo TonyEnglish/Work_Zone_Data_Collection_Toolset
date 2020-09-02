@@ -1,4 +1,9 @@
 # Updates
+9/2/2020
+- Integrated Sonar Cloud and Travis.ci into master branch
+- Fixed bugs and code smells from sonar cloud analysis
+- Removed unnecessary files (images + icons)
+
 8/19/2020
 - Added PDFs of completed documentation
   - V2X POC Interface Control Document
