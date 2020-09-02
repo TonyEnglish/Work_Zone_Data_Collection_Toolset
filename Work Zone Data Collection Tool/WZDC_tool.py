@@ -46,7 +46,9 @@ from    wz_map_constructor  import getDist              #get distance in meters 
 
 from    wz_xml_builder          import build_xml_CC         #common container
 from    wz_xml_builder          import build_xml_WZC        #WZ container
-from    rsm_2_wzdx_translator   import wzdx_creator         #RSM to WZDx Translator
+
+sys.path.append('..')
+from    Translators.rsm_2_wzdx_translator   import wzdx_creator         #RSM to WZDx Translator
 
 from    wz_msg_segmentation     import buildMsgSegNodeList  #msg segmentation node list builder
 
