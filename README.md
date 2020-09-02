@@ -1,4 +1,7 @@
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=coverage)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=bugs)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=security_rating)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
 
 # V2X Manual Data Collection
 
