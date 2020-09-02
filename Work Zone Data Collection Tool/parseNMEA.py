@@ -23,7 +23,7 @@ import string
 #   parse $GxGGA sentence... x = P GPS, N = GNSS
 ###
 
-def parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid):   
+def parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt):   
 
 ###
 #       Input:  NMEAData
@@ -107,7 +107,7 @@ def parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid):
 #   parse $GxRMC sentence...
 ###
 
-def parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid):    
+def parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading):    
 
 ###
 #       Input:  NMEAData
@@ -198,7 +198,7 @@ def parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid):
 #   parse $GxGSA sentence...
 ###
 
-def parseGxGSA(NMEAData,GPSHdop,GSAValid):    
+def parseGxGSA(NMEAData,GPSHdop):    
 
 ###
 #       Input:  NMEAData

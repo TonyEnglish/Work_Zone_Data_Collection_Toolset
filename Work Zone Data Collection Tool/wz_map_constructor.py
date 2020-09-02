@@ -214,7 +214,7 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
     # lonRP       = pathPt[refPt][2]
     # altRP       = pathPt[refPt][3]
     # ctrHead     = pathPt[refPt][4]                      #current heading
-    dataFreq = 10.0
+    # dataFreq = 10.0
     distVec = 0
     stopIndex = 0
     startIndex = 0

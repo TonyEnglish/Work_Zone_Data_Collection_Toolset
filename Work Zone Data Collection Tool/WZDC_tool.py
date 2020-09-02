@@ -26,7 +26,8 @@ import  xmltodict                                       #dict to xml converter
 
 from    azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
-from    tkinter         import *   
+# from    tkinter         import *   
+from    tkinter         import Button, Tk, Frame, Label, LEFT, W, IntVar, StringVar, Radiobutton, CENTER, Listbox, Scrollbar, END, Entry, SUNKEN, DISABLED, OptionMenu, NORMAL
 from    tkinter         import messagebox
 from    tkinter         import filedialog
 from    PIL             import ImageTk, Image
@@ -58,7 +59,7 @@ def inputFileDialog():
     filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.json")])
     if len(filename): 
         local_config_path = filename
-        local_updated_config_path = local_config_path.replace('.json', '_updated.json')
+        local_updated_config_path = local_config_path.replace(json_ext, '_updated.json')
         logMsg('Reading configuration file')
         try:
             configRead()
@@ -179,7 +180,7 @@ def getConfigVars():
     endingMilepost          = wzConfig['GeneralInfo']['EndingMilePost']
     eventStatus             = wzConfig['GeneralInfo']['EventStatus']
     creationDate            = wzConfig['GeneralInfo'].get('CreationDate', '')
-    updateDate              = wzConfig['GeneralInfo'].get('UpdateDate', datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+    updateDate              = wzConfig['GeneralInfo'].get('UpdateDate', datetime.datetime.now().strftime(time_format_iso))
 
     typeOfWork = wzConfig['TypesOfWork']
     if not typeOfWork: typeOfWork = []
@@ -197,12 +198,12 @@ def getConfigVars():
     c_sc_codes              = [int(wzConfig['CauseCodes']['CauseCode']), int(wzConfig['CauseCodes']['SubCauseCode'])]
 
     startDateTime           = wzConfig['Schedule']['StartDate']
-    wzStartDate             = datetime.datetime.strptime(startDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y")
-    wzStartTime             = datetime.datetime.strptime(startDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%H:%M")
+    wzStartDate             = datetime.datetime.strptime(startDateTime, time_format_iso).strftime("%m/%d/%Y")
+    wzStartTime             = datetime.datetime.strptime(startDateTime, time_format_iso).strftime("%H:%M")
     startDateAccuracy       = wzConfig['Schedule'].get('StartDateAccuracy', 'estimated')
     endDateTime             = wzConfig['Schedule']['EndDate']
-    wzEndDate               = datetime.datetime.strptime(endDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y")
-    wzEndTime               = datetime.datetime.strptime(endDateTime, "%Y-%m-%dT%H:%M:%SZ").strftime("%H:%M")
+    wzEndDate               = datetime.datetime.strptime(endDateTime, time_format_iso).strftime("%m/%d/%Y")
+    wzEndTime               = datetime.datetime.strptime(endDateTime, time_format_iso).strftime("%H:%M")
     endDateAccuracy         = wzConfig['Schedule'].get('EndDateAccuracy', 'estimated')
     wzDaysOfWeek            = wzConfig['Schedule']['DaysOfWeek']
 
@@ -242,10 +243,10 @@ def getConfigVars():
             fh.close()
             mapFailed = False
         except:
-            shutil.copy('./images/map_failed.png', mapFileName)
+            shutil.copy(map_failed_img, mapFileName)
             mapFailed = True
     else:
-        shutil.copy('./images/map_failed.png', mapFileName)
+        shutil.copy(map_failed_img, mapFileName)
         mapFailed = True
  
 # Set description box in UI from config file
@@ -338,7 +339,7 @@ def downloadConfig():
 
     local_blob_path = configDirectory + '/' + blobName
     local_config_path = local_blob_path
-    local_updated_config_path = local_config_path.replace('.json', '_updated.json')
+    local_updated_config_path = local_config_path.replace(json_ext, '_updated.json')
 
     downloadBlob(local_blob_path, blob_full_name)
 
@@ -402,6 +403,17 @@ configUpdated = False
 manualDetection = False
 mapFailed = False
 
+json_ext = '.json'
+geojson_ext = '.geojson'
+uper_ext = '.uper'
+xml_ext = '.xml'
+
+time_format_iso = "%Y-%m-%dT%H:%M:%SZ"
+
+map_failed_img = './images/map_failed.png'
+helvetica_14 = 'Helvetica 14'
+choose_local_config = 'Choose Local\nConfig File'
+
 ###
 #   WZ config parser object....
 ###
@@ -447,7 +459,7 @@ local_config_path = ''
 local_updated_config_path = ''
 isConfigReady = False
 
-lbl_top = Label(root, text='Work Zone Data Collection\n', font='Helvetica 14', fg='royalblue', pady=10)
+lbl_top = Label(root, text='Work Zone Data Collection\n', font=helvetica_14, fg='royalblue', pady=10)
 lbl_top.place(x=550, y=10)
 
 msg = Label(root, text='NO CONFIGURATION FILE SELECTED',bg='slategray1', fg='red',justify=LEFT,anchor=W,padx=10,pady=10, font=('Calibri', 12))
@@ -541,7 +553,7 @@ def loadCloudContent():
         blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
         for blob in blobListSorted:
             blob_name = blob.name.split('/')[-1]
-            if '.json' in blob_name:
+            if json_ext in blob_name:
                 blob_names_dict[blob_name] = blob.name
                 listbox.insert(END, blob_name)
 
@@ -552,7 +564,7 @@ def loadCloudContent():
         config_label_or = Label(root, text='OR', font='Helvetica 10', padx=5)
         config_label_or.place(x=150, y=352)
 
-        diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+        diag_wzConfig_file = Button(root, text=choose_local_config, command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
         diag_wzConfig_file.place(x=115,y=380)
 
         # wzConfig_file = StringVar()
@@ -569,7 +581,7 @@ def loadCloudContent():
         config_label_error = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
         config_label_error.place(x=150, y=200)
 
-        diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+        diag_wzConfig_file = Button(root, text=choose_local_config, command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
         diag_wzConfig_file.place(x=115,y=280)
 
         # wzConfig_file = StringVar()
@@ -587,7 +599,7 @@ def loadCloudContent():
         # config_label_error = Label(root, text='No azure connection string detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
         # config_label_error.place(x=150, y=200)
 
-        diag_wzConfig_file = Button(root, text='Choose Local\nConfig File', command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
+        diag_wzConfig_file = Button(root, text=choose_local_config, command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
         diag_wzConfig_file.place(x=115,y=210)
 
         # wzConfig_file = StringVar()
@@ -631,7 +643,7 @@ loadCloudContent()
 # instr_label = Label(root, text=instructions,justify=CENTER, bg='slategray1',anchor=W,padx=10,pady=10, font=('Calibri', 12))
 # instr_label.place(x=700, y=30)
 
-btnBegin = Button(root, text='Begin Data\nCollection', font='Helvetica 14',border=2,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
+btnBegin = Button(root, text='Begin Data\nCollection', font=helvetica_14,border=2,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
 btnBegin.place(x=570,y=390)
 
 isGPSReady = False
@@ -836,7 +848,7 @@ def getNMEA_String():
 ###
         try:
             if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == '$GNGGA':
-                GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt,GGAValid)
+                GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt)
                 if GGA_out[3] == True:
                     GPSTime = GGA_out[0]
                     GPSSats = GGA_out[1]
@@ -850,7 +862,7 @@ def getNMEA_String():
     ###
 
             if NMEAData[0:6] == '$GPRMC' or NMEAData[0:6] == '$GNRMC':
-                RMC_out = parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading,RMCValid)
+                RMC_out = parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading)
                 if RMC_out[5] == True:
                     GPSDate     = RMC_out[0]
                     GPSLat      = RMC_out[1]
@@ -866,7 +878,7 @@ def getNMEA_String():
     ###
 
             if NMEAData[0:6] == '$GPGSA' or NMEAData[0:6] == '$GNGSA':
-                GSA_out = parseGxGSA(NMEAData,GPSHdop,GSAValid)
+                GSA_out = parseGxGSA(NMEAData,GPSHdop)
                 if GSA_out[1] == True:
                     GPSHdop = GSA_out[0]
                 pass
@@ -1323,7 +1335,7 @@ root.place(x=0, y=0)
 
 laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
 
-lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font='Helvetica 14', fg='royalblue', pady=10)
+lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font=helvetica_14, fg='royalblue', pady=10)
 lbl_top.place(x=window_width/2-250/2, y=10)
 
 laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))                             # Lane Line
@@ -1439,7 +1451,7 @@ elif not manualDetection:
 ### Map Image
 # If manual detection, set image to map_failed
 if manualDetection: #No map image to load
-    shutil.copy('./images/map_failed.png', mapFileName)
+    shutil.copy(map_failed_img, mapFileName)
     mapFailed = True
 # If automatic detection, attempt to load image
 # else:
@@ -1721,7 +1733,7 @@ def build_messages():
     totSeg  = msgSegList[0][0]                              #total message segments
     rsmSegments = []
         
-    wzdx_outFile = './WZ_MapMsg/WZDx_File-' + ctrDT + '.geojson'
+    wzdx_outFile = './WZ_MapMsg/WZDx_File-' + ctrDT + geojson_ext
     logMsg('WZDx output file path: ' + wzdx_outFile)
     wzdxFile = open(wzdx_outFile, 'w')
     files_list.append(wzdx_outFile)
@@ -1735,9 +1747,9 @@ def build_messages():
 ###
        
         ##xml_outFile = './WZ_XML_File/RSZW_MAP_xmlFile-' + str(currSeg)+'_of_'+str(totSeg)+'.exer'
-        xml_outFile = './WZ_MapMsg/RSZW_MAP_xml_File-' + ctrDT + '-' + str(currSeg)+'_of_'+str(totSeg)+'.xml'
+        xml_outFile = './WZ_MapMsg/RSZW_MAP_xml_File-' + ctrDT + '-' + str(currSeg)+'_of_'+str(totSeg)+xml_ext
         logMsg('RSM XML output file path: ' + xml_outFile)
-        uper_outFile = './WZ_MapMsg/RSZW_MAP_xml_File-' + ctrDT + '-' + str(currSeg)+'_of_'+str(totSeg)+'.uper'
+        uper_outFile = './WZ_MapMsg/RSZW_MAP_xml_File-' + ctrDT + '-' + str(currSeg)+'_of_'+str(totSeg)+uper_ext
         logMsg('RSM UPER output file path: ' + uper_outFile)
         xmlFile = open(xml_outFile, 'w')
         files_list.append(xml_outFile)
@@ -2159,22 +2171,22 @@ def create_messages_and_zip():
         name_wo_ext = name[:name.rfind('.')]
         if '.csv' in filename.lower():
             name = 'path-data--' + name_id + '.csv'
-        elif '.json' in filename.lower():
+        elif json_ext in filename.lower():
             if configUpdated:
                 if needsImage:
                     name = 'config--' + name_id + '-updated-needsimage.json'
                 else:
                     name = 'config--' + name_id + '-updated.json'
             else:
-                name = 'config--' + name_id + '.json'
-        elif '.xml' in filename.lower():
+                name = 'config--' + name_id + json_ext
+        elif xml_ext in filename.lower():
             number = name[name.rfind('-')+1:name.rfind('.')]
-            name = 'rsm-xml--' + name_id + '--' + number + '.xml'
-        elif '.uper' in filename.lower():
+            name = 'rsm-xml--' + name_id + '--' + number + xml_ext
+        elif uper_ext in filename.lower():
             number = name[name.rfind('-')+1:name.rfind('.')]
-            name = 'rsm-uper--' + name_id + '--' + number + '.uper'
-        elif '.geojson' in filename.lower():
-            name = 'wzdx--' + name_id + '.geojson'
+            name = 'rsm-uper--' + name_id + '--' + number + uper_ext
+        elif geojson_ext in filename.lower():
+            name = 'wzdx--' + name_id + geojson_ext
         else:
             continue
         logMsg('Adding file to archive: ' + filename + ', as: ' + name)
