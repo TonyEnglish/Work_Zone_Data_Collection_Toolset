@@ -272,7 +272,7 @@ def getLanePt(laneType,pathPt,mapPt,laneWidth,lanePad,refPtIdx,mapPtDist,laneSta
                         if lcwpStat[ln] == 1: #Lane closure
                             if ln == 0 and lcwpStat[1] == 0: #Left lane, lane to right open
                                 laneTaperVal = 1
-                            elif ln == tLanes - 1 and lcwpStat[tLanes - 2] == 1: #Right lane, lane to left open
+                            elif ln == tLanes - 1 and lcwpStat[tLanes - 2] == 0: #Right lane, lane to left open
                                 laneTaperVal = 2
                             elif ln != 0 and ln != tLanes - 1:
                                 leftLaneOpen = False

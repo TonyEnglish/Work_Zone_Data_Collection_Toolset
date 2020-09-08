@@ -62,7 +62,11 @@ from    wz_map_constructor  import getDist              #get distance in meters 
 
 from wz_xml_builder         import build_xml_CC         #common container
 from wz_xml_builder         import build_xml_WZC        #WZ container
-from rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
+
+
+sys.path.append('..')
+from    Translators.rsm_2_wzdx_translator   import wzdx_creator         #RSM to WZDx Translator
+# from rsm_2_wzdx_translator  import wzdx_creator         #WZDx Translator
 
 
 ###
@@ -616,7 +620,7 @@ def startMainProcess():
     appHeading  = atRefPoint[2]
 
     logMsg(' --- Start of Work Zone at Data Point: '+str(refPtIdx))
-    logMsg('Reference Point @ '+refPoint[0]+', '+refPoint[1]+', '+refPoint[2])
+    logMsg('Reference Point @ '+str(refPoint[0])+', '+str(refPoint[1])+', '+str(refPoint[2]))
 
     
 
@@ -887,7 +891,7 @@ logFile = ''
 #
 ###############################################################################################
 
-wzID = 'sample-work-zone--white-rock-cir'
+wzID = 'wz-description--road-name'
 vehPathDataFile = './WZ_VehPathData/path-data--' + wzID + '.csv'
 local_config_path = './Config Files/config--' + wzID + '.json'
 
