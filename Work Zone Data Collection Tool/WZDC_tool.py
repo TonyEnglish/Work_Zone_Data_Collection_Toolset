@@ -664,21 +664,12 @@ def testGPSConnection(retry=False, *args):
             for i in range(20):
                 NMEAData = sio.readline()
                 # print(NMEAData)
-                if NMEAData[0:3] == '$GP':
+                if NMEAData[0:3] == '$GP' or NMEAData[0:3] == '$GN':
                     gpsFound = True
-                    if NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]:
+                    if (NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]) or (NMEAData[0:6] == '$GPGGA' and NMEAData.split(',')[2]):
                         gpsFix = True
                         break
-                    elif NMEAData[0:6] == '$GPGGA' and NMEAData.split(',')[2]:
-                        gpsFix = True
-                        break
-
-                elif NMEAData[0:3] == '$GN':
-                    gpsFound = True
-                    if NMEAData[0:6] == '$GNVTG' and NMEAData.split(',')[1]:
-                        gpsFix = True
-                        break
-                    elif NMEAData[0:6] == '$GNGGA' and NMEAData.split(',')[2]:
+                    elif (NMEAData[0:6] == '$GNVTG' and NMEAData.split(',')[1]) or (NMEAData[0:6] == '$GNGGA' and NMEAData.split(',')[2]):
                         gpsFix = True
                         break
     except:

@@ -1,4 +1,7 @@
 # Updates
+9/15/2020
+- Fixed bugs from Sonar Cloud
+
 9/8/2020
 - Integrated Sonar Cloud and Travis.ci into master branch
 - Fixed bugs and code smells from sonar cloud analysis
