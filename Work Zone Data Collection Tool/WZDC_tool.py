@@ -27,7 +27,6 @@ import  xmltodict                                       #dict to xml converter
 
 from    azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
-# from    tkinter         import *   
 from    tkinter         import Button, Tk, Frame, Label, LEFT, W, IntVar, StringVar, Radiobutton, CENTER, Listbox, Scrollbar, END, Entry, SUNKEN, DISABLED, OptionMenu, NORMAL
 from    tkinter         import messagebox
 from    tkinter         import filedialog
@@ -46,40 +45,37 @@ from    Translators.rsm_2_wzdx_translator   import wzdx_creator         #RSM to 
 
 
 # Load local configuration file
-def inputFileDialog():
+def input_file_dialog():
     global local_config_path
-    global local_updated_config_path
-    filename = filedialog.askopenfilename(initialdir=configDirectory, title="Select Input File", filetypes=[("Config File","*.json")])
+    # global local_updated_config_path
+    filename = filedialog.askopenfilename(initialdir=config_directory, title="Select Input File", filetypes=[("Config File","*.json")])
     if len(filename): 
         local_config_path = filename
-        local_updated_config_path = local_config_path.replace(json_ext, '_updated.json')
-        logMsg('Reading configuration file')
+        log_msg('Reading configuration file')
         try:
-            configRead()
+            read_config()
 
-            logMsg('Setting configuration path: ' + local_config_path)
+            log_msg('Setting configuration path: ' + local_config_path)
             # local_config_file = abs_path
             set_config_description(local_config_path)
-            wzConfig_file.set(local_config_path)
+            wz_config_file.set(local_config_path)
         except Exception as e:
             print(e)
-            logMsg('ERROR: Config read failed, ' + str(e))
+            log_msg('ERROR: Config read failed, ' + str(e))
             messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
-    pass
 
 # Open and read config file
-def configRead():
-    global wzConfig
+def read_config():
+    global wz_config
     file = local_config_path
     if os.path.exists(file):
         cfg = open(file, 'r+')
-        wzConfig = json.loads(cfg.read())
-        getConfigVars()
-        # update_config(cfg)
+        wz_config = json.loads(cfg.read())
+        get_config_vars()
         cfg.close()
 
 # Read configuration file
-def getConfigVars():
+def get_config_vars():
 
 ###
 #   Following are global variables are later used by other functions/methods...
@@ -105,7 +101,7 @@ def getConfigVars():
     global  typeOfWork
 
     # Lane Information
-    global  totalLanes                                      #total number of lanes in wz
+    global  total_lanes                                      #total number of lanes in wz
     global  laneWidth                                       #average lane width in meters
     global  lanePadApp                                      #approach lane padding in meters
     global  lanePadWZ                                       #WZ lane padding in meters
@@ -130,11 +126,11 @@ def getConfigVars():
     global  wzDaysOfWeek                                    #wz active days of week
 
     # Location
-    global  wzStartLat                                     #wz start date
-    global  wzStartLon                                     #wz start time
+    global  wz_start_lat                                     #wz start date
+    global  wz_start_lon                                     #wz start time
     global  beginingAccuracy
-    global  wzEndLat                                       #wz end date
-    global  wzEndLon                                       #wz end time
+    global  wz_end_lat                                       #wz end date
+    global  wz_end_lon                                       #wz end time
     global  endingAccuracy
     
     # WZDx Metadata
@@ -148,205 +144,203 @@ def getConfigVars():
     global  issuingOrganization
 
     # Image Info
-    global  mapImageZoom
-    global  mapImageCenterLat
-    global  mapImageCenterLon
+    global  map_image_zoom
+    global  map_image_center_lat
+    global  map_image_center_lat
     global  mapImageMarkers
     global  marker_list
-    global  mapImageMapType
-    global  mapImageHeight
-    global  mapImageWidth
-    global  mapImageFormat
+    global  map_image_map_type
+    global  map_image_height
+    global  map_image_width
+    global  map_image_format
     global  mapImageString
 
-    global  mapFailed
+    global  map_failed
     
-    feed_info_id            = wzConfig['FeedInfoID']
+    feed_info_id            = wz_config['FeedInfoID']
 
-    wzDesc                  = wzConfig['GeneralInfo']['Description']
-    roadName                = wzConfig['GeneralInfo']['RoadName']
-    roadNumber              = wzConfig['GeneralInfo']['RoadNumber']
-    direction               = wzConfig['GeneralInfo']['Direction']
-    beginningCrossStreet    = wzConfig['GeneralInfo']['BeginningCrossStreet']
-    endingCrossStreet       = wzConfig['GeneralInfo']['EndingCrossStreet']
-    beginningMilepost       = wzConfig['GeneralInfo']['BeginningMilePost']
-    endingMilepost          = wzConfig['GeneralInfo']['EndingMilePost']
-    eventStatus             = wzConfig['GeneralInfo']['EventStatus']
-    creationDate            = wzConfig['GeneralInfo'].get('CreationDate', '')
-    updateDate              = wzConfig['GeneralInfo'].get('UpdateDate', datetime.datetime.now().strftime(time_format_iso))
+    wzDesc                  = wz_config['GeneralInfo']['Description']
+    roadName                = wz_config['GeneralInfo']['RoadName']
+    roadNumber              = wz_config['GeneralInfo']['RoadNumber']
+    direction               = wz_config['GeneralInfo']['Direction']
+    beginningCrossStreet    = wz_config['GeneralInfo']['BeginningCrossStreet']
+    endingCrossStreet       = wz_config['GeneralInfo']['EndingCrossStreet']
+    beginningMilepost       = wz_config['GeneralInfo']['BeginningMilePost']
+    endingMilepost          = wz_config['GeneralInfo']['EndingMilePost']
+    eventStatus             = wz_config['GeneralInfo']['EventStatus']
+    creationDate            = wz_config['GeneralInfo'].get('CreationDate', '')
+    updateDate              = wz_config['GeneralInfo'].get('UpdateDate', datetime.datetime.now().strftime(time_format_iso))
 
-    typeOfWork = wzConfig['TypesOfWork']
+    typeOfWork = wz_config['TypesOfWork']
     if not typeOfWork: typeOfWork = []
 
-    totalLanes              = int(wzConfig['LaneInfo']['NumberOfLanes'])           #total number of lanes in wz
-    laneWidth               = float(wzConfig['LaneInfo']['AverageLaneWidth'])      #average lane width in meters
-    lanePadApp              = float(wzConfig['LaneInfo']['ApproachLanePadding'])   #approach lane padding in meters
-    lanePadWZ               = float(wzConfig['LaneInfo']['WorkzoneLanePadding'])   #WZ lane padding in meters
-    dataLane                = int(wzConfig['LaneInfo']['VehiclePathDataLane'])     #lane used for collecting veh path data
-    lanes_obj               = list(wzConfig['LaneInfo']['Lanes'])
+    total_lanes              = int(wz_config['LaneInfo']['NumberOfLanes'])           #total number of lanes in wz
+    laneWidth               = float(wz_config['LaneInfo']['AverageLaneWidth'])      #average lane width in meters
+    lanePadApp              = float(wz_config['LaneInfo']['ApproachLanePadding'])   #approach lane padding in meters
+    lanePadWZ               = float(wz_config['LaneInfo']['WorkzoneLanePadding'])   #WZ lane padding in meters
+    dataLane                = int(wz_config['LaneInfo']['VehiclePathDataLane'])     #lane used for collecting veh path data
+    lanes_obj               = list(wz_config['LaneInfo']['Lanes'])
 
-    speedList               = wzConfig['SpeedLimits']['NormalSpeed'], wzConfig['SpeedLimits']['ReferencePointSpeed'], \
-                              wzConfig['SpeedLimits']['WorkersPresentSpeed']
+    speedList               = wz_config['SpeedLimits']['NormalSpeed'], wz_config['SpeedLimits']['ReferencePointSpeed'], \
+                              wz_config['SpeedLimits']['WorkersPresentSpeed']
 
-    c_sc_codes              = [int(wzConfig['CauseCodes']['CauseCode']), int(wzConfig['CauseCodes']['SubCauseCode'])]
+    c_sc_codes              = [int(wz_config['CauseCodes']['CauseCode']), int(wz_config['CauseCodes']['SubCauseCode'])]
 
-    startDateTime           = wzConfig['Schedule']['StartDate']
+    startDateTime           = wz_config['Schedule']['StartDate']
     wzStartDate             = datetime.datetime.strptime(startDateTime, time_format_iso).strftime("%m/%d/%Y")
     wzStartTime             = datetime.datetime.strptime(startDateTime, time_format_iso).strftime("%H:%M")
-    startDateAccuracy       = wzConfig['Schedule'].get('StartDateAccuracy', 'estimated')
-    endDateTime             = wzConfig['Schedule']['EndDate']
+    startDateAccuracy       = wz_config['Schedule'].get('StartDateAccuracy', 'estimated')
+    endDateTime             = wz_config['Schedule']['EndDate']
     wzEndDate               = datetime.datetime.strptime(endDateTime, time_format_iso).strftime("%m/%d/%Y")
     wzEndTime               = datetime.datetime.strptime(endDateTime, time_format_iso).strftime("%H:%M")
-    endDateAccuracy         = wzConfig['Schedule'].get('EndDateAccuracy', 'estimated')
-    wzDaysOfWeek            = wzConfig['Schedule']['DaysOfWeek']
+    endDateAccuracy         = wz_config['Schedule'].get('EndDateAccuracy', 'estimated')
+    wzDaysOfWeek            = wz_config['Schedule']['DaysOfWeek']
 
-    wzStartLat              = wzConfig['Location']['BeginningLocation']['Lat']
-    wzStartLon              = wzConfig['Location']['BeginningLocation']['Lon']
-    beginingAccuracy        = wzConfig['Location']['BeginningAccuracy']
-    wzEndLat                = wzConfig['Location']['EndingLocation']['Lat']
-    wzEndLon                = wzConfig['Location']['EndingLocation']['Lon']
-    endingAccuracy          = wzConfig['Location']['EndingAccuracy']
+    wz_start_lat              = wz_config['Location']['BeginningLocation']['Lat']
+    wz_start_lon              = wz_config['Location']['BeginningLocation']['Lon']
+    beginingAccuracy        = wz_config['Location']['BeginningAccuracy']
+    wz_end_lat                = wz_config['Location']['EndingLocation']['Lat']
+    wz_end_lon                = wz_config['Location']['EndingLocation']['Lon']
+    endingAccuracy          = wz_config['Location']['EndingAccuracy']
 
-    wzLocationMethod        = wzConfig['metadata']['wz_location_method']
-    lrsType                 = wzConfig['metadata']['lrs_type']
-    locationVerifyMethod    = wzConfig['metadata']['location_verify_method']
-    dataFeedFrequencyUpdate = wzConfig['metadata']['datafeed_frequency_update']
-    timestampMetadataUpdate = wzConfig['metadata']['timestamp_metadata_update']
-    contactName             = wzConfig['metadata']['contact_name']
-    contactEmail            = wzConfig['metadata']['contact_email']
-    issuingOrganization     = wzConfig['metadata']['issuing_organization']
+    wzLocationMethod        = wz_config['metadata']['wz_location_method']
+    lrsType                 = wz_config['metadata']['lrs_type']
+    locationVerifyMethod    = wz_config['metadata']['location_verify_method']
+    dataFeedFrequencyUpdate = wz_config['metadata']['datafeed_frequency_update']
+    timestampMetadataUpdate = wz_config['metadata']['timestamp_metadata_update']
+    contactName             = wz_config['metadata']['contact_name']
+    contactEmail            = wz_config['metadata']['contact_email']
+    issuingOrganization     = wz_config['metadata']['issuing_organization']
 
-    mapImageZoom            = wzConfig['ImageInfo']['Zoom']
-    mapImageCenterLat       = wzConfig['ImageInfo']['Center']['Lat']
-    mapImageCenterLon       = wzConfig['ImageInfo']['Center']['Lon']
-    mapImageMarkers         = wzConfig['ImageInfo']['Markers'] # Markers:List of {Name, Color, Location {Lat, Lon, ?Elev}}
+    map_image_zoom            = wz_config['ImageInfo']['Zoom']
+    map_image_center_lat       = wz_config['ImageInfo']['Center']['Lat']
+    map_image_center_lat       = wz_config['ImageInfo']['Center']['Lon']
+    mapImageMarkers         = wz_config['ImageInfo']['Markers'] # Markers:List of {Name, Color, Location {Lat, Lon, ?Elev}}
     marker_list = []
     for marker in mapImageMarkers:
         marker_list.append("markers=color:" + marker['Color'].lower() + "|label:" + marker['Name'] + "|" + str(marker['Location']['Lat']) + "," + str(marker['Location']['Lon']) + "|")
-    mapImageMapType         = wzConfig['ImageInfo']['MapType']
-    mapImageHeight          = wzConfig['ImageInfo']['Height']
-    mapImageWidth           = wzConfig['ImageInfo']['Width']
-    mapImageFormat          = wzConfig['ImageInfo']['Format']
-    mapImageString          = wzConfig['ImageInfo']['ImageString']
+    map_image_map_type         = wz_config['ImageInfo']['MapType']
+    map_image_height          = wz_config['ImageInfo']['Height']
+    map_image_width           = wz_config['ImageInfo']['Width']
+    map_image_format          = wz_config['ImageInfo']['Format']
+    mapImageString          = wz_config['ImageInfo']['ImageString']
 
     if mapImageString:
+        # TODO: Specify exception class
         try:
-            fh = open(mapFileName, "wb")
+            fh = open(map_file_name, "wb")
             fh.write(base64.b64decode(mapImageString))
             fh.close()
-            mapFailed = False
+            map_failed = False
         except:
-            shutil.copy(map_failed_img, mapFileName)
-            mapFailed = True
+            shutil.copy(map_failed_img, map_file_name)
+            map_failed = True
     else:
-        shutil.copy(map_failed_img, mapFileName)
-        mapFailed = True
+        shutil.copy(map_failed_img, map_file_name)
+        map_failed = True
  
 # Set description box in UI from config file
 def set_config_description(config_file):
-    global isConfigReady
-    global autoRadioButton
-    global manualRadioButton
+    global is_config_ready
+    global auto_radio_button
+    global manual_radio_button
 
     if config_file:
-        startDate_split = wzStartDate.split('/')
-        start_date = startDate_split[0] + '/' + startDate_split[1] + '/' + startDate_split[2]
-        endDate_split = wzEndDate.split('/')
-        end_date = endDate_split[0] + '/' + endDate_split[1] + '/' + endDate_split[2]
+        start_date_split = wzStartDate.split('/')
+        start_date = start_date_split[0] + '/' + start_date_split[1] + '/' + start_date_split[2]
+        end_date_split = wzEndDate.split('/')
+        end_date = end_date_split[0] + '/' + end_date_split[1] + '/' + end_date_split[2]
         config_description = '----Selected Config File----\nDescription: ' + wzDesc + '\nRoad Name: ' + roadName + \
             '\nDate Range: ' + start_date + ' to ' + end_date + '\nConfig Path: ' + os.path.relpath(config_file)
-        logMsg('Configuration File Summary: \n' + config_description)
+        log_msg('Configuration File Summary: \n' + config_description)
         msg['text'] = config_description
         msg['fg'] = 'black'
-        isConfigReady = True
-        updateMainButton()
+        is_config_ready = True
+        update_main_button()
         
-        if wzStartLat and wzEndLat:
-            autoRadioButton['state'] = NORMAL
+        if wz_start_lat and wz_end_lat:
+            auto_radio_button['state'] = NORMAL
             # v.set(1)
         else:
-            autoRadioButton['state'] = DISABLED
+            auto_radio_button['state'] = DISABLED
             v.set(2)
     else:
         msg['text'] = 'NO CONFIGURATION FILE SELECTED'
         msg['fg'] = 'red'
 
 # Move on to data collection/acquisition
-def launch_WZ_veh_path_data_acq():
-    global needsImage
-    global configUpdated
-    global manualDetection
-    global wzStartLat
-    global wzStartLon
-    global wzEndLat
-    global wzEndLon
+def launch_wz_veh_path_data_acq():
+    global needs_image
+    global config_updated
+    global manual_detection
+    global wz_start_lat
+    global wz_start_lon
+    global wz_end_lat
+    global wz_end_lon
 
     # If mamual detection:
     if v.get() == 2:
-        manualDetection = True
-        configUpdated = True
-        needsImage = True
-        wzStartLat = 0
-        wzStartLon = 0
-        wzEndLat = 0
-        wzEndLon = 0
+        manual_detection = True
+        config_updated = True
+        needs_image = True
+        wz_start_lat = 0
+        wz_start_lon = 0
+        wz_end_lat = 0
+        wz_end_lon = 0
 
     root.destroy()
     window.quit()
 
 # Download blobl from Azure blob storage
-def downloadBlob(local_blob_path, blobName):
-    logMsg('Downloading blob: ' + blobName + ', from container: ' + container_name + ', to local path: ' + local_blob_path)
-    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blobName)
+def download_blob(local_blob_path, blob_name):
+    log_msg('Downloading blob: ' + blob_name + ', from container: ' + container_name + ', to local path: ' + local_blob_path)
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
     with open(local_blob_path, 'wb') as download_file:
         download_file.write(blob_client.download_blob().readall())
 
 # Download configuration file from Azure blob storage and read file
-def downloadConfig():
+def download_config():
     global local_config_path
-    global local_updated_config_path
-    blobName = listbox.get(listbox.curselection())
-    logMsg('Blob selected to download: ' + blobName)
+    # global local_updated_config_path
+    blob_name = listbox.get(listbox.curselection())
+    log_msg('Blob selected to download: ' + blob_name)
 
-    blob_full_name = blob_names_dict[blobName]
+    blob_full_name = blob_names_dict[blob_name]
 
     #Check if unpublished work zone already exists, ask user if they want to overwrite
     file_found = False
-    unapprovedContainer = 'unapprovedworkzones'
+    unapproved_container = 'unapprovedworkzones'
     unpublished_config_name = 'configurationfiles/' + blob_full_name
+    # TODO: Specify exception class
     try:
-        temp_container_client = blob_service_client.get_container_client(unapprovedContainer)
+        temp_container_client = blob_service_client.get_container_client(unapproved_container)
         temp_blob_client = temp_container_client.get_blob_client(unpublished_config_name)
-        props = temp_blob_client.get_blob_properties()
-        logMsg('Blob: ' + unpublished_config_name + ', found in container: ' + unapprovedContainer)
+        log_msg('Blob: ' + unpublished_config_name + ', found in container: ' + unapproved_container)
         file_found = True
     except:
-        logMsg('Blob: ' + unpublished_config_name + ', not found in container: ' + unapprovedContainer)
-        pass
+        log_msg('Blob: ' + unpublished_config_name + ', not found in container: ' + unapproved_container)
     if file_found:
-        MsgBox = messagebox.askquestion('Work zone already exists','This Work zone already exists\nIf you continue you will overwrite the unpublished work zone data. Would you like to continue?',icon = 'warning')
-        if MsgBox == 'no':
-            logMsg('User denied overwrite of unapproved work zone data')
+        msg_box = messagebox.askquestion('Work zone already exists','This Work zone already exists\nIf you continue you will overwrite the unpublished work zone data. Would you like to continue?',icon = 'warning')
+        if msg_box == 'no':
+            log_msg('User denied overwrite of unapproved work zone data')
             return
-        logMsg('User accepted overwrite of unapproved work zone data')
+        log_msg('User accepted overwrite of unapproved work zone data')
 
-    local_blob_path = configDirectory + '/' + blobName
+    local_blob_path = config_directory + '/' + blob_name
     local_config_path = local_blob_path
-    local_updated_config_path = local_config_path.replace(json_ext, '_updated.json')
+    
+    download_blob(local_blob_path, blob_full_name)
 
-    downloadBlob(local_blob_path, blob_full_name)
-
-    logMsg('Reading configuration file')
+    log_msg('Reading configuration file')
     try:
-        configRead()
+        read_config()
 
         abs_path = os.path.abspath(local_blob_path)
-        logMsg('Setting configuration path: ' + abs_path)
-        # local_config_file = abs_path
+        log_msg('Setting configuration path: ' + abs_path)
         set_config_description(local_blob_path)
-        wzConfig_file.set(local_config_path)
+        wz_config_file.set(local_config_path)
     except Exception as e:
-        logMsg('ERROR: Config read failed, ' + str(e))
+        log_msg('ERROR: Config read failed, ' + str(e))
         print(e)
         messagebox.showerror('Configuration File Reading Failed', 'Configuration file reading failed. Please load a valid configuration file')
 
@@ -361,21 +355,21 @@ def internet_on():
         return False
 
 # Format and log emssage to file
-def logMsg(msg):
+def log_msg(msg):
     formattedTime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '+00:00'
     try:
-        logFile.write('[' + formattedTime + '] ' + msg + '\n')
+        log_file.write('[' + formattedTime + '] ' + msg + '\n')
     except:
         pass
 
 # Enable/disable Begin Data Collection button
-def updateMainButton():
-    if isConfigReady and isGPSReady:
-        btnBegin['state']   = 'normal'
-        btnBegin['bg']      = 'green'
+def update_main_button():
+    if is_config_ready and is_gps_ready:
+        btn_begin['state']   = 'normal'
+        btn_begin['bg']      = 'green'
     else:
-        btnBegin['state']   = 'disabled'
-        btnBegin['bg']     = '#F0F0F0'
+        btn_begin['state']   = 'disabled'
+        btn_begin['bg']     = '#F0F0F0'
 
 ##
 #   ---------------------------- END of Functions... -----------------------------------------
@@ -391,15 +385,16 @@ window.geometry('1300x500')
 root = Frame(width=1300, height=500)
 root.place(x=0, y=0)
 
-needsImage = False
-configUpdated = False
-manualDetection = False
-mapFailed = False
+needs_image = False
+config_updated = False
+manual_detection = False
+map_failed = False
 
 json_ext = '.json'
 geojson_ext = '.geojson'
 uper_ext = '.uper'
 xml_ext = '.xml'
+text_font = 'Helvetica 10'
 
 time_format_iso = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -411,18 +406,18 @@ choose_local_config = 'Choose Local\nConfig File'
 #   WZ config parser object....
 ###
 
-wzConfig        = {}
+wz_config        = {}
 
-cDT = datetime.datetime.now().strftime('%m/%d/%Y - ') + time.strftime('%H:%M:%S')
+cdt = datetime.datetime.now().strftime('%m/%d/%Y - ') + time.strftime('%H:%M:%S')
 
 # Output log file
-logFileName = './data_collection_log.txt'
-if os.path.exists(logFileName):
+log_file_name = './data_collection_log.txt'
+if os.path.exists(log_file_name):
     append_write = 'a' # append if already exists
 else:
     append_write = 'w' # make a new file if not
-logFile = open(logFileName, append_write)         #log file
-logMsg('*** Running Main UI ***')
+log_file = open(log_file_name, append_write)         #log file
+log_msg('*** Running Main UI ***')
 
 # Check java version for RSM binary conversion
 try:
@@ -430,27 +425,27 @@ try:
     version_number = java_version.splitlines()[0].split()[2].strip('"')
     major, minor, _ = version_number.split('.')
     if (int(major) == 1 and int(minor) >= 8) or int(major) >= 1:
-        logMsg('Java version check successful. Java version detected was ' + major + '.' + minor)
+        log_msg('Java version check successful. Java version detected was ' + major + '.' + minor)
     else:
-        logMsg('ERROR: Incorrect java version. Java version detected was ' + major + '.' + minor)
-        logMsg('Closing Application')
-        logFile.close()
+        log_msg('ERROR: Incorrect java version. Java version detected was ' + major + '.' + minor)
+        log_msg('Closing Application')
+        log_file.close()
         messagebox.showerror('Java version incorrect', 'This application requires Java version >=1.8 or jdk>=8.0. Java version detected was ' + major + '.' + minor + ', please update your java version and add it to your system path')
         sys.exit(0)
 except FileNotFoundError as e:
-    logMsg('ERROR: Java installation not found')
-    logMsg('Closing Application')
-    logFile.close()
+    log_msg('ERROR: Java installation not found')
+    log_msg('Closing Application')
+    log_file.close()
     messagebox.showerror('Java Not Installed', 'This application requires Java to run, with version >=1.8 or jdk>=8.0. Ensure that java is inatalled, added to the system path, and that you have restarted your command window')
     sys.exit(0)
 except Exception as e:
-    logMsg('ERROR: Unable to Verify Java Version, error: ' + str(e))
+    log_msg('ERROR: Unable to Verify Java Version, error: ' + str(e))
     messagebox.showwarning('Unable to Verify Java Version', 'Unable to verify java version. Ensure that you have Java version >=1.8 or jdk>=8.0 installed and added to your system path')
 
-configDirectory = './Config Files'
+config_directory = './Config Files'
 local_config_path = ''
-local_updated_config_path = ''
-isConfigReady = False
+# local_updated_config_path = ''
+is_config_ready = False
 
 lbl_top = Label(root, text='Work Zone Data Collection\n', font=helvetica_14, fg='royalblue', pady=10)
 lbl_top.place(x=550, y=10)
@@ -466,21 +461,17 @@ connect_str = os.getenv(connect_str_env_var)
 has_azure_connection = False
 if not connect_str:
     has_azure_connection = False
-    logMsg('Error: Failed to load connection string from environment variable: ' + connect_str_env_var)
-    # logFile.close()
-
-    # messagebox.showerror('Unable to retrieve azure credentials', 'Unable to Retrieve Azure Credentials:\nTo enable cloud connection, configure your \
-    # \nenvironment variables and restart your command window')
-    # sys.exit(0)
+    log_msg('Error: Failed to load connection string from environment variable: ' + connect_str_env_var)
+    # Unable to Retrieve Azure Credentials. To enable cloud connection, configure your environment variables and restart your command window
 else:
     has_azure_connection = True
-    logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
+    log_msg('Loaded connection string from environment variable: ' + connect_str_env_var)
 
 download_file_path = './Config Files/local_config.json'
-mapFileName = "./mapImage.png"
-refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))
+map_file_name = "./mapImage.png"
+refresh_img = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))
 
-def loadCloudContent():
+def load_cloud_content():
     global blob_service_client
     global blob_names_dict
     global container_name
@@ -489,23 +480,25 @@ def loadCloudContent():
     global listbox
     global load_config
     global config_label_or
-    global diag_wzConfig_file
+    global diag_wz_config_file
 
-    global wzConfig_file
-    global wzConfig_file_name
+    global wz_config_file
+    global wz_config_file_name
 
+    # TODO: Specify Exception Class
     try:
         frame.destroy()
-        listbox.destroy() #?
+        listbox.destroy()
         load_config.destroy()
         config_label_or.destroy()
-        diag_wzConfig_file.destroy()
-        wzConfig_file_name.destroy()
+        diag_wz_config_file.destroy()
+        wz_config_file_name.destroy()
     except:
+        # TODO: Specify Exception Class
         try:
             config_label_or.destroy()
-            diag_wzConfig_file.destroy()
-            wzConfig_file_name.destroy()
+            diag_wz_config_file.destroy()
+            wz_config_file_name.destroy()
         except:
             pass
 
@@ -515,10 +508,9 @@ def loadCloudContent():
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
         container_name = 'publishedconfigfiles'
         container_client = blob_service_client.get_container_client(container_name)
-        #blob_client = blob_service_client.get_blob_client(container='', blob='')
+        
 
-
-        logMsg('Listing blobs in container:' + container_name)
+        log_msg('Listing blobs in container:' + container_name)
         blob_list = container_client.list_blobs()
 
         frame = Frame(root)
@@ -534,85 +526,79 @@ def loadCloudContent():
         listbox.config(yscrollcommand=scrollbar.set)
 
         now = datetime.datetime.now()
-        def getModTimeDelta(blob):
+        def get_modified_time_delta(blob):
             time_delta = now-blob.last_modified.replace(tzinfo=None)
             return time_delta
 
         blob_names_dict = {}
-        blobListSorted = []
+        blob_list_sorted = []
         for blob in blob_list:
-            logMsg('Blob Name: ' + blob.name)
-            blobListSorted.append(blob) #stupid line but this turns blob_list into a sortable list
-        blobListSorted.sort(key=getModTimeDelta) #reverse=True, #sort files on last_modified date
-        for blob in blobListSorted:
+            log_msg('Blob Name: ' + blob.name)
+            blob_list_sorted.append(blob) #stupid line but this turns blob_list into a sortable list
+        blob_list_sorted.sort(key=get_modified_time_delta) #sort files on last_modified date
+        for blob in blob_list_sorted:
             blob_name = blob.name.split('/')[-1]
             if json_ext in blob_name:
                 blob_names_dict[blob_name] = blob.name
                 listbox.insert(END, blob_name)
 
-        logMsg('Blobs sorted, filtered and inserted into listbox')
-        load_config = Button(root, text='Load Cloud Configuration File', font='Helvetica 10', padx=5, command=downloadConfig)
+        log_msg('Blobs sorted, filtered and inserted into listbox')
+        load_config = Button(root, text='Load Cloud Configuration File', font=text_font, padx=5, command=download_config)
         load_config.place(x=100, y=320)
 
-        config_label_or = Label(root, text='OR', font='Helvetica 10', padx=5)
+        config_label_or = Label(root, text='OR', font=text_font, padx=5)
         config_label_or.place(x=150, y=352)
 
-        diag_wzConfig_file = Button(root, text=choose_local_config, command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
-        diag_wzConfig_file.place(x=115,y=380)
-
-        # wzConfig_file = StringVar()
-        # wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-        # wzConfig_file_name.place(x=220,y=390)
+        diag_wz_config_file = Button(root, text=choose_local_config, command=input_file_dialog, anchor=W,padx=5, font=text_font)
+        diag_wz_config_file.place(x=115,y=380)
+        # TODO: Specify Exception Class
         try:
-            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-            wzConfig_file_name.place(x=220,y=390)
+            wz_config_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wz_config_file, width=50)
+            wz_config_file_name.place(x=220,y=390)
         except:
-            wzConfig_file = StringVar()
-            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-            wzConfig_file_name.place(x=220,y=390)
+            wz_config_file = StringVar()
+            wz_config_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wz_config_file, width=50)
+            wz_config_file_name.place(x=220,y=390)
     elif not internet_on:
-        config_label_error = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
+        config_label_error = Label(root, text='No internet connection detected\nConnect to download\ncloud configuration files', bg='slategray1', font=text_font, padx=10, pady=10)
         config_label_error.place(x=150, y=200)
 
-        diag_wzConfig_file = Button(root, text=choose_local_config, command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
-        diag_wzConfig_file.place(x=115,y=280)
+        diag_wz_config_file = Button(root, text=choose_local_config, command=input_file_dialog, anchor=W,padx=5, font=text_font)
+        diag_wz_config_file.place(x=115,y=280)
 
-        # wzConfig_file = StringVar()
+        # TODO: Specify Exception Class
         try:
-            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-            wzConfig_file_name.place(x=220,y=290)
+            wz_config_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wz_config_file, width=50)
+            wz_config_file_name.place(x=220,y=290)
         except:
-            wzConfig_file = StringVar()
-            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-            wzConfig_file_name.place(x=220,y=290)
+            wz_config_file = StringVar()
+            wz_config_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wz_config_file, width=50)
+            wz_config_file_name.place(x=220,y=290)
 
-        refreshButton = Button(root, image = refreshImg, command=loadCloudContent)
-        refreshButton.place(x=50, y=200)
+        refresh_button = Button(root, image = refresh_img, command=load_cloud_content)
+        refresh_button.place(x=50, y=200)
     else:
-        # config_label_error = Label(root, text='No azure connection string detected\nConnect to download\ncloud configuration files', bg='slategray1', font='Helvetica 10', padx=10, pady=10)
-        # config_label_error.place(x=150, y=200)
+        diag_wz_config_file = Button(root, text=choose_local_config, command=input_file_dialog, anchor=W,padx=5, font=text_font)
+        diag_wz_config_file.place(x=115,y=210)
 
-        diag_wzConfig_file = Button(root, text=choose_local_config, command=inputFileDialog, anchor=W,padx=5, font='Helvetica 10')
-        diag_wzConfig_file.place(x=115,y=210)
-
-        # wzConfig_file = StringVar()
+        # TODO: Specify Exception Class
         try:
-            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-            wzConfig_file_name.place(x=220,y=220)
+            wz_config_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wz_config_file, width=50)
+            wz_config_file_name.place(x=220,y=220)
         except:
-            wzConfig_file = StringVar()
-            wzConfig_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wzConfig_file, width=50)
-            wzConfig_file_name.place(x=220,y=220)
+            wz_config_file = StringVar()
+            wz_config_file_name = Entry(root, relief=SUNKEN, state=DISABLED, textvariable=wz_config_file, width=50)
+            wz_config_file_name.place(x=220,y=220)
 
 radioHeight = 210
 Label(root, text='Beginning and Ending of Work Zone Locations', font='Helvetica 12 bold', padx=10, pady=10).place(x=800,y=radioHeight)
 v = IntVar()
 
-autoRadioButton = Radiobutton(root, text="Automatic Detection (Recommended)", variable=v, value=1) #, indicatoron=0
-manualRadioButton = Radiobutton(root, text="Manual Detection", variable=v, value=2)
+auto_radio_button = Radiobutton(root, text="Automatic Detection (Recommended)", variable=v, value=1) #, indicatoron=0
+manual_radio_button = Radiobutton(root, text="Manual Detection", variable=v, value=2)
 v.set(1)
-autoRadioButton.place(x=850, y=radioHeight+35)
-manualRadioButton.place(x=850, y=radioHeight+60)
+auto_radio_button.place(x=850, y=radioHeight+35)
+manual_radio_button.place(x=850, y=radioHeight+60)
 
 
 notes = '''Automatic detection uses the locations from the configuration file for the starting
@@ -622,7 +608,7 @@ set as the the automatic locations next time the work zone is mapped'''
 notes_label = Label(root, text=notes,justify=CENTER, bg='slategray1',anchor=W, font=('Helvetica', 10))
 notes_label.place(x=760, y=radioHeight+85)
 
-loadCloudContent()
+load_cloud_content()
 
 # instructions = '''This is the initialization component of the Work Zone Data Collection tool.
 # To begin collecting data, first load a configuration file and verify
@@ -636,85 +622,76 @@ loadCloudContent()
 # instr_label = Label(root, text=instructions,justify=CENTER, bg='slategray1',anchor=W,padx=10,pady=10, font=('Calibri', 12))
 # instr_label.place(x=700, y=30)
 
-btnBegin = Button(root, text='Begin Data\nCollection', font=helvetica_14,border=2,state=DISABLED,command=launch_WZ_veh_path_data_acq, anchor=W,padx=20,pady=10)
-btnBegin.place(x=570,y=390)
+btn_begin = Button(root, text='Begin Data\nCollection', font=helvetica_14,border=2,state=DISABLED,command=launch_wz_veh_path_data_acq, anchor=W,padx=20,pady=10)
+btn_begin.place(x=570,y=390)
 
-isGPSReady = False
+is_gps_ready = False
 
 # test serial port for GPS device (check for NMEA string)
-def testGPSConnection(retry=False, *args):
-    global isGPSReady
-    gpsFix = False
-    gpsFound = False
+def test_gps_connection(retry=False, *args):
+    global is_gps_ready
+    gps_fix = False
+    gps_found = False
     try:
-        ser = serial.Serial(port=tkPortVar.get()[0:5].strip(), baudrate=tkBaudVar.get(), timeout=1.1, )
+        ser = serial.Serial(port=tk_port_var.get()[0:5].strip(), baudrate=tk_baud_var.get(), timeout=1.1, )
         sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
         
-        NMEAData = sio.readline()
-        if NMEAData:
+        nmea_data = sio.readline()
+        if nmea_data:
             for i in range(20):
-                NMEAData = sio.readline()
-                # print(NMEAData)
-                if NMEAData[0:3] == '$GP':
-                    gpsFound = True
-                    if NMEAData[0:6] == '$GPVTG' and NMEAData.split(',')[1]:
-                        gpsFix = True
-                        break
-                    elif NMEAData[0:6] == '$GPGGA' and NMEAData.split(',')[2]:
-                        gpsFix = True
+                nmea_data = sio.readline()
+                if nmea_data[0:3] == '$GP' or nmea_data[0:3] == '$GN':
+                    gps_found = True
+                    if ((nmea_data[0:6] == '$GPVTG' or nmea_data[0:6] == '$GNVTG') and nmea_data.split(',')[1]) or ((nmea_data[0:6] == '$GPGGA' or nmea_data[0:6] == '$GNGGA') and nmea_data.split(',')[2]):
+                        gps_fix = True
                         break
 
-                elif NMEAData[0:3] == '$GN':
-                    gpsFound = True
-                    if NMEAData[0:6] == '$GNVTG' and NMEAData.split(',')[1]:
-                        gpsFix = True
-                        break
-                    elif NMEAData[0:6] == '$GNGGA' and NMEAData.split(',')[2]:
-                        gpsFix = True
-                        break
-    except:
+    except SerialException:
+        # TODO: Add message window to display this message
+        messagebox.showinfo('Port Closed', 'Serial port: ' + str(tk_port_var.get()) + ' is closed, if this is the GPS device please ensure that no other programs are already utilizing the device')
         return False
-    if gpsFound:
-        if gpsFix:
-            commLabel['text']   = 'GPS DEVICE FOUND'
-            commLabel['fg']     = 'green'
-            isGPSReady = True
-            updateMainButton()
+
+    if gps_found:
+        if gps_fix:
+            comm_label['text']   = 'GPS DEVICE FOUND'
+            comm_label['fg']     = 'green'
+            is_gps_ready = True
+            update_main_button()
             return True
         else:
-            commLabel['text']   = 'INVALID GPS POSITION'
-            commLabel['fg']     = 'orange'
-            return TRUE
+            comm_label['text']   = 'INVALID GPS POSITION'
+            comm_label['fg']     = 'orange'
+            return True
     else:
-        btnBegin['state']   = 'disabled'
-        btnBegin['bg']     = '#F0F0F0'
-        commLabel['text']   = 'GPS DEVICE NOT FOUND'
-        commLabel['fg']     = 'red'
-        isGPSReady = False
+        btn_begin['state']   = 'disabled'
+        btn_begin['bg']     = '#F0F0F0'
+        comm_label['text']   = 'GPS DEVICE NOT FOUND'
+        comm_label['fg']     = 'red'
+        is_gps_ready = False
         return False
 
 gpsHeight = 75
 def showSerialDropdowns():
-    serialButton.destroy()
-    baudLabel.place(x=850, y=gpsHeight+60)
-    baudPopupMenu.place(x=850, y=gpsHeight+80)
-    dataLabel.place(x=950, y=gpsHeight+60)
-    dataPopupMenu.place(x=950, y=gpsHeight+80)
+    serial_button.destroy()
+    baud_label.place(x=850, y=gpsHeight+60)
+    baud_popup_menu.place(x=850, y=gpsHeight+80)
+    data_label.place(x=950, y=gpsHeight+60)
+    data_popup_menu.place(x=950, y=gpsHeight+80)
 
 # Set baud rate and data rate labels
-baudLabel = Label(root, text='Baud Rate (bps)')
-baudRates = ['4800', '9600', '19200', '57600', '115200']
-tkBaudVar = StringVar(window)
-tkBaudVar.set('115200') #default is 10 Hz, 115200bps
-baudPopupMenu = OptionMenu(root, tkBaudVar, *baudRates)
+baud_label = Label(root, text='Baud Rate (bps)')
+baud_rates = ['4800', '9600', '19200', '57600', '115200']
+tk_baud_var = StringVar(window)
+tk_baud_var.set('115200') #default is 10 Hz, 115200bps
+baud_popup_menu = OptionMenu(root, tk_baud_var, *baud_rates)
 
-dataLabel = Label(root, text='Data Rate (Hz)')
-dataRates = ['1', '2', '5', '10']
-tkDataVar = StringVar(window)
-tkDataVar.set('10') #default is 10 Hz, 115200bps
-dataPopupMenu = OptionMenu(root, tkDataVar, *dataRates)
-serialButton = Button(root, text='Show Advanced Serial Settings', command=showSerialDropdowns)
-serialButton.place(x=850, y=gpsHeight+60)
+data_label = Label(root, text='Data Rate (Hz)')
+data_rates = ['1', '2', '5', '10']
+tk_data_var = StringVar(window)
+tk_data_var.set('10') #default is 10 Hz, 115200bps
+data_popup_menu = OptionMenu(root, tk_data_var, *data_rates)
+serial_button = Button(root, text='Show Advanced Serial Settings', command=showSerialDropdowns)
+serial_button.place(x=850, y=gpsHeight+60)
 
 ports = serial.tools.list_ports.comports(include_links=False)
 if not ports: ports = ['NO DEVICES FOUND']
@@ -726,48 +703,47 @@ mainframe.columnconfigure(0, weight=1)
 mainframe.rowconfigure(0, weight=1)
 
 # Create COMM port popup menu
-logMsg('Creating comm port popup menu')
-commLabel = Label(mainframe, text='GPS DEVICE NOT FOUND', font='Helvetica 13 bold', fg='red')
-tkPortVar = StringVar(window)
-popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
-commLabel.pack()
-popupMenu.pack()
+log_msg('Creating comm port popup menu')
+comm_label = Label(mainframe, text='GPS DEVICE NOT FOUND', font='Helvetica 13 bold', fg='red')
+tk_port_var = StringVar(window)
+popup_menu = OptionMenu(mainframe, tk_port_var, *ports)
+comm_label.pack()
+popup_menu.pack()
 
 # Update COMM ports popup menu and search for GPS device
-def updatePortsDropdown():
-    global popupMenu
+def update_ports_dropdown():
+    global popup_menu
     global ports
     ports = serial.tools.list_ports.comports(include_links=False)
     if not ports: ports = ['NO DEVICES FOUND']
-    currentValue = tkPortVar.get()
-    popupMenu.destroy()
-    popupMenu = OptionMenu(mainframe, tkPortVar, *ports)
-    popupMenu.pack()
-    searchPorts()
+    popup_menu.destroy()
+    popup_menu = OptionMenu(mainframe, tk_port_var, *ports)
+    popup_menu.pack()
+    search_ports()
 
 # Search COMM ports for GPS device
-def searchPorts():
+def search_ports():
+    # TODO: Specify Exception Class
     try:
-        tkPortVar.trace_vdelete("w", tkPortVar.trace_id)
+        tk_port_var.trace_vdelete("w", tk_port_var.trace_id)
     except:
         pass
     for port in ports:
-        tkPortVar.set(port)
-        if (testGPSConnection(True)):
+        tk_port_var.set(port)
+        if (test_gps_connection(True)):
             break
-    tkPortVar.trace_id = tkPortVar.trace("w", testGPSConnection)
+    tk_port_var.trace_id = tk_port_var.trace("w", test_gps_connection)
 
-
-# refreshImg = ImageTk.PhotoImage(Image.open('./images/refresh_small.png'))                                         # Car image
-btnTestGps = Button(root, image = refreshImg, command=updatePortsDropdown)                                  # Label with car image , command=loadCloudContent
-btnTestGps.place(x=800, y=gpsHeight+30)
+                                     # Car image
+btn_test_gps = Button(root, image = refresh_img, command=update_ports_dropdown)                                  # Label with car image , command=load_cloud_content
+btn_test_gps.place(x=800, y=gpsHeight+30)
 
 def on_closing():
-    logFile.close()
+    log_file.close()
     sys.exit(0)
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
-window.after(500, searchPorts)
+window.after(500, search_ports)
 window.mainloop()
   
 
@@ -778,61 +754,46 @@ window.mainloop()
 ################################################################################################################
 
 # Start data collection function
-def startMainFunc():
-    global  appRunning                          #boolean
-    if (appRunning):
-        logMsg('App running, starting getNMEA_String loop')
-        getNMEA_String()                        #Get NMEA String and process it until 'appRunning is True...'
+def start_main_func():
+    global  app_running                          #boolean
+    if (app_running):
+        log_msg('App running, starting get_nmea_string loop')
+        get_nmea_string()                        #Get NMEA String and process it until 'app_running is True...'
     else:
-        logMsg('App not running, exiting')
+        log_msg('App not running, exiting')
 
 # Retrieve NMEA string and GPS data from device
-def getNMEA_String():
+def get_nmea_string():
 
 ###
 #   Global variables...
 ###
 
     global      sio                                 #serial io
-    global      GPSTime, GPSDate, prevGPSTime       #time, date and prev. GPS time
-    global      keyMarker, dataLog                  #key marker and data log
-    global      appRunning                          #until Esc is pressed
-    global      GPSLat, GPSLon, GPSAlt              #needed for ref. pt, lane state and workers present locations
-    global      carPosLat, carPosLon, carPosHeading
+    global      gps_time, gps_date, prev_gps_time       #time, date and prev. GPS time
+    global      key_marker, data_log                  #key marker and data log
+    global      app_running                          #until Esc is pressed
+    global      gps_lat, gps_lon, gps_alt              #needed for ref. pt, lane state and workers present locations
+    global      car_pos_lat, car_pos_lon, car_pos_heading
 
 
 ###
 #   Local variables...
 ###
 
-    #GPSRate     = 10                                #GPS data rate in Hz
-    #GPSDate     = ''                                #GPS Date
-    #GPSTime     = ''                                #GPS Time
-    #prevGPSTime = ''                                #previous GPS Time
-    GPSSats     = 0                                 #No. of Satellites
-    #GPSLat      = 0.0                               #Latitude in degrees in decimal
-    #GPSLon      = 0.0                               #Longitude in degrees in decimal
-    #GPSAlt      = 0.0                               #Altitude in meters
-    GPSSpeed    = 0.0                               #Speed in m/s
-    GPSHeading  = 0.0                               #Heading in degrees
-    GPSHdop     = 0.0                               #Horizontal dilution of precision
-    # GGAValid    = False                             #Init value
-    # RMCValid    = False                             #Init value
-    # GSAValid    = False                             #Init value
-    prevDistance = 0
+    gps_sats     = 0                                 #No. of Satellites
+    gps_speed    = 0.0                               #Speed in m/s
+    gps_heading  = 0.0                               #Heading in degrees
+    gps_hdop     = 0.0                               #Horizontal dilution of precision
+    prev_distance = 0
     pi = 3.14159
-    isFirstTime = True
     i = 0
-    isNearEnd = False
     prevLat = 0
     prevLon = 0
 
-    # i = 1
-
-    while (appRunning):                             #continue reading and processing NMEA string while TRUE
-        NMEAData = sio.readline()                   #Read NMEA string from serial port COM7
+    while (app_running):                             #continue reading and processing NMEA string while TRUE
+        nmea_data = sio.readline()                   #Read NMEA string from serial port COM7
         root.update()
-        #print (NMEAData)
 
 ###
 #
@@ -842,92 +803,86 @@ def getNMEA_String():
 #
 ###
         try:
-            if NMEAData[0:6] == '$GPGGA' or NMEAData[0:6] == '$GNGGA':
-                GGA_out = parseGxGGA(NMEAData,GPSTime,GPSSats,GPSAlt)
-                if GGA_out[3] == True:
-                    GPSTime = GGA_out[0]
-                    GPSSats = GGA_out[1]
-                    GPSAlt  = GGA_out[2]
+            if nmea_data[0:6] == '$GPGGA' or nmea_data[0:6] == '$GNGGA':
+                gga_out = parseGxGGA(nmea_data,gps_time,gps_sats,gps_alt)
+                if gga_out[3] == True:
+                    gps_time = gga_out[0]
+                    gps_sats = gga_out[1]
+                    gps_alt  = gga_out[2]
                 pass
-                #print ('GGA: ', GPSTime, GPSSats,GPSAlt)
             pass
 
     ###
     #       --- Parse RMC ---
     ###
 
-            if NMEAData[0:6] == '$GPRMC' or NMEAData[0:6] == '$GNRMC':
-                RMC_out = parseGxRMC(NMEAData,GPSDate,GPSLat,GPSLon,GPSSpeed,GPSHeading)
+            if nmea_data[0:6] == '$GPRMC' or nmea_data[0:6] == '$GNRMC':
+                RMC_out = parseGxRMC(nmea_data,gps_date,gps_lat,gps_lon,gps_speed,gps_heading)
                 if RMC_out[5] == True:
-                    GPSDate     = RMC_out[0]
-                    GPSLat      = RMC_out[1]
-                    GPSLon      = RMC_out[2]
-                    GPSSpeed    = RMC_out[3]*(1852.0/3600.0)    #Knot = 1.852 km/hr, Convert to m/s
-                    GPSHeading  = RMC_out[4]
+                    gps_date     = RMC_out[0]
+                    gps_lat      = RMC_out[1]
+                    gps_lon      = RMC_out[2]
+                    gps_speed    = RMC_out[3]*(1852.0/3600.0)    #Knot = 1.852 km/hr, Convert to m/s
+                    gps_heading  = RMC_out[4]
                 pass
-                #print ('RMC Output:', RMC_out)
             pass
             
     ###
     #       --- Parse GSA ---
     ###
 
-            if NMEAData[0:6] == '$GPGSA' or NMEAData[0:6] == '$GNGSA':
-                GSA_out = parseGxGSA(NMEAData,GPSHdop)
-                if GSA_out[1] == True:
-                    GPSHdop = GSA_out[0]
+            if nmea_data[0:6] == '$GPGSA' or nmea_data[0:6] == '$GNGSA':
+                gsa_out = parseGxGSA(nmea_data,gps_hdop)
+                if gsa_out[1] == True:
+                    gps_hdop = gsa_out[0]
                 pass
-                #print ('GSA Hdop:', GSA_out)
             pass
         except Exception as e:
-            logMsg('ERROR: GPS parsing failed. ' + str(e))
+            log_msg('ERROR: GPS parsing failed. ' + str(e))
             continue
 
         # Update marker position on map
-        carPosLat = GPSLat
-        carPosLon = GPSLon
-        carHeading = GPSHeading
-        updatePosition()
+        car_pos_lat = gps_lat
+        car_pos_lon = gps_lon
+        car_pos_heading = gps_heading
+        update_position()
         
-        if dataLog:
-            distanceToEndPt = round(dist(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
-            # TODO: Add check for direction of travel
-            if distanceToEndPt < 20 and gotRefPt and not manualDetection:
-                minLineDist, t = dist_to_line(prevLat*pi/180, prevLon*pi/180, GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180)
-                if minLineDist < 20 and t > 0 and t < 1:
-                    logMsg('-------- Exiting Work Zone (by location, distance=' + str(distanceToEndPt) + ') -------')
-                    stopDataLog()
-            # TODO: Auto mark reference point
-            elif not gotRefPt and distanceToStartPt > prevDistance and i >= 10: #Auto mark reference point
-                logMsg('-------- Auto Marking Reference Point (by location, distance=' + str(distanceToStartPt) + ') -------')
-                markRefPt()
+        # if data_log:
+        #     distance_to_end_pt = round(dist(gps_lat*pi/180, gps_lon*pi/180, wz_end_lat*pi/180, wz_end_lon*pi/180))
+        #     # TODO: Add check for direction of travel
+        #     if distance_to_end_pt < 20 and got_ref_pt and not manual_detection:
+        #         minLineDist, t = dist_to_line(prevLat*pi/180, prevLon*pi/180, gps_lat*pi/180, gps_lon*pi/180, wz_end_lat*pi/180, wz_end_lon*pi/180)
+        #         if minLineDist < 20 and t > 0 and t < 1:
+        #             log_msg('-------- Exiting Work Zone (by location, distance=' + str(distance_to_end_pt) + ') -------')
+        #             stop_data_log()
+        #     # TODO: Auto mark reference point
+        #     elif not got_ref_pt and distance_to_start_pt > prev_distance and i >= 10: #Auto mark reference point
+        #         log_msg('-------- Auto Marking Reference Point (by location, distance=' + str(distance_to_start_pt) + ') -------')
+        #         mark_ref_pt()
 
 
         # Automatically start/end data collection
-        if dataLog:
-            distanceToEndPt = round(dist(GPSLat*pi/180, GPSLon*pi/180, wzEndLat*pi/180, wzEndLon*pi/180))
-            if distanceToEndPt < 20 and distanceToEndPt > prevDistance and gotRefPt and not manualDetection: #Leaving Workzone
-                logMsg('-------- Exiting Work Zone (by location, distance=' + str(distanceToEndPt) + ') -------')
-                stopDataLog()
-                #appRunning = False
-            distanceToStartPt = round(dist(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if not gotRefPt and distanceToStartPt > prevDistance and i >= 10: #Auto mark reference point
-                logMsg('-------- Auto Marking Reference Point (by location, distance=' + str(distanceToStartPt) + ') -------')
-                markRefPt()
-            if gotRefPt:
-                prevDistance = distanceToEndPt
+        if data_log:
+            distance_to_end_pt = round(dist(gps_lat*pi/180, gps_lon*pi/180, wz_end_lat*pi/180, wz_end_lon*pi/180))
+            if distance_to_end_pt < 20 and distance_to_end_pt > prev_distance and got_ref_pt and not manual_detection: #Leaving Workzone
+                log_msg('-------- Exiting Work Zone (by location, distance=' + str(distance_to_end_pt) + ') -------')
+                stop_data_log()
+            distance_to_start_pt = round(dist(gps_lat*pi/180, gps_lon*pi/180, wz_start_lat*pi/180, wz_start_lon*pi/180))
+            if not got_ref_pt and distance_to_start_pt > prev_distance and i >= 10: #Auto mark reference point
+                log_msg('-------- Auto Marking Reference Point (by location, distance=' + str(distance_to_start_pt) + ') -------')
+                mark_ref_pt()
+            if got_ref_pt:
+                prev_distance = distance_to_end_pt
             else:
-                prevDistance = distanceToStartPt
-            # isFirstTime = False
+                prev_distance = distance_to_start_pt
             i += 1
 
         else:
-            distanceToStartPt = round(dist(GPSLat*pi/180, GPSLon*pi/180, wzStartLat*pi/180, wzStartLon*pi/180))
-            if distanceToStartPt < 50 and not manualDetection: #Entering Workzone
-                logMsg('-------- Entering Work Zone (by location, distance=' + str(distanceToStartPt) + ') -------')
-                startDataLog()
-                prevDistance = distanceToStartPt
-                #dataLog = True
+            distance_to_start_pt = round(dist(gps_lat*pi/180, gps_lon*pi/180, wz_start_lat*pi/180, wz_start_lon*pi/180))
+            if distance_to_start_pt < 50 and not manual_detection: #Entering Workzone
+                log_msg('-------- Entering Work Zone (by location, distance=' + str(distance_to_start_pt) + ') -------')
+                start_data_log()
+                prev_distance = distance_to_start_pt
 
 ###
 #
@@ -940,41 +895,40 @@ def getNMEA_String():
 #
 ###
 
-        if (dataLog == True) and (GPSTime != prevGPSTime) and (GPSDate != ''):              #log data only if next sentence(GPSTime) is different from the previous
-            time_date = GPSDate+'-'+GPSTime
-            outStr  = time_date,GPSSats,GPSHdop,GPSLat,GPSLon,GPSAlt,GPSSpeed,GPSHeading,keyMarker[0],keyMarker[1]      #to CSV file...
-            ##print (outStr)
+        if (data_log == True) and (gps_time != prev_gps_time) and (gps_date != ''):              #log data only if next sentence(gps_time) is different from the previous
+            time_date = gps_date+'-'+gps_time
+            out_str  = time_date,gps_sats,gps_hdop,gps_lat,gps_lon,gps_alt,gps_speed,gps_heading,key_marker[0],key_marker[1]      #to CSV file...
 
-            writeCSVFile (outStr)                       #write to CSV file
-            keyMarker = ['','']                         #reset key marker
-            prevGPSTime = GPSTime                       #set prevGPSTime to GPSTime             
-        pass                                            #end of writing outStr
+            write_csv_file(out_str)                       #write to CSV file
+            key_marker = ['','']                         #reset key marker
+            prev_gps_time = gps_time                       #set prev_gps_time to gps_time             
+        pass                                            #end of writing out_str
 
 ###
 #       Save the last record with App Ended marker...
 ###
 
 
-        if appRunning == False:                         #save the last record...
-            logMsg('App not running, save last dataset and exit')
-            time_date = GPSDate+'-'+GPSTime
-            outStr  = time_date,GPSSats,GPSHdop,GPSLat,GPSLon,GPSAlt,GPSSpeed,GPSHeading,keyMarker[0],keyMarker[1]      #to CSV file...
-            writeCSVFile (outStr)                       #write to CSV file
+        if app_running == False:                         #save the last record...
+            log_msg('App not running, save last dataset and exit')
+            time_date = gps_date+'-'+gps_time
+            out_str  = time_date,gps_sats,gps_hdop,gps_lat,gps_lon,gps_alt,gps_speed,gps_heading,key_marker[0],key_marker[1]      #to CSV file...
+            write_csv_file(out_str)                       #write to CSV file
         pass
 
     return
 
 ###
 #   
-#   -------------------  END OF getNMEA_String...  ---------------------------------------------------------------------
+#   -------------------  END OF get_nmea_string...  ---------------------------------------------------------------------
 #
 ##
 
 # Calculate accurate distance between GPS points
 def dist(lat1, lon1, lat2, lon2):
-    R = 6371000
+    r = 6371000
     avg_lat = (lat1+lat2)/2
-    distance = R*math.sqrt((lat1-lat2)**2+math.cos(avg_lat)**2*(lon1-lon2)**2)
+    distance = r*math.sqrt((lat1-lat2)**2+math.cos(avg_lat)**2*(lon1-lon2)**2)
     return distance
 
 # TODO: Determine if need lon=lon*cos(lat)
@@ -992,243 +946,240 @@ def dif(v1, v2, w1, w2):
     return v1 - w1, v2 - w2
 
 # Toggle lane closures
-def laneClicked(lane):
-    global gotRefPt
-    global laneStat
-    global keyMarker
-    global laneSymbols
+def lane_clicked(lane):
+    global got_ref_pt
+    global lane_stat
+    global key_marker
+    global lane_Symbols
 
-    laneStat[lane] = not laneStat[lane]         #Lane open status (T or F)
+    lane_stat[lane] = not lane_stat[lane]         #Lane open status (T or F)
     lc = 'LC'                                   #set lc to 'LC' - Lane Closed
-    if laneStat[lane]:
+    if lane_stat[lane]:
         lc = 'LO'                               #toggle lane status to Lane Open
         lanes[lane]['bg']   = 'green'
         lanes[lane]['fg']   = 'white'
-        laneLabels[lane]['fg'] = 'green'
-        laneLabels[lane]['text'] = 'OPEN'
-        laneLabels[lane].place(x=marginLeft+22 + (lane-1)*110, y=100)
+        lane_labels[lane]['fg'] = 'green'
+        lane_labels[lane]['text'] = 'OPEN'
+        lane_labels[lane].place(x=margin_left+22 + (lane-1)*110, y=100)
     else:
         lanes[lane]['bg']   = 'gray92'
         lanes[lane]['fg']   = 'red3'
-        laneLabels[lane]['fg'] = 'red3'
-        laneLabels[lane]['text'] = 'CLOSED'
-        laneLabels[lane].place(x=marginLeft+10 + (lane-1)*110, y=100)
+        lane_labels[lane]['fg'] = 'red3'
+        lane_labels[lane]['text'] = 'CLOSED'
+        lane_labels[lane].place(x=margin_left+10 + (lane-1)*110, y=100)
 
-    if not gotRefPt:                       #if ref pt has not been marked yet
+    if not got_ref_pt:                       #if ref pt has not been marked yet
         lc = lc + '+RP'                         #lc + ref. pt
-        gotRefPt = True                         #set to true
+        got_ref_pt = True                         #set to true
     pass
 
     lStat = 'Closed'
     if lc == 'LO': lStat = 'Open'
         
-    markerStr = '   *** Lane '+str(lane)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
-    logMsg('*** Lane '+str(lane)+' Status Marked: '+lStat+' @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
-    keyMarker = [lc, str(lane)]
-    displayStatusMsg(markerStr)
+    marker_str = '   *** Lane '+str(lane)+' Status Marked: '+lStat+' @ '+str(gps_lat)+', '+str(gps_lon)+', '+str(gps_alt)+' ***'
+    log_msg('*** Lane '+str(lane)+' Status Marked: '+lStat+' @ '+str(gps_lat)+', '+str(gps_lon)+', '+str(gps_alt)+' ***')
+    key_marker = [lc, str(lane)]
+    display_status_msg(marker_str)
 
 # Toggle worker presence
-def workersPresentClicked():
-    global gotRefPt
-    global wpStat
-    global keyMarker
-    global worksersPresentLabel
+def workers_present_clicked():
+    global got_ref_pt
+    global wp_stat
+    global key_marker
+    global workers_present_label
 
-    wpStat = not wpStat                         #Toggle wp/np
+    wp_stat = not wp_stat                         #Toggle wp/np
 
-    if wpStat:
-        bWP['text'] = 'Workers No\nLonger Present'
-        bWP['bg']   = 'gray92'
-        bWP['fg']   = 'red3'
-        worksersPresentLabel = Label(root, image = workersPresentImg)
-        worksersPresentLabel.place(x=marginLeft+60 + (totalLanes)*110, y=100)
+    if wp_stat:
+        btn_wp['text'] = 'Workers No\nLonger Present'
+        btn_wp['bg']   = 'gray92'
+        btn_wp['fg']   = 'red3'
+        workers_present_label = Label(root, image = workers_present_img)
+        workers_present_label.place(x=margin_left+60 + (total_lanes)*110, y=100)
     else:
-        bWP['text'] = 'Workers are\nPresent'
-        bWP['bg']   = 'green'
-        bWP['fg']   = 'white'
-        worksersPresentLabel.destroy()
+        btn_wp['text'] = 'Workers are\nPresent'
+        btn_wp['bg']   = 'green'
+        btn_wp['fg']   = 'white'
+        workers_present_label.destroy()
 
-    markerStr = '   *** Workers Presence Marked: '+str(wpStat)+' ***'
-    logMsg('*** Workers Presence Marked: '+str(wpStat)+' ***')
+    marker_str = '   *** Workers Presence Marked: '+str(wp_stat)+' ***'
+    log_msg('*** Workers Presence Marked: '+str(wp_stat)+' ***')
 
-    keyMarker[0] = 'WP'                         #WP marker
-    if gotRefPt == False:
-        keyMarker[0]='WP+RP'                    #WP+ref pt
-        gotRefPt = True                         #gotRefPT True    
-    keyMarker[1] = wpStat
-    displayStatusMsg(markerStr)
+    key_marker[0] = 'WP'                         #WP marker
+    if got_ref_pt == False:
+        key_marker[0]='WP+RP'                    #WP+ref pt
+        got_ref_pt = True                         #got_ref_pt True    
+    key_marker[1] = wp_stat
+    display_status_msg(marker_str)
 
 # Start data logging
-def startDataLog():
-    global dataLog
-    global keyMarker
+def start_data_log():
+    global data_log
+    global key_marker
 
-    dataLog = True
+    data_log = True
 
-    markerStr = '   *** Data Logging Started ***'
-    logMsg('*** Data Logging Started ***')
+    marker_str = '   *** Data Logging Started ***'
+    log_msg('*** Data Logging Started ***')
 
-    keyMarker = ['Data Log', dataLog]
+    key_marker = ['Data Log', data_log]
 
     overlay.destroy()
-    enableForm()
+    enable_form()
 
-    displayStatusMsg(markerStr)
+    display_status_msg(marker_str)
 
 # Stop data logging and move to message building
-def stopDataLog():
-    global dataLog
-    global keyMarker
-    global appRunning
+def stop_data_log():
+    global data_log
+    global key_marker
+    global app_running
 
-    dataLog = False
+    data_log = False
 
-    markerStr = '   *** Data Logging Stopped ***'
-    logMsg('*** Data Logging Stopped ***')
+    marker_str = '   *** Data Logging Stopped ***'
+    log_msg('*** Data Logging Stopped ***')
 
-    keyMarker = ['Data Log', dataLog]
+    key_marker = ['Data Log', data_log]
 
-    displayStatusMsg(markerStr)
-    appRunning = False
+    display_status_msg(marker_str)
+    app_running = False
 
 # Mark reference point
-def markRefPt():
-    global gotRefPt
-    global keyMarker
+def mark_ref_pt():
+    global got_ref_pt
+    global key_marker
 
-    if not gotRefPt:
-        markerStr = '   *** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
-        logMsg('*** Reference Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
-        ##T.insert (END, markerStr)
-        keyMarker = ['RP','']                       #reference point
-        gotRefPt = True                             #got the reference point
+    if not got_ref_pt:
+        marker_str = '   *** Reference Point Marked @ '+str(gps_lat)+', '+str(gps_lon)+', '+str(gps_alt)+' ***'
+        log_msg('*** Reference Point Marked @ '+str(gps_lat)+', '+str(gps_lon)+', '+str(gps_alt)+' ***')
+        key_marker = ['RP','']                       #reference point
+        got_ref_pt = True                             #got the reference point
 
-        displayStatusMsg(markerStr)
+        display_status_msg(marker_str)
 
-def markStartPt():
-    global wzConfig
-    global wzStartLat
-    global wzStartLon
+def mark_start_pt():
+    global wz_config
+    global wz_start_lat
+    global wz_start_lon
 
-    bStart['state'] = DISABLED
-    bStart['bg'] = 'gray92'
+    btn_start['state'] = DISABLED
+    btn_start['bg'] = 'gray92'
 
-    wzConfig['Location']['BeginningLocation']['Lat'] = GPSLat
-    wzConfig['Location']['BeginningLocation']['Lon'] = GPSLon
-    wzStartLat = GPSLat
-    wzStartLon = GPSLon
+    wz_config['Location']['BeginningLocation']['Lat'] = gps_lat
+    wz_config['Location']['BeginningLocation']['Lon'] = gps_lon
+    wz_start_lat = gps_lat
+    wz_start_lon = gps_lon
 
-    markerStr = '   *** Starting Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
-    logMsg('*** Starting Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
-    displayStatusMsg(markerStr)
+    marker_str = '   *** Starting Point Marked @ '+str(gps_lat)+', '+str(gps_lon)+', '+str(gps_alt)+' ***'
+    log_msg('*** Starting Point Marked @ '+str(gps_lat)+', '+str(gps_lon)+', '+str(gps_alt)+' ***')
+    display_status_msg(marker_str)
 
-    startDataLog()
+    start_data_log()
 
-def markEndPt():
-    global wzConfig
-    global wzEndLat
-    global wzEndLon
+def mark_end_pt():
+    global wz_config
+    global wz_end_lat
+    global wz_end_lon
 
-    wzConfig['Location']['EndingLocation']['Lat'] = GPSLat
-    wzConfig['Location']['EndingLocation']['Lon'] = GPSLon
-    wzEndLat = GPSLat
-    wzEndLon = GPSLon
+    wz_config['Location']['EndingLocation']['Lat'] = gps_lat
+    wz_config['Location']['EndingLocation']['Lon'] = gps_lon
+    wz_end_lat = gps_lat
+    wz_end_lon = gps_lon
 
 
-    centerLat = (float(wzStartLat) + float(wzEndLat))/2
-    centerLon = (float(wzStartLon) + float(wzEndLon))/2
-    center = str(centerLat) + ',' + str(centerLon)
+    center_lat = (float(wz_start_lat) + float(wz_end_lat))/2
+    center_lon = (float(wz_start_lon) + float(wz_end_lon))/2
+    center = str(center_lat) + ',' + str(center_lon)
 
-    north = max(float(wzStartLat), float(wzEndLat))
-    south = min(float(wzStartLat), float(wzEndLat))
-    east = max(float(wzStartLon), float(wzEndLon))
-    west = min(float(wzStartLon), float(wzEndLon))
-    calcZoomLevel(north, south, east, west, imgWidth, imgHeight)
+    north = max(float(wz_start_lat), float(wz_end_lat))
+    south = min(float(wz_start_lat), float(wz_end_lat))
+    east = max(float(wz_start_lon), float(wz_end_lon))
+    west = min(float(wz_start_lon), float(wz_end_lon))
+    calc_zoom_level(north, south, east, west, map_image_width, map_image_height)
 
-    wzConfig['ImageInfo']['Zoom'] = zoom
-    wzConfig['ImageInfo']['Center']['Lat'] = centerLat
-    wzConfig['ImageInfo']['Center']['Lon'] = centerLon
+    wz_config['ImageInfo']['Zoom'] = zoom
+    wz_config['ImageInfo']['Center']['Lat'] = center_lat
+    wz_config['ImageInfo']['Center']['Lon'] = center_lon
     markers = []
-    markers.append({'Name': 'Start', 'Color': 'Green', 'Location': {'Lat': wzStartLat, 'Lon': wzStartLon, 'Elev': None}})
-    markers.append({'Name': 'End', 'Color': 'Red', 'Location': {'Lat': wzEndLat, 'Lon': wzEndLon, 'Elev': None}})
-    wzConfig['ImageInfo']['Markers'] = markers
-    wzConfig['ImageInfo']['MapType'] = mapImageMapType
-    wzConfig['ImageInfo']['Height'] = mapImageHeight
-    wzConfig['ImageInfo']['Width'] = mapImageWidth
-    wzConfig['ImageInfo']['Format'] = mapImageFormat
-    wzConfig['ImageInfo']['ImageString'] = ""
+    markers.append({'Name': 'Start', 'Color': 'Green', 'Location': {'Lat': wz_start_lat, 'Lon': wz_start_lon, 'Elev': None}})
+    markers.append({'Name': 'End', 'Color': 'Red', 'Location': {'Lat': wz_end_lat, 'Lon': wz_end_lon, 'Elev': None}})
+    wz_config['ImageInfo']['Markers'] = markers
+    wz_config['ImageInfo']['MapType'] = map_image_map_type
+    wz_config['ImageInfo']['Height'] = map_image_height
+    wz_config['ImageInfo']['Width'] = map_image_width
+    wz_config['ImageInfo']['Format'] = map_image_format
+    wz_config['ImageInfo']['ImageString'] = ""
 
 
-    markerStr = '   *** Ending Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***'
-    logMsg('*** Ending Point Marked @ '+str(GPSLat)+', '+str(GPSLon)+', '+str(GPSAlt)+' ***')
-    displayStatusMsg(markerStr)
+    marker_str = '   *** Ending Point Marked @ '+str(gps_lat)+', '+str(gps_lon)+', '+str(gps_alt)+' ***'
+    log_msg('*** Ending Point Marked @ '+str(gps_lat)+', '+str(gps_lon)+', '+str(gps_alt)+' ***')
+    display_status_msg(marker_str)
 
-    stopDataLog()
+    stop_data_log()
 
 # Write line to CSV data vile
-def writeCSVFile(write_str):
-    global writeData                            #file handle
+def write_csv_file(write_str):
+    global write_data                            #file handle
     
-    writeData.writerow(write_str)               #write output to csv file...
+    write_data.writerow(write_str)               #write output to csv file...
 
 # Display message in status window
-def displayStatusMsg(msgStr):
+def display_status_msg(msg_str):
 
-    xPos = marginLeft-80+45
-    yPos = 410
-    blankStr = ' '*190
-    Text = Label(root,anchor='w', justify=LEFT, text=blankStr)
-    Text.place(x=xPos,y=yPos)    
+    x_pos = margin_left-80+45
+    y_pos = 410
+    blank_str = ' '*190
+    text_label = Label(root,anchor='w', justify=LEFT, text=blank_str)
+    text_label.place(x=x_pos,y=y_pos)    
 
-    Text = Label(root,anchor='w', justify=LEFT, text=msgStr)
-    Text.place(x=xPos,y=yPos)    
+    text_label = Label(root,anchor='w', justify=LEFT, text=msg_str)
+    text_label.place(x=x_pos,y=y_pos)    
 
 
 # Enable buttons and remove overlay message
-def enableForm():
-    for i in range(1, totalLanes+1):
+def enable_form():
+    for i in range(1, total_lanes+1):
         if i != dataLane:
             lanes[i]['fg'] = 'white'
             lanes[i]['bg'] = 'green'
             lanes[i]['state'] = NORMAL
         else:
             lanes[i]['text'] = 'Lane ' + str(i) + '\n(Vehicle Lane)'
-    bWP['fg'] = 'white'
-    bWP['bg'] = 'green'
-    bWP['state'] = NORMAL
+    btn_wp['fg'] = 'white'
+    btn_wp['bg'] = 'green'
+    btn_wp['state'] = NORMAL
 
 
 
-GPSDate     = ''                                #GPS Date
-GPSTime     = ''                                #GPS Time
-prevGPSTime = ''                                #previous GPS Time
-GPSLat      = 0.0                               #Latitude in degrees in decimal
-GPSLon      = 0.0                               #Longitude in degrees in decimal
-GPSAlt      = 0.0                               #Altitude in meters
+gps_date     = ''                                #GPS Date
+gps_time     = ''                                #GPS Time
+prev_gps_time = ''                                #previous GPS Time
+gps_lat      = 0.0                               #Latitude in degrees in decimal
+gps_lon      = 0.0                               #Longitude in degrees in decimal
+gps_alt      = 0.0                               #Altitude in meters
 
-dataLog     = False                             #data logging off
-appRunning  = True                              #set application running to TRUE
-keyMarker   = ['',0]                            #marker from key press
-gotRefPt    = False                             #got Ref. Point
-wpStat      = False                             #workers not present
+data_log     = False                             #data logging off
+app_running  = True                              #set application running to TRUE
+key_marker   = ['',0]                            #marker from key press
+got_ref_pt    = False                             #got Ref. Point
+wp_stat      = False                             #workers not present
                                                 #pressing the same lane # key will toggle the from close to open  
 
-# local_config_path = './Config Files/ACTIVE_CONFIG.json'
-cDT = datetime.datetime.now().strftime('%m/%d/%Y - ') + time.strftime('%H:%M:%S')
-ctrDT = datetime.datetime.now().strftime('%Y%m%d-') + time.strftime('%H%M%S')
+cdt = datetime.datetime.now().strftime('%m/%d/%Y - ') + time.strftime('%H:%M:%S')
 
 files_list      = []
 
 
-commPort = tkPortVar.get()[0:4]
-baudRate = int(tkBaudVar.get())
-dataRate = int(tkDataVar.get())
+comm_port = tk_port_var.get()[0:4]
+baud_rate = int(tk_baud_var.get())
+data_rate = int(tk_data_var.get())
 
-logMsg('*** Running Vehicle Path Data Acquisition ***')
+log_msg('*** Running Vehicle Path Data Acquisition ***')
 
-outDir      = './WZ_VehPathData'
-vehPathDataFileName = 'path-data--' + wzDesc.lower().strip().replace(' ', '-') + '--' + roadName.lower().strip().replace(' ', '-') + '.csv'
-vehPathDataFile = outDir + '/' + vehPathDataFileName
+out_dir      = './WZ_VehPathData'
+veh_path_data_file_name = 'path-data--' + wzDesc.lower().strip().replace(' ', '-') + '--' + roadName.lower().strip().replace(' ', '-') + '.csv'
+veh_path_data_file = out_dir + '/' + veh_path_data_file_name
 
 ##########################################################################
 #
@@ -1236,275 +1187,206 @@ vehPathDataFile = outDir + '/' + vehPathDataFileName
 #
 ############################################################################
 
-marginLeft = 750
-window_width = max(1400, totalLanes*100+300+marginLeft)
+margin_left = 750
+window_width = max(1400, total_lanes*100+300+margin_left)
 window.geometry(str(window_width)+'x750')
 root = Frame(width=window_width, height=750)
 root.place(x=0, y=0)
 # root.bind_all('<Key>', keyPress)                #key press event...
 
-laneStat = [True]*(totalLanes+1) #all 8 lanes are open (default), Lane 0 is not used...
+lane_stat = [True]*(total_lanes+1) #all 8 lanes are open (default), Lane 0 is not used...
 
 lbl_top = Label(root, text='Vehicle Path Data Acquisition\n\n', font=helvetica_14, fg='royalblue', pady=10)
 lbl_top.place(x=window_width/2-250/2, y=10)
 
-laneLine = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))                             # Lane Line
-carImg = ImageTk.PhotoImage(Image.open('./images/caricon.png'))                                         # Car image
-carlabel = Label(root, image = carImg)                                                                  # Label with car image
-workersPresentImg = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))             # Workers present image
+lane_line = ImageTk.PhotoImage(Image.open('./images/verticalLine_thin.png'))                             # Lane Line
+car_img = ImageTk.PhotoImage(Image.open('./images/caricon.png'))                                         # Car image
+car_label = Label(root, image = car_img)                                                                  # Label with car image
+workers_present_img = ImageTk.PhotoImage(Image.open('./images/workersPresentSign_small.png'))             # Workers present image
 userPositionImg = ImageTk.PhotoImage(Image.open('./images/blue-circle.png'))                            # Workers present image
 
-plusImg = ImageTk.PhotoImage(Image.open('./images/plus.png'))
-minusImg = ImageTk.PhotoImage(Image.open('./images/minus.png'))
 
-arrowUpImg = ImageTk.PhotoImage(Image.open('./images/arrow_up.png'))
-arrowRightImg = ImageTk.PhotoImage(Image.open('./images/arrow_right.png'))
-arrowDownImg = ImageTk.PhotoImage(Image.open('./images/arrow_down.png'))
-arrowLeftImg = ImageTk.PhotoImage(Image.open('./images/arrow_left.png'))
-
-
-mapFileName = "./mapImage.png"
+map_file_name = "./mapImage.png"
 
 zoom = 10
-imgHeight = 640
-imgWidth = 640
+
+# re-initialized
+map_image_height = 640
+map_image_width = 640
 center = "40.4742350,-104.9692566"
 imgFormat = "png"
-vertBound = 0
-horizBound = 0
-carPosLat = 0
-carPosLon = 0
-carPosHeading = 0
-markerHeight = 20
-markerWidth = 20
+vert_bound = 0
+horiz_bound = 0
+car_pos_lat = 0
+car_pos_lon = 0
+car_pos_heading = 0
+marker_height = 20
+marker_width = 20
 
 if not marker_list:
     marker_list = []
-    marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|")
-    marker_list.append("markers=color:red|label:End|" + str(wzEndLat) + "," + str(wzEndLon) + "|")
+    marker_list.append("markers=color:green|label:Start|" + str(wz_start_lat) + "," + str(wz_start_lon) + "|")
+    marker_list.append("markers=color:red|label:End|" + str(wz_end_lat) + "," + str(wz_end_lon) + "|")
 
 # Calculate map bounds from google maps zoom level
-def getCurrentMapBounds():
-    global horizBound
-    global vertBound
+def get_current_map_bounds():
+    global horiz_bound
+    global vert_bound
 
-    # zoom = math.log(pixelWidth * 360 / angle / GLOBE_WIDTH) / math.log(2)
-    # GLOBE_WIDTH * e ^ (zoom * math.log(2)) = pixelWidth * 360 / angle
+    # zoom = math.log(pixelWidth * 360 / angle / globe_width) / math.log(2)
+    # globe_width * e ^ (zoom * math.log(2)) = pixelWidth * 360 / angle
 
-    GLOBE_WIDTH = 256
-    scale = 360 / (GLOBE_WIDTH * math.e**(zoom * math.log(2)))
-    horizBound = imgWidth * scale
-    vertBound = imgHeight * scale * math.cos(centerLat*math.pi/180) #.77 -78.388249  * math.cos(centerLat*math.pi/180)
+    globe_width = 256
+    scale = 360 / (globe_width * math.e**(zoom * math.log(2)))
+    horiz_bound = map_image_width * scale
+    vert_bound = map_image_height * scale * math.cos(center_lat*math.pi/180) #.77 -78.388249  * math.cos(center_lat*math.pi/180)
 
 # Caculate pixel location on screen from bounds (Linear Interpolation)
 def getPixelLocation(lat, lon):
-    x = (lon - centerLon) / (horizBound / 2)
-    y = -(lat - centerLat) / (vertBound / 2) # / math.cos(lat*math.pi/180) * math.cos(centerLat*math.pi/180)
-    x = round((imgWidth/2) + x * (imgWidth/2) - (markerWidth/2))
-    y = round((imgHeight/2) + y * (imgHeight/2) - (markerHeight/2))
-    if (x < 0 or x > imgWidth) or (y < 0 or y > imgHeight):
+    x = (lon - center_lon) / (horiz_bound / 2)
+    y = -(lat - center_lat) / (vert_bound / 2) # / math.cos(lat*math.pi/180) * math.cos(center_lat*math.pi/180)
+    x = round((map_image_width/2) + x * (map_image_width/2) - (marker_width/2))
+    y = round((map_image_height/2) + y * (map_image_height/2) - (marker_height/2))
+    if (x < 0 or x > map_image_width) or (y < 0 or y > map_image_height):
         x = -1
         y = -1
     return x, y
 
 # Calculate google maps zoom level to fit a rectangle
-def calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight):
+def calc_zoom_level(north, south, east, west, pixelWidth, pixelHeight):
     global zoom
-    global centerLat
+    global center_lat
 
-    GLOBE_WIDTH = 256
-    ZOOM_MAX = 21
+    globe_width = 256
+    zoom_max = 21
     angle = east - west
     if angle < 0:
         angle += 360
-    zoomHoriz = round(math.log(pixelWidth * 360 / angle / GLOBE_WIDTH) / math.log(2)) - 1
+    zoom_horiz = round(math.log(pixelWidth * 360 / angle / globe_width) / math.log(2)) - 1
 
     angle = north - south
-    centerLat = (north + south) / 2
+    center_lat = (north + south) / 2
     if angle < 0:
         angle += 360
-    zoomVert = round(math.log(pixelHeight * 360 / angle / GLOBE_WIDTH * math.cos(centerLat*math.pi/180)) / math.log(2)) - 1
+    zoom_vert = round(math.log(pixelHeight * 360 / angle / globe_width * math.cos(center_lat*math.pi/180)) / math.log(2)) - 1
 
-    zoom = max(min(zoomHoriz, zoomVert, ZOOM_MAX), 0)
-    getCurrentMapBounds()
+    zoom = max(min(zoom_horiz, zoom_vert, zoom_max), 0)
+    get_current_map_bounds()
 
 
 ### Center Location
 # If center coordinates present in configuration file, write center to global vars
-if mapImageCenterLat and mapImageCenterLon:
-    centerLat = float(mapImageCenterLat)
-    centerLon = float(mapImageCenterLon)
-    center = str(centerLat) + ',' + str(centerLon)
+if map_image_center_lat and map_image_center_lat:
+    center_lat = float(map_image_center_lat)
+    center_lon = float(map_image_center_lat)
+    center = str(center_lat) + ',' + str(center_lon)
 # If center coordinates not present and automatic detection, recalculate center based on coordinates
-elif not manualDetection:
-    centerLat = (float(wzStartLat) + float(wzEndLat))/2
-    centerLon = (float(wzStartLon) + float(wzEndLon))/2
-    center = str(centerLat) + ',' + str(centerLon)
+elif not manual_detection:
+    center_lat = (float(wz_start_lat) + float(wz_end_lat))/2
+    center_lon = (float(wz_start_lon) + float(wz_end_lon))/2
+    center = str(center_lat) + ',' + str(center_lon)
 # If center coordinates not present and manual detection, do nothing
 
 
 ### Zoom Level
 # If zoom level set in configuration file, write zoom to global var
-if mapImageZoom:
-    zoom = int(mapImageZoom)
-    getCurrentMapBounds()
+if map_image_zoom:
+    zoom = int(map_image_zoom)
+    get_current_map_bounds()
 # If zoom level not set and automatic detection, recalculate zoom level
-elif not manualDetection:
-    north = max(float(wzStartLat), float(wzEndLat))
-    south = min(float(wzStartLat), float(wzEndLat))
-    east = max(float(wzStartLon), float(wzEndLon))
-    west = min(float(wzStartLon), float(wzEndLon))
-    calcZoomLevel(north, south, east, west, imgWidth, imgHeight)
+elif not manual_detection:
+    north = max(float(wz_start_lat), float(wz_end_lat))
+    south = min(float(wz_start_lat), float(wz_end_lat))
+    east = max(float(wz_start_lon), float(wz_end_lon))
+    west = min(float(wz_start_lon), float(wz_end_lon))
+    calc_zoom_level(north, south, east, west, map_image_width, map_image_height)
 # If zoom level not set and manual detection, do nothing
 
 
 ### Map Image
 # If manual detection, set image to map_failed
-if manualDetection: #No map image to load
-    shutil.copy(map_failed_img, mapFileName)
-    mapFailed = True
-# If automatic detection, attempt to load image
-# else:
-#     # If internet on, load cloud image
-#     if internet_on():
-#         get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
-#         mapFailed = False
-    # If no internet, leave image as is (This image was set from the configuration file ImageString)
-mapImg = ImageTk.PhotoImage(Image.open(mapFileName))
+if manual_detection: #No map image to load
+    shutil.copy(map_failed_img, map_file_name)
+    map_failed = True
+map_img = ImageTk.PhotoImage(Image.open(map_file_name))
 
 # Exit data collection loop and quit
 def end_application():
-    global appRunning
-    appRunning = False
-    logFile.close()
+    global app_running
+    app_running = False
+    log_file.close()
     sys.exit(0)
 
 # Initialize UI lane variables
-lanes = [0]*(totalLanes+1)
-laneBoxes = [0]*(totalLanes+1)
-laneLabels = [0]*(totalLanes+1)
-laneSymbols = [0]*(totalLanes+1)
-laneLines = [0]*(totalLanes+1)
+lanes = [0]*(total_lanes+1)
+lane_boxes = [0]*(total_lanes+1)
+lane_labels = [0]*(total_lanes+1)
+lane_Symbols = [0]*(total_lanes+1)
+lane_lines = [0]*(total_lanes+1)
 
-# Zoom in or out by 1 unit
-# def changeZoom(incr):
-#     global mapImg
-#     global zoom
-#     global mapLabel
-#     zoom += incr
-#     get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
-#     mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
-#     mapLabel.configure(image = mapImg)
-#     getCurrentMapBounds()
-#     updatePosition()
+map_label = Label(root, image = map_img)
+map_label.place(x=50, y=60)
 
-# # Move 1/5 of the screen size based on direct
-# def moveMap(direct):
-#     global centerLat
-#     global centerLon
-#     global center
-#     global mapImg
-#     global mapLabel
-
-#     fract = 1/5
-#     distanceVert = 0
-#     distanceHoriz = 0
-#     if direct == 'u':
-#         distanceVert = vertBound*fract
-#     elif direct == 'd':
-#         distanceVert = -vertBound*fract
-#     elif direct == 'r':
-#         distanceHoriz = horizBound*fract
-#     elif direct == 'l':
-#         distanceHoriz = -horizBound*fract
-#     centerLat += distanceVert
-#     centerLon += distanceHoriz
-#     center = str(centerLat) + ',' + str(centerLon)
-
-#     get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list) #, markers=marker_list
-#     mapImg = ImageTk.PhotoImage(Image.open(mapFileName))             # Workers present image
-#     mapLabel.configure(image = mapImg)
-#     updatePosition()
-
-mapLabel = Label(root, image = mapImg)
-mapLabel.place(x=50, y=60)
-
-# If manual detection, no map to move so do not place buttons
-# if not manualDetection:
-#     bZoomIn = Button(root, image=plusImg, font='Helvetica 10', command=lambda:changeZoom(1), highlightthickness = 0, bd = 0)
-#     bZoomIn.place(x=540, y=68)
-#     bZoomOut = Button(root, image=minusImg, font='Helvetica 10', command=lambda:changeZoom(-1), highlightthickness = 0, bd = 0)
-#     bZoomOut.place(x=540, y=102)
-
-#     bMoveUp = Button(root, image=arrowUpImg, font='Helvetica 10', command=lambda:moveMap("u"), highlightthickness = 0, bd = 0)
-#     bMoveUp.place(x=610, y=60)
-#     bMoveRight = Button(root, image=arrowRightImg, font='Helvetica 10', command=lambda:moveMap("r"), highlightthickness = 0, bd = 0)
-#     bMoveRight.place(x=635, y=85)
-#     bMoveDown = Button(root, image=arrowDownImg, font='Helvetica 10', command=lambda:moveMap("d"), highlightthickness = 0, bd = 0)
-#     bMoveDown.place(x=610, y=110)
-#     bMoveLeft = Button(root, image=arrowLeftImg, font='Helvetica 10', command=lambda:moveMap("l"), highlightthickness = 0, bd = 0)
-#     bMoveLeft.place(x=585, y=85)
-
-carLabel = Label(root, image = userPositionImg, highlightthickness = 0, borderwidth = 0, width= 0, height = 0)
+user_car_label = Label(root, image = userPositionImg, highlightthickness = 0, borderwidth = 0, width= 0, height = 0)
 
 # Update position of marker on screen
-def updatePosition():
-    global carLabel
-    if not mapFailed:
-        x, y = getPixelLocation(carPosLat, carPosLon)
-        carLabel.place(x=x + 50, y=y + 60)
+def update_position():
+    global user_car_label
+    if not map_failed:
+        x, y = getPixelLocation(car_pos_lat, car_pos_lon)
+        user_car_label.place(x=x + 50, y=y + 60)
     else:
-        carLabel.place(x=-1 + 50, y=-1 + 60)
+        user_car_label.place(x=-1 + 50, y=-1 + 60)
 
 # Initialize lane images
-for i in range(totalLanes):
-    laneLines[i] = Label(root, image = laneLine)
-    laneLines[i].place(x=marginLeft + i*110, y=50)
+for i in range(total_lanes):
+    lane_lines[i] = Label(root, image = lane_line)
+    lane_lines[i].place(x=margin_left + i*110, y=50)
     if i+1 == dataLane:
-        carlabel.place(x=marginLeft+8 + i*110, y=50)
+        car_label.place(x=margin_left+8 + i*110, y=50)
     else:
-        laneBoxes[i+1] = Label(root, justify=LEFT,anchor=W,padx=50,pady=90)
-        laneBoxes[i+1].place(x=marginLeft+10 + i*110, y=50)
-        laneLabels[i+1] = Label(root, text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
-        laneLabels[i+1].place(x=marginLeft+22 + i*110, y=100)
-    if i == totalLanes-1:
-        laneLines[i+1] = Label(root, image = laneLine)
-        laneLines[i+1].place(x=marginLeft + (i+1)*110, y=50)
+        lane_boxes[i+1] = Label(root, justify=LEFT,anchor=W,padx=50,pady=90)
+        lane_boxes[i+1].place(x=margin_left+10 + i*110, y=50)
+        lane_labels[i+1] = Label(root, text='OPEN',justify=CENTER,font='Calibri 22 bold',fg='green')
+        lane_labels[i+1].place(x=margin_left+22 + i*110, y=100)
+    if i == total_lanes-1:
+        lane_lines[i+1] = Label(root, image = lane_line)
+        lane_lines[i+1].place(x=margin_left + (i+1)*110, y=50)
 
-# This is required because otherwise the lane command laneClicked(lane #) cannot be set in a for loop
-def createButton(id):
-    laneBtn = Button(root, text='Lane '+str(id), font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:laneClicked(id))
-    laneBtn.place(x=marginLeft+10 + (id-1)*110, y=300)
-    return laneBtn
+# This is required because otherwise the lane command lane_clicked(lane #) cannot be set in a for loop
+def create_button(id):
+    lane_btn = Button(root, text='Lane '+str(id), font=text_font, state=DISABLED, width=11, height=4, command=lambda:lane_clicked(id))
+    lane_btn.place(x=margin_left+10 + (id-1)*110, y=300)
+    return lane_btn
 
 # Create lane buttons dynamically to number of lanes
-for i in range(1, totalLanes+1):
-    lanes[i] = createButton(i)
+for i in range(1, total_lanes+1):
+    lanes[i] = create_button(i)
 
 # Toggle workers present button
-bWP = Button(root, text='Workers are\nPresent', font='Helvetica 10', state=DISABLED, width=11, height=4, command=lambda:workersPresentClicked())
-bWP.place(x=marginLeft+60 + (totalLanes)*110, y=300)
+btn_wp = Button(root, text='Workers are\nPresent', font=text_font, state=DISABLED, width=11, height=4, command=lambda:workers_present_clicked())
+btn_wp.place(x=margin_left+60 + (total_lanes)*110, y=300)
 
 
-if manualDetection:
-    bStart = Button(root, text='Mark Start of\nWork Zone', font='Helvetica 10', padx=5, bg='green', fg='white', command=markStartPt)
-    bStart.place(x=marginLeft-100+150, y=510)
-    bEnd = Button(root, text='Mark End of\nWork Zone', font='Helvetica 10', padx=5, bg='red3', fg='gray92', command=markEndPt)
-    bEnd.place(x=marginLeft-100+450, y=510)
+if manual_detection:
+    btn_start = Button(root, text='Mark Start of\nWork Zone', font=text_font, padx=5, bg='green', fg='white', command=mark_start_pt)
+    btn_start.place(x=margin_left-100+150, y=510)
+    btn_end = Button(root, text='Mark End of\nWork Zone', font=text_font, padx=5, bg='red3', fg='gray92', command=mark_end_pt)
+    btn_end.place(x=margin_left-100+450, y=510)
 
 ###
 #   Application Message Window...
 ###
 
-appMsgWin = Button(root, text='Application Message Window...                                             ',      \
+app_msg_win = Button(root, text='Application Message Window...                                             ',      \
                 font='Courier 10', justify=LEFT,anchor=W,padx=10,pady=10)
-appMsgWin.place(x=marginLeft-80+50, y=400)
-overlayWidth = 710
-overlayx = marginLeft + (window_width - marginLeft)/2 - overlayWidth/2
+app_msg_win.place(x=margin_left-80+50, y=400)
+overlay_width = 710
+overlay_x = margin_left + (window_width - margin_left)/2 - overlay_width/2
 overlay = Label(root, text='Application will begin data collection\nwhen the starting location has been reached', bg='gray', font='Calibri 28')
-if manualDetection:
+if manual_detection:
     overlay['text'] = 'Application will begin data collection\nwhen the starting location is marked'
-overlay.place(x=overlayx, y=200)
+overlay.place(x=overlay_x, y=200)
 
 
 ##############################################################
@@ -1516,18 +1398,18 @@ gps_found = False
 first = True
 while not gps_found:
     try:
-        ser         = serial.Serial(port=commPort, baudrate=baudRate, timeout=1.1, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)               #open serial port
-        msgStr      = '   Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
-        displayStatusMsg(msgStr)                                                        #system ready
+        ser         = serial.Serial(port=comm_port, baudrate=baud_rate, timeout=1.1, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)               #open serial port
+        msg_str      = '   Vehicle Path Data Acquisition is Ready - Logging Will Start When Start Location is Reached'
+        display_status_msg(msg_str)                                                        #system ready
         gps_found = True
 
     except SerialException as e:
-        logMsg('Failed to find GPS device, SerialException: ' + str(e))
-        MsgBox = messagebox.askquestion ('GPS Receiver NOT Found','*** GPS Receiver NOT Found ***, Reconnect to USB Port ***\n\n'   \
+        log_msg('Failed to find GPS device, SerialException: ' + str(e))
+        msg_box = messagebox.askquestion ('GPS Receiver NOT Found','*** GPS Receiver NOT Found ***, Reconnect to USB Port ***\n\n'   \
                     '   --- Press Yes to try again, No to exit the application ---',icon = 'warning')
-        if MsgBox == 'no':
-            logMsg('User exited application')
-            logFile.close()
+        if msg_box == 'no':
+            log_msg('User exited application')
+            log_file.close()
             sys.exit(0)                                                 #system ready
 
 ###
@@ -1535,17 +1417,17 @@ while not gps_found:
 #   must use sio
 ###
 
-logMsg('Creating serial IO connection')
+log_msg('Creating serial IO connection')
 sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
 
-#   Open outFile for csv write...
-logMsg('Opening path data output file: ' + vehPathDataFile)
-outFile     = open(vehPathDataFile,'w',newline='')
-writeData   = csv.writer(outFile)
+#   Open out_file for csv write...
+log_msg('Opening path data output file: ' + veh_path_data_file)
+out_file     = open(veh_path_data_file,'w',newline='')
+write_data   = csv.writer(out_file)
 
 # Write heading to file
-titleLine = 'GPS Date & Time','# of Sats','HDOP','Latitude','Longitude','Altitude(m)','Speed(m/s)','Heading(Deg)','Marker','Value'
-writeCSVFile(titleLine)
+title_line = 'GPS Date & Time','# of Sats','HDOP','Latitude','Longitude','Altitude(m)','Speed(m/s)','Heading(Deg)','Marker','Value'
+write_csv_file(title_line)
 
 ###
 #
@@ -1553,59 +1435,37 @@ writeCSVFile(titleLine)
 #
 ###
 
-logMsg('Starting main loop')
+log_msg('Starting main loop')
 
 window.protocol("WM_DELETE_WINDOW", end_application)
-startMainFunc()                                         #main function, starts NMEA processing 
+start_main_func()                                         #main function, starts NMEA processing 
 
-logMsg('Main loop ended, closing streams/files')
+log_msg('Main loop ended, closing streams/files')
 
 ###
 #   Done, close everything...
 ###
 
 ser.close()                                             #close serial IO
-outFile.close()                                         #end of data acquisition and logging
-logMsg('Ending data acquisition')
-# logFile.close()
+out_file.close()                                         #end of data acquisition and logging
+log_msg('Ending data acquisition')
 root.destroy()
 window.quit()
-
-
-# Start 
-# laneStat = []
-# wpStat = []
-
-# # Upload messag archive
-# def uploadArchive():
-#     if internet_on():
-#         logMsg('Creating blob in azure: ' + zip_name + ', in container: ' + container_name)
-#         blob_client = blob_service_client.get_blob_client(container=container_name, blob=zip_name)
-#         logMsg('Uploading zip archive to blob')
-#         with open(zip_name, 'rb') as data:
-#             blob_client.upload_blob(data, overwrite=True)
-#         logMsg('Closing log file in Message Builder and Export')
-#         logFile.close()
-#         messagebox.showinfo('Upload Successful', 'Data upload successful! Please navigate to\nhttp://www.neaeraconsulting.com/V2x_Verification\nto view and verify the mapped workzone.\nYou will find your data under\n' + name_id)
-#         sys.exit(0)
-#     else:
-#         logMsg('Attempted uploadArchive, no internet connection detected')
-#         messagebox.showerror('No Internet Cnnection', 'No internet connection detected\nConnect and try again')
 
 def uploadFile():
     upload_container = "workzoneuploads"
     if internet_on():
-        logMsg('Creating blob in azure: ' + blob_name + ', in container: ' + upload_container)
+        log_msg('Creating blob in azure: ' + blob_name + ', in container: ' + upload_container)
         blob_client = blob_service_client.get_blob_client(container=upload_container, blob=blob_name)
-        logMsg('Uploading zip archive to blob')
-        with open(vehPathDataFile, 'rb') as data:
+        log_msg('Uploading zip archive to blob')
+        with open(veh_path_data_file, 'rb') as data:
             blob_client.upload_blob(data, overwrite=True)
-        logMsg('Closing log file in Message Builder and Export')
-        logFile.close()
+        log_msg('Closing log file in Message Builder and Export')
+        log_file.close()
         messagebox.showinfo('Upload Successful', 'Data upload successful! Please navigate to\nhttp://www.neaeraconsulting.com/V2x_Verification\nto view and verify the mapped workzone.\nYou will find your data under\n' + name_id)
         sys.exit(0)
     else:
-        logMsg('Attempted uploadArchive, no internet connection detected')
+        log_msg('Attempted uploadArchive, no internet connection detected')
         messagebox.showerror('No Internet Cnnection', 'No internet connection detected\nConnect and try again')
 
 # Create upload button
@@ -1624,55 +1484,20 @@ loading_label.place(x=60, y=120)
 # ---------------------------- Automatically Export Files ------------------------------------
 #
 ###############################################################################################
-logMsg('*** Running Message Builder and Export ***')
+log_msg('*** Running Message Builder and Export ***')
 
 description = wzDesc.lower().strip().replace(' ', '-')
 road_name = roadName.lower().strip().replace(' ', '-')
 name_id = description + '--' + road_name
 blob_name = 'path-data--' + name_id + '.csv'
 
-def updateConfigImage():
-    global needsImage
-    global wzConfig
-    global center
-
-    centerLat = (float(wzStartLat) + float(wzEndLat))/2
-    centerLon = (float(wzStartLon) + float(wzEndLon))/2
-    center = str(centerLat) + ',' + str(centerLon)
-    
-    north = max(float(wzStartLat), float(wzEndLat))
-    south = min(float(wzStartLat), float(wzEndLat))
-    east = max(float(wzStartLon), float(wzEndLon))
-    west = min(float(wzStartLon), float(wzEndLon))
-    calcZoomLevel(north, south, east, west, imgWidth, imgHeight)
-
-    marker_list = []
-    marker_list.append("markers=color:green|label:Start|" + str(wzStartLat) + "," + str(wzStartLon) + "|")
-    marker_list.append("markers=color:red|label:End|" + str(wzEndLat) + "," + str(wzEndLon) + "|")
-
-    # encoded_string = ''
-    # if internet_on():
-    #     get_static_google_map(mapFileName, center=center, zoom=zoom, imgsize=(imgWidth, imgHeight), imgformat="png", markers=marker_list)
-    #     with open(mapFileName, "rb") as image_file:
-    #         encoded_string = base64.b64encode(image_file.read()).decode()
-    #     needsImage = False
-
-    wzConfig['ImageInfo']['Zoom'] = zoom
-    wzConfig['ImageInfo']['Center']['Lat'] = centerLat
-    wzConfig['ImageInfo']['Center']['Lon'] = centerLon
-    wzConfig['ImageInfo']['ImageString'] = ''
-
-    cfg = open(local_updated_config_path, 'w')
-    cfg.write(json.dumps(wzConfig, indent='  '))
-    cfg.close()
-
-def prepareDataFile():
+def prepare_data_file():
     global blob_name
-    if updateConfigImage:
+    if config_updated:
         blob_name = blob_name.replace('.csv', '--update-image.csv')
+        # updateConfigImage()
 
-    valid, msgs = validateDataFile()
-    print(valid)
+    valid, msgs = validate_data_file()
     if not valid:
         messages = '\n'
         for msg in msgs:
@@ -1681,12 +1506,8 @@ def prepareDataFile():
         messagebox.showerror('Data File Invalid',message + 'After fixing, upload to to https://neaeraconsulting.com/V2X_Upload')
         sys.exit(0)
 
-    # logMsg('Removing local configuration file: ' + local_config_path)
-    if configUpdated:
-        os.remove(local_updated_config_path)
-
     if has_azure_connection:
-        logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
+        log_msg('Loaded connection string from environment variable: ' + connect_str_env_var)
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
         container_name = 'workzonedatauploads'
 
@@ -1694,125 +1515,49 @@ def prepareDataFile():
         load_config['state']= NORMAL
         loading_label.destroy()
     else:
-        logMsg('Closing log file in Message Builder and Export')
-        logFile.close()
-        messagebox.showinfo('Upload Data File', 'Data file generation complete. Please upload the\ngenerated CSV file: ' + vehPathDataFile.split('/')[-1] + '\nto https://neaeraconsulting.com/V2X_Upload')
+        log_msg('Closing log file in Message Builder and Export')
+        log_file.close()
+        messagebox.showinfo('Upload Data File', 'Data file generation complete. Please upload the\ngenerated CSV file: ' + veh_path_data_file.split('/')[-1] + '\nto https://neaeraconsulting.com/V2X_Upload')
         sys.exit(0)
 
-# # Create zip archive of messages
-# def create_messages_and_zip():
-#     global zip_name
-#     global name_id
-#     global blob_service_client
-#     global container_name
-
-#     if manualDetection:
-#         updateConfigImage()
-
-#     build_all_messages()
-#     files_list.append(vehPathDataFile)
-#     if configUpdated:
-#         files_list.append(local_updated_config_path)
-#     else:
-#         files_list.append(local_config_path)
-
-#     description = wzDesc.lower().strip().replace(' ', '-')
-#     road_name = roadName.lower().strip().replace(' ', '-')
-#     name_id = description + '--' + road_name
-#     logMsg('Work zone name id: ' + name_id)
-#     zip_name = 'wzdc-exports--' + name_id + '.zip'
-#     logMsg('Creating zip archive: ' + zip_name)
-
-#     zipObj = zipfile.ZipFile(zip_name, 'w')
-
-#     for filename in files_list:
-#         name = filename.split('/')[-1]
-#         name_orig = name
-#         name_wo_ext = name[:name.rfind('.')]
-#         if '.csv' in filename.lower():
-#             name = 'path-data--' + name_id + '.csv'
-#         elif json_ext in filename.lower():
-#             if configUpdated:
-#                 if needsImage:
-#                     name = 'config--' + name_id + '-updated-needsimage.json'
-#                 else:
-#                     name = 'config--' + name_id + '-updated.json'
-#             else:
-#                 name = 'config--' + name_id + json_ext
-#         elif xml_ext in filename.lower():
-#             number = name[name.rfind('-')+1:name.rfind('.')]
-#             name = 'rsm-xml--' + name_id + '--' + number + xml_ext
-#         elif uper_ext in filename.lower():
-#             number = name[name.rfind('-')+1:name.rfind('.')]
-#             name = 'rsm-uper--' + name_id + '--' + number + uper_ext
-#         elif geojson_ext in filename.lower():
-#             name = 'wzdx--' + name_id + geojson_ext
-#         else:
-#             continue
-#         logMsg('Adding file to archive: ' + filename + ', as: ' + name)
-#         zipObj.write(filename, name)
-
-#     # close the Zip File
-#     zipObj.close()
-
-#     # logMsg('Removing local configuration file: ' + local_config_path)
-#     if configUpdated:
-#         os.remove(local_updated_config_path)
-
-#     # connect_str_env_var = 'AZURE_STORAGE_CONNECTION_STRING'
-#     # connect_str = os.getenv(connect_str_env_var)
-#     if has_azure_connection:
-#         logMsg('Loaded connection string from environment variable: ' + connect_str_env_var)
-#         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-#         container_name = 'workzonedatauploads'
-
-#         load_config['bg'] = 'green'
-#         load_config['state']= NORMAL
-#         loading_label.destroy()
-#     else:
-#         logMsg('Closing log file in Message Builder and Export')
-#         logFile.close()
-#         messagebox.showinfo('Upload Generated Messages', 'Message generation complete. Please upload the\ngenerated ZIP file: ' + zip_name + '\nto https://neaeraconsulting.com/V2X_Upload')
-#         sys.exit(0)
-
-def validateDataFile():
-    laneList = range(1, totalLanes)
+def validate_data_file():
+    laneList = range(1, total_lanes)
     print(laneList)
-    markerList = ['Data Log', 'RP', 'RP+WP', 'RP+LC', 'WP', 'LC', 'LO', '']
-    markerValueDict = {'Data Log': ['True', 'False'], 'RP': '', 'RP+WP': ['True', 'False'], 'RP+LC': laneList, 
+    markerList = ['Data Log', 'RP', 'WP+RP', 'LC+RP', 'WP', 'LC', 'LO', '']
+    markerValueDict = {'Data Log': ['True', 'False'], 'RP': '', 'WP+RP': ['True', 'False'], 'LC+RP': laneList, 
     'WP': ['True', 'False'], 'LC': laneList, 'LO': laneList, '': ''}
 
-    laneStat = [0]*9
-    wpStat = False
+    lane_stat = [0]*9
+    wp_stat = False
     messages = []
-    fileValid = True
-    gotRP = False
+    file_valid = True
+    got_rp = False
     i = 0
-    with open(vehPathDataFile, 'r') as f:
+    with open(veh_path_data_file, 'r') as f:
         headers = f.readline()
         data = f.readline().rstrip('\n')
         while data:
             i += 1
-            valid, msg, laneStat, wpStat, gotRP = validateDataLine(data, markerList, markerValueDict, laneStat, wpStat, gotRP)
+            valid, msg, lane_stat, wp_stat, got_rp = validate_data_line(data, markerList, markerValueDict, lane_stat, wp_stat, got_rp)
             if not valid:
                 vileValid = False
                 messages.append('Line ' + str(i) + " " + msg)
 
             data = f.readline().rstrip('\n')
 
-        if not gotRP == True:
-            fileValid = False
+        if not got_rp == True:
+            file_valid = False
             messages.append(" No reference point found by end")
-        if not wpStat == False:
-            fileValid = False
+        if not wp_stat == False:
+            file_valid = False
             messages.append("Workers present not false at end")
-        if not laneStat == [0]*9:
-            fileValid = False
+        if not lane_stat == [0]*9:
+            file_valid = False
             messages.append("All lanes not open at end")
                 
-    return fileValid, messages
+    return file_valid, messages
 
-def validateDataLine(line, markerList, markerValueDict):
+def validate_data_line(line, markerList, markerValueDict, lane_stat, wp_stat, got_rp):
     fields = line.split(',')
     msg = ''
 
@@ -1828,7 +1573,7 @@ def validateDataLine(line, markerList, markerValueDict):
     value   = fields[9]
 
     valid = True
-    if not re.match('([0-9]){4}\/(0[1-9]|1[0-2])\/([0-9]){2}-(0[1-9]|1[0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9]):([0-9]){2}', time): 
+    if not re.match('([0-9]){4}\/(0[1-9]|1[0-2])\/([0-9]){2}-(0[0-9]|1[0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9]):([0-9]){2}', time): 
         valid = False
         msg = "GPS date time gormat invalid: " + str(time)
     if not (sats >= 0 and sats <= 12): 
@@ -1864,17 +1609,18 @@ def validateDataLine(line, markerList, markerValueDict):
         # This error is caught by the above check
         pass
 
-    advValid, advMsg, laneStat, wpStat, gotRP = validateDataLineAdvanced(line, markerValueDict, laneStat, wpStat, gotRP)
-    if not advValid or not valid:
+    adv_valid, adv_msg, lane_stat, wp_stat, got_rp = validate_data_line_advanced(line, markerValueDict, lane_stat, wp_stat, got_rp)
+    if not adv_valid or not valid:
         valid = False
-    for msg_str in advMsg:
+    for msg_str in adv_msg:
         msg.append(msg_str)
 
-    return valid, msg, laneStat, wpStat, gotRP
+    return valid, msg, lane_stat, wp_stat, got_rp
 
-def validateDataLineAdvanced(line, markerValueDict, laneStat, wpStat, gotRP):
+def validate_data_line_advanced(line, markerValueDict, lane_stat, wp_stat, got_rp):
     fields = line.split(',')
     msg = ''
+    valid = True
 
     time    = fields[0]
     sats    = int(fields[1])
@@ -1888,40 +1634,38 @@ def validateDataLineAdvanced(line, markerValueDict, laneStat, wpStat, gotRP):
     value   = fields[9]
 
     # Verify Reference Point
-    if marker == 'RP' or  marker == 'RP+LC' or  marker == 'RP+LC':
-        gotRP = True
+    if marker == 'RP' or  marker == 'LC+RP' or  marker == 'LC+WP':
+        got_rp = True
 
     if value in markerValueDict['LC']:
         # Verify lane closure continuity
-        if marker == 'LC' or  marker == 'RP+LC':
-            if laneStat[value] != 0: 
+        if marker == 'LC' or  marker == 'LC+RP':
+            if lane_stat[value] != 0: 
                 valid = False
                 msg = "Lane closure invalid, closed lane being closed: " + str(marker) + ":" + str(value)
             else: 
-                laneStat[value] = 1
+                lane_stat[value] = 1
         if marker == 'LO':
-            if laneStat[value] != 1: 
+            if lane_stat[value] != 1: 
                 valid = False
                 msg = "Lane closure invalid, open lane being opened: " + str(marker) + ":" + str(value)
             else: 
-                laneStat[value] = 0
+                lane_stat[value] = 0
     else:
         # This error is caught by the basic validator
         pass
 
     # Verify worker presence continuity
-    if marker == 'WP' or  marker == 'RP+WP':
-        if str(wpStat) == value:
+    if marker == 'WP' or  marker == 'WP+RP':
+        if str(wp_stat) == value:
             valid = False
-            msg = "Worker Presence change invalid, wp: " + str(wpStat) + ", value: " + str(value)
+            msg = "Worker Presence change invalid, wp: " + str(wp_stat) + ", value: " + str(value)
         else: 
-            wpStat = not wpStat
+            wp_stat = not wp_stat
     
-    return valid, msg, laneStat, wpStat, gotRP
+    return valid, msg, lane_stat, wp_stat, got_rp
 
-root.after(500, prepareDataFile)
-
-# root.protocol("WM_DELETE_WINDOW", on_closing)
+root.after(500, prepare_data_file)
 
 window.mainloop()
 
