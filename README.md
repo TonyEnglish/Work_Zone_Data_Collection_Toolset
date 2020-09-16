@@ -1,11 +1,13 @@
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=coverage)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=bugs)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=TonyEnglish_V2X-manual-data-collection&metric=security_rating)](https://sonarcloud.io/dashboard?id=TonyEnglish_V2X-manual-data-collection)
 
 # V2X Manual Data Collection
 
 ## Project Description
 
-This project is an open source, proof of concept work zone data collection tool. The purpose of this tool is to allow a construction manager and an IOO user to map work zones and distribute generated map messages to third parties. 
-This project is part of a larger V2X work zone data collection project, funded by ICF. This repository is the result of tasks 6-7 of that 7 part project, the purpose of which is: Development and Demonstration of Proof-of-Concept of an Integrated Work Zone Mapping Toolset.
+This project is an open source, proof of concept work zone data collection tool. The purpose of this tool is to allow a construction manager in the field and transportation system manager at the Infrastructure Owner Operator (IOO) back-office  to map work zones and distribute generated map messages to third parties. This project is part of a larger effort on understanding mapping needs for V2X applications, funded by USDOT. This repository is a deliverable under the project and supports the Development and Demonstration of Proof-of-Concept of an Integrated Work Zone Mapping Toolset.
 
 ![Tasks 6-7 Diagram](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/images/POC_WZ_Toolset.jpg)
 
