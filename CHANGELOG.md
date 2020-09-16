@@ -5,6 +5,7 @@
   - WZDC_tool now generated only breadcrumb (CSV) files
   - Message generation has been moved to the Azure Cloud
   - Tested and verified updates
+- Added breadcrumb (CSV) validator
 
 9/8/2020
 - Integrated Sonar Cloud and Travis.ci into master branch
