@@ -146,10 +146,10 @@ def extract_nodes(rsm, wzd, ids, data_lane, info):
             geometry = get_geometry(lane, point, data_lane, geometry)
 
             # Lane Restrictions
-            reduced_speed_limit, prev_attributes_general = get_reduced_speed_limit(node_contents, reduced_speed_limit, prev_attributes_general)
+            reduced_speed_limit, prev_attributes_general = get_reduced_speed_limit(node_contents, prev_attributes_general)
 
             # Workers Present
-            people_present, prev_attributes_general = get_worker_presence(node_contents, people_present, prev_attributes_general)
+            people_present, prev_attributes_general = get_worker_presence(node_contents, prev_attributes_general)
 
             # Add Lane
             lanes_wzdx.append(lane)
@@ -281,7 +281,7 @@ def get_geometry(lane, point, data_lane, geometry):
         geometry['coordinates'].append(lane_coordinate)
     return geometry
 
-def get_reduced_speed_limit(node_contents, reduced_speed_limit, prev_attributes_general):
+def get_reduced_speed_limit(node_contents, prev_attributes_general):
     # Reduced Speed Limit
     if node_contents.get('nodeAttributes', {}).get('speedLimit', {}).get('type', {}).get('vehicleMaxSpeed', {}) == None:
         reduced_speed_limit = int(node_contents['nodeAttributes']['speedLimit']['speed'])
@@ -293,7 +293,7 @@ def get_reduced_speed_limit(node_contents, reduced_speed_limit, prev_attributes_
     prev_attributes_general['reducedSpeedLimit'] = reduced_speed_limit
     return reduced_speed_limit, prev_attributes_general
 
-def get_worker_presence(node_contents, people_present, prev_attributes_general):
+def get_worker_presence(node_contents, prev_attributes_general):
     # Workers Present
     if node_contents.get('nodeAttributes', {}).get('peoplePresent', {}).get('true', {}) == None: #People present
         people_present = True

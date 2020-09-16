@@ -146,7 +146,7 @@ def get_config_vars():
     # Image Info
     global  map_image_zoom
     global  map_image_center_lat
-    global  map_image_center_lat
+    global  map_image_center_lon
     global  mapImageMarkers
     global  marker_list
     global  map_image_map_type
@@ -214,7 +214,7 @@ def get_config_vars():
 
     map_image_zoom            = wz_config['ImageInfo']['Zoom']
     map_image_center_lat       = wz_config['ImageInfo']['Center']['Lat']
-    map_image_center_lat       = wz_config['ImageInfo']['Center']['Lon']
+    map_image_center_lon       = wz_config['ImageInfo']['Center']['Lon']
     mapImageMarkers         = wz_config['ImageInfo']['Markers'] # Markers:List of {Name, Color, Location {Lat, Lon, ?Elev}}
     marker_list = []
     for marker in mapImageMarkers:
@@ -932,18 +932,18 @@ def dist(lat1, lon1, lat2, lon2):
     return distance
 
 # TODO: Determine if need lon=lon*cos(lat)
-def dist_to_line(v1, v2, w1, w2, p1, p2):
-    l = dist(v1, v2, w1, w2) ** 2
-    t = max(0, min(1, dot(dif(p1, p2, v1, v1), dif(w1, w2, v1, v2))))
-    pp1 = v1 + t * (w1 - v1)
-    pp2 = v2 + t * (w2 - v2)
-    return dist(p1, p2, pp1, pp2), t
+# def dist_to_line(v1, v2, w1, w2, p1, p2):
+#     l = dist(v1, v2, w1, w2) ** 2
+#     t = max(0, min(1, dot(dif(p1, p2, v1, v1), dif(w1, w2, v1, v2))))
+#     pp1 = v1 + t * (w1 - v1)
+#     pp2 = v2 + t * (w2 - v2)
+#     return dist(p1, p2, pp1, pp2), t
 
-def dot(v1, v2, w1, w2):
-    return v1 * w1 + v2 * w2
+# def dot(v1, v2, w1, w2):
+#     return v1 * w1 + v2 * w2
 
-def dif(v1, v2, w1, w2):
-    return v1 - w1, v2 - w2
+# def dif(v1, v2, w1, w2):
+#     return v1 - w1, v2 - w2
 
 # Toggle lane closures
 def lane_clicked(lane):
@@ -1276,9 +1276,9 @@ def calc_zoom_level(north, south, east, west, pixelWidth, pixelHeight):
 
 ### Center Location
 # If center coordinates present in configuration file, write center to global vars
-if map_image_center_lat and map_image_center_lat:
+if map_image_center_lat and map_image_center_lon:
     center_lat = float(map_image_center_lat)
-    center_lon = float(map_image_center_lat)
+    center_lon = float(map_image_center_lon)
     center = str(center_lat) + ',' + str(center_lon)
 # If center coordinates not present and automatic detection, recalculate center based on coordinates
 elif not manual_detection:
