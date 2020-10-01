@@ -6,11 +6,11 @@ Data WZDC Tool Output Files: Raw WZDC Output
   - Path History (Breadcrumbs) File: path-data--sample-work-zone--white-rock-cir.csv
   - RSM (binary) File: rsm-uper--sample-work-zone--white-rock-cir.uper
   - RSM (xml) File: rsm-xml--sample-work-zone--white-rock-cir.xml
-  - WZDx File: wzdx--sample-work-zone--white-rock-cir.geojson
+  - WZDx (v3.0) File: wzdx--sample-work-zone--white-rock-cir.geojson
 
 Published Work Zone Files: Published Files
 - Work Zone: sample-work-zone--white-rock-cir
-  - Published WZDx File: Published-WZData--WZDx--sample-work-zone--white-rock-cir.geojson
+  - Published WZDx (v3.0) File: Published-WZData--WZDx--sample-work-zone--white-rock-cir.geojson
   - Published RSM (xml) File: Published-WZData--rsm-xml--sample-work-zone--white-rock-cir--1-of-1.xml
   - Published RSM (binary) File: Published-WZData--rsm-uper--sample-work-zone--white-rock-cir--1-of-1.uper
 
