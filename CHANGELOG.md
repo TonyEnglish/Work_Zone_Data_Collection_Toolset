@@ -1,4 +1,9 @@
 # Updates
+10/2/2020
+- Updated RSM to WZDx translator to WZDx version 3.0 (from version 2.0)
+- Updated sample WZDx files version 3.0
+- Updated README with related repositories
+
 9/15/2020
 - Fixed bugs and code smells from Sonar Cloud
 - Removed message generation from WZDC_tool
