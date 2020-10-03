@@ -15,6 +15,12 @@ This repository contains the following components:
 
 - POC Work Zone Data Collection (WZDC) tool
 - POC RSM(XML) to WZDx Translator
+- Sample Files
+
+Related repositories:
+- [V2X Mobile Application](https://github.com/TonyEnglish/V2X_MobileApplication)
+- [V2X Website](https://github.com/TonyEnglish/V2X_Website)
+- [V2X Azure Functions](https://github.com/TonyEnglish/V2X_AzureFunctions)
 
 ## Prerequisites
 
