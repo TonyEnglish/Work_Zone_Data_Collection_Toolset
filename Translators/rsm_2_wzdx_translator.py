@@ -5,15 +5,68 @@ import uuid
 import random
 import string
 
+# info = {}
+# info['feed_info_id'] = feed_info_id
+# info['road_name'] = roadName
+# info['road_number'] = roadNumber
+# info['description'] = wzDesc
+# info['direction'] = direction
+# info['beginning_cross_street'] = beginningCrossStreet
+# info['ending_cross_street'] = endingCrossStreet
+# info['beginning_milepost'] = beginningMilepost
+# info['ending_milepost'] = endingMilepost
+# info['issuing_organization'] = issuingOrganization
+# info['creation_date'] = creationDate
+# info['update_date'] = updateDate
+# info['event_status'] = eventStatus
+# info['beginning_accuracy'] = beginingAccuracy
+# info['ending_accuracy'] = endingAccuracy
+# info['start_date_accuracy'] = startDateAccuracy
+# info['end_date_accuracy'] = endDateAccuracy
+
+# info['metadata'] = {}
+# info['metadata']['wz_location_method'] = wzLocationMethod
+# info['metadata']['lrs_type'] = lrsType
+# info['metadata']['location_verify_method'] = locationVerifyMethod
+# if dataFeedFrequencyUpdate:
+#     info['metadata']['datafeed_frequency_update'] = dataFeedFrequencyUpdate
+# info['metadata']['timestamp_metadata_update'] = timestampMetadataUpdate
+# info['metadata']['contact_name'] = contactName
+# info['metadata']['contact_email'] = contactEmail
+# info['metadata']['issuing_organization'] = issuingOrganization
+
+# info['types_of_work'] = typeOfWork
+# info['lanes_obj'] = lanes_obj
+
 # Translator 
 def wzdx_creator(messages, data_lane, info):
     wzd = {}
     wzd['road_event_feed_info'] = {}
     wzd['road_event_feed_info']['feed_info_id'] = info['feed_info_id']
-    wzd['road_event_feed_info']['feed_update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    wzd['road_event_feed_info']['update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    wzd['road_event_feed_info']['publisher'] = 'POC Work Zone Integrated Mapping'
+    wzd['road_event_feed_info']['contact_name'] = 'Tony English'
+    wzd['road_event_feed_info']['contact_email'] = 'tony@neaeraconsulting.com'
+    if info['metadata'].get('datafeed_frequency_update', False):
+        wzd['road_event_feed_info']['update_frequency'] = info['metadata']['datafeed_frequency_update'] # Verify data type
+    wzd['road_event_feed_info']['version'] = '3.0'
 
-    wzd['road_event_feed_info']['metadata'] = info['metadata']
-    wzd['road_event_feed_info']['version'] = '2.0'
+    data_source = {}
+    data_source['data_source_id'] = str(uuid.uuid4())
+    data_source['feed_info_id'] = info['feed_info_id']
+    data_source['organization_name'] = info['metadata']['issuing_organization']
+    data_source['contact_name'] = info['metadata']['contact_name']
+    data_source['contact_email'] = info['metadata']['contact_email']
+    if info['metadata'].get('datafeed_frequency_update', False):
+        data_source['update_frequency'] = info['metadata']['datafeed_frequency_update']
+    data_source['update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    data_source['location_verify_method'] = info['metadata']['location_verify_method']
+    data_source['location_method'] = info['metadata']['wz_location_method']
+    data_source['lrs_type'] = info['metadata']['lrs_type']
+    # data_source['lrs_url'] = "basic url"
+
+    wzd['road_event_feed_info']['data_sources'] = [data_source]
+
     wzd['type'] = 'FeatureCollection'
     nodes = []
     sub_identifier = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6)) #Create random 6 character digit/letter string
@@ -34,15 +87,29 @@ def wzdx_creator(messages, data_lane, info):
 def add_ids(message, add_ids):
     if add_ids:
         feed_info_id = message['road_event_feed_info']['feed_info_id']
-        for feature in message['features']:
-            road_event_id = str(uuid.uuid4())
+        data_source_id = message['road_event_feed_info']['data_sources'][0]['data_source_id']
+
+        road_event_length = len(message['features'])
+        road_event_ids = []
+        for i in range(road_event_length):
+            road_event_ids.append(str(uuid.uuid4()))
+
+        for i in range(road_event_length):
+            feature = message['features'][i]
+            road_event_id = road_event_ids[i]
             feature['properties']['road_event_id'] = road_event_id
-            feature['properties']['feed_info_id'] = feed_info_id
+            # feature['properties']['feed_info_id'] = feed_info_id
+            feature['properties']['data_source_id'] = data_source_id
+            # feature['properties']['relationship'] = {}
+            feature['properties']['relationship']['relationship_id'] = str(uuid.uuid4())
+            feature['properties']['relationship']['road_event_id'] = road_event_id
+            if i == 0: feature['properties']['relationship']['first'] = road_event_ids
+            else: feature['properties']['relationship']['next'] = road_event_ids
             for lane in feature['properties']['lanes']:
                 lane_id = str(uuid.uuid4())
                 lane['lane_id'] = lane_id
                 lane['road_event_id'] = road_event_id
-                for lane_restriction in lane.get('lane_restrictions', []):
+                for lane_restriction in lane.get('restrictions', []):
                     lane_restriction_id = str(uuid.uuid4())
                     lane_restriction['lane_restriction_id'] = lane_restriction_id
                     lane_restriction['lane_id'] = lane_id
@@ -122,30 +189,38 @@ def extract_nodes(rsm, wzd, ids, data_lane, info):
             lane['lane_id'] = ''
             lane['road_event_id'] = ''
             # Lane Number
+            lane['order'] = int(lanes[j]['lanePosition'])
             lane['lane_number'] = int(lanes[j]['lanePosition'])
 
             # Lane Edge Reference
-            lane['lane_edge_reference'] = 'left' #This is an assumed value
+            # lane['lane_edge_reference'] = 'left' #This is an assumed value
 
             # Generically set lane type
-            lane, lane_type = get_lane_type(lane, num_lanes)
+            # lane, lane_type = get_lane_type(lane, num_lanes)
 
-            # Lane Type
-            if not lane_type: #Generally set lane type (right, middle or left)
-                lane, lane_type = get_lane_type(lane, num_lanes)
-            lane['lane_type'] = lane_type
-
+            
             node_contents = lanes[j]['laneGeometry']['nodeSet']['NodeLLE'][i]
 
             # Lane Status
             lane_status = get_lane_status(node_contents, j, prev_attr_list)
-            lane['lane_status'] = lane_status
+            lane['status'] = lane_status
+
+            lane['type'] = ''
+
+            # Lane Restrictions
+            lane, lane_type, restrictions = get_lane_restrictions(info, lane, restrictions)
+
+            # Lane Type
+            if not lane_type: #Generally set lane type (right, middle or left)
+                lane, lane_type = get_lane_type(lane, num_lanes)
+            lane['type'] = lane_type
+
 
             # Geometry
             point = lanes[j]['laneGeometry']['nodeSet']['NodeLLE'][i]['nodePoint']
             geometry = get_geometry(lane, point, data_lane, geometry)
 
-            # Lane Restrictions
+            # Reduced Speed Limit
             reduced_speed_limit, prev_attributes_general = get_reduced_speed_limit(node_contents, prev_attributes_general)
 
             # Workers Present
@@ -165,7 +240,7 @@ def extract_nodes(rsm, wzd, ids, data_lane, info):
         # vehicle_impact
         num_closed_lanes = 0
         for lane in lanes_wzdx:
-            if lane['lane_status'] == 'closed' or lane['lane_status'] == 'merge-left' or lane['lane_status'] == 'merge-right':
+            if lane['status'] == 'closed' or lane['status'] == 'merge-left' or lane['status'] == 'merge-right':
                 num_closed_lanes = num_closed_lanes + 1
         if num_closed_lanes == 0:
             lanes_obj['vehicle_impact'] = 'all-lanes-open'
@@ -184,7 +259,8 @@ def extract_nodes(rsm, wzd, ids, data_lane, info):
         lanes_obj['description'] = info['description']
 
         # restrictions
-        lanes_obj['restrictions'] = restrictions
+        if restrictions:
+            lanes_obj['restrictions'] = restrictions
 
         # Lanes object
         lanes_obj['lanes'] = lanes_wzdx
@@ -200,7 +276,7 @@ def extract_nodes(rsm, wzd, ids, data_lane, info):
 
 def get_lane_restrictions(info, lane, restrictions):
     lane_type = ''
-    lane['lane_restrictions'] = []#no-trucks, travel-peak-hours-only, hov-3, hov-2, no-parking
+    lane['restrictions'] = []#no-trucks, travel-peak-hours-only, hov-3, hov-2, no-parking
         #reduced-width, reduced-height, reduced-length, reduced-weight, axle-load-limit, gross-weight-limit, towing-prohibited, permitted-oversize-loads-prohibited
 
     # Overwrite lane_type if present in configuration file
@@ -216,9 +292,9 @@ def get_lane_restrictions(info, lane, restrictions):
                 if lane_restriction['restriction_type'] in ['reduced-width', 'reduced-height', 'reduced-length', 'reduced-weight', 'axle-load-limit', 'gross-weight-limit']:
                     lane_restriction['restriction_value'] = lane_restriction_info['RestrictionValue']
                     lane_restriction['restriction_units'] = lane_restriction_info['RestrictionUnits']
-                lane['lane_restrictions'].append(lane_restriction)
+                lane['restrictions'].append(lane_restriction)
 
-    return lane, lane_type
+    return lane, lane_type, restrictions
 
 
 def get_lane_type(lane, num_lanes):
@@ -307,10 +383,16 @@ def get_worker_presence(node_contents, prev_attributes_general):
 def set_lane_properties(ids, info, rsm):
     lanes_obj = {}
     lanes_obj['road_event_id'] = ''
-    lanes_obj['feed_info_id'] = ''
+    lanes_obj['data_source_id'] = ''
+
+    # Event Type ['work-zone', 'detour']
+    lanes_obj['event_type'] = 'work-zone'
+
+    # Relationship
+    lanes_obj['relationship'] = {}
 
     # Subidentifier
-    lanes_obj['sub_identifier'] = ids['sub_identifier']
+    # lanes_obj['sub_identifier'] = ids['sub_identifier']
 
     # road_name
     lanes_obj['road_name'] = info['road_name']
@@ -387,7 +469,7 @@ def set_lane_properties(ids, info, rsm):
         type_of_work = {}
         type_of_work['types_of_work_id'] = ''
         type_of_work['road_event_id'] = ''
-        type_of_work['type_of_work'] = types_of_work['WorkType']
+        type_of_work['type_name'] = types_of_work['WorkType']
         if types_of_work.get('Is_Architectural_Change', '') != '': type_of_work['is_architectural_change'] = types_of_work['Is_Architectural_Change']
         lanes_obj['types_of_work'].append(type_of_work)
 
