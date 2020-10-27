@@ -23,7 +23,6 @@ from    serial import SerialException           #serial port exception
 import  base64
 
 import  zipfile
-import  xmltodict                                       #dict to xml converter
 
 from    azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
@@ -419,28 +418,28 @@ else:
 log_file = open(log_file_name, append_write)         #log file
 log_msg('*** Running Main UI ***')
 
-# Check java version for RSM binary conversion
-try:
-    java_version = subprocess.check_output(['java', '-version'], stderr=subprocess.STDOUT).decode('utf-8')
-    version_number = java_version.splitlines()[0].split()[2].strip('"')
-    major, minor, _ = version_number.split('.')
-    if (int(major) == 1 and int(minor) >= 8) or int(major) >= 1:
-        log_msg('Java version check successful. Java version detected was ' + major + '.' + minor)
-    else:
-        log_msg('ERROR: Incorrect java version. Java version detected was ' + major + '.' + minor)
-        log_msg('Closing Application')
-        log_file.close()
-        messagebox.showerror('Java version incorrect', 'This application requires Java version >=1.8 or jdk>=8.0. Java version detected was ' + major + '.' + minor + ', please update your java version and add it to your system path')
-        sys.exit(0)
-except FileNotFoundError as e:
-    log_msg('ERROR: Java installation not found')
-    log_msg('Closing Application')
-    log_file.close()
-    messagebox.showerror('Java Not Installed', 'This application requires Java to run, with version >=1.8 or jdk>=8.0. Ensure that java is inatalled, added to the system path, and that you have restarted your command window')
-    sys.exit(0)
-except Exception as e:
-    log_msg('ERROR: Unable to Verify Java Version, error: ' + str(e))
-    messagebox.showwarning('Unable to Verify Java Version', 'Unable to verify java version. Ensure that you have Java version >=1.8 or jdk>=8.0 installed and added to your system path')
+# # Check java version for RSM binary conversion
+# try:
+#     java_version = subprocess.check_output(['java', '-version'], stderr=subprocess.STDOUT).decode('utf-8')
+#     version_number = java_version.splitlines()[0].split()[2].strip('"')
+#     major, minor, _ = version_number.split('.')
+#     if (int(major) == 1 and int(minor) >= 8) or int(major) >= 1:
+#         log_msg('Java version check successful. Java version detected was ' + major + '.' + minor)
+#     else:
+#         log_msg('ERROR: Incorrect java version. Java version detected was ' + major + '.' + minor)
+#         log_msg('Closing Application')
+#         log_file.close()
+#         messagebox.showerror('Java version incorrect', 'This application requires Java version >=1.8 or jdk>=8.0. Java version detected was ' + major + '.' + minor + ', please update your java version and add it to your system path')
+#         sys.exit(0)
+# except FileNotFoundError as e:
+#     log_msg('ERROR: Java installation not found')
+#     log_msg('Closing Application')
+#     log_file.close()
+#     messagebox.showerror('Java Not Installed', 'This application requires Java to run, with version >=1.8 or jdk>=8.0. Ensure that java is inatalled, added to the system path, and that you have restarted your command window')
+#     sys.exit(0)
+# except Exception as e:
+#     log_msg('ERROR: Unable to Verify Java Version, error: ' + str(e))
+#     messagebox.showwarning('Unable to Verify Java Version', 'Unable to verify java version. Ensure that you have Java version >=1.8 or jdk>=8.0 installed and added to your system path')
 
 config_directory = './Config Files'
 local_config_path = ''
