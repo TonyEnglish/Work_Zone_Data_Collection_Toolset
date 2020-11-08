@@ -1,4 +1,8 @@
 # Updates
+11/8/2020
+- Removed unnecessary python libraries
+- Updated screenshots
+
 10/2/2020
 - Updated RSM to WZDx translator to WZDx version 3.0 (from version 2.0)
 - Updated sample WZDx files version 3.0
