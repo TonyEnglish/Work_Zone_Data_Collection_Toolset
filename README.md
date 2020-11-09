@@ -26,17 +26,14 @@ Related repositories:
 
 Requires:
 
-- Java 8 (or higher)
 - Python 3.6 (or higher)
   - azure-storage-blob
   - esptool
   - image
   - wheel
   - serial
-  - pynmea2
-  - xmltodict
   - requests
-- Environment Variables (Contact Tony English at Tony@neaeraconsulting.com for more information)
+- Environment Variables (Optional, Contact Tony English at [tony@neaeraconsulting.com](mailto://tony@neaeraconsulting.com) for more information)
 
 ## Usage
 
