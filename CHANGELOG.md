@@ -1,5 +1,8 @@
 # Updates
-11/8/2020
+11/9/2020
+- Updated sample files
+- Added WZDC Tool Documentation Updates document
+  - Described message generation process in detail
 - Removed unnecessary python libraries
 - Updated screenshots
 

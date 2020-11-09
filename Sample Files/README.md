@@ -1,6 +1,11 @@
 # Sample Files
 
-Data WZDC Tool Output Files: Raw WZDC Output
+Data WZDC Tool Output Path Data: Raw WZDC Output
+- Work Zone: sample-work-zone--white-rock-cir
+  - Path History (Breadcrumbs) File: path-data--sample-work-zone--white-rock-cir.csv
+
+
+Azure Function Message Generation Output Files: Message Generation Output
 - Work Zone: sample-work-zone--white-rock-cir
   - Configuration File: config--sample-work-zone--white-rock-cir.json
   - Path History (Breadcrumbs) File: path-data--sample-work-zone--white-rock-cir.csv
