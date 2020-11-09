@@ -86,6 +86,8 @@ Documentation for this project is located here: [Documentation](https://github.c
 - V2X POC Interface Control Document
 - V2X POC System Engineering Report
 - V2X POC Test Case Results Report
+- WZDC Tool Documentation Updates
+  - Describes message generation
 
 ## Version History and Retention
 
