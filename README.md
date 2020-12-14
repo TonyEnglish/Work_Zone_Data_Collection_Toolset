@@ -39,6 +39,13 @@ Requires:
 
 The WZDC tool is a python-based tool that utilizes a user interface. Steps for starting and running the tool are listed below and are described in further detail here: [POC Toolset User Guide](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/POC%20Toolset%20User%20Guide.pdf)
 
+Video tutorials for each tool:
+Website- Edit Work Zone - https://youtu.be/fBRkcWIBCWI
+WZDC Mobile app - https://youtu.be/PMs6gDkm7NY
+WZDC Computer app - https://youtu.be/pfD8pcYpGcE
+Website - Config File - https://youtu.be/mm1Cm24tOIc
+
+
 ### Building
 
 No building/compiling is required for this tool.
