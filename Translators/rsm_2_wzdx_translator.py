@@ -43,7 +43,7 @@ def wzdx_creator(messages, data_lane, info):
     wzd = {}
     wzd['road_event_feed_info'] = {}
     wzd['road_event_feed_info']['feed_info_id'] = info['feed_info_id']
-    wzd['road_event_feed_info']['update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    wzd['road_event_feed_info']['update_date'] = get_UTC_time(datetime.now())
     wzd['road_event_feed_info']['publisher'] = 'POC Work Zone Integrated Mapping'
     wzd['road_event_feed_info']['contact_name'] = 'Tony English'
     wzd['road_event_feed_info']['contact_email'] = 'tony@neaeraconsulting.com'
@@ -59,7 +59,7 @@ def wzdx_creator(messages, data_lane, info):
     data_source['contact_email'] = info['metadata']['contact_email']
     if info['metadata'].get('datafeed_frequency_update', False):
         data_source['update_frequency'] = info['metadata']['datafeed_frequency_update']
-    data_source['update_date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    data_source['update_date'] = get_UTC_time(datetime.now())
     data_source['location_verify_method'] = info['metadata']['location_verify_method']
     data_source['location_method'] = info['metadata']['wz_location_method']
     data_source['lrs_type'] = info['metadata']['lrs_type']
@@ -129,23 +129,11 @@ def wzdx_collapser(features): #Collapse identical nodes together to reduce overa
         if features[i]['properties'] != features[i-1]['properties'] and i != len(features)-1: #Only add unique nodes to output list
             new_nodes.append(features[i])
 
-    long_dif = new_nodes[-1]['geometry']['coordinates'][-1][0] - new_nodes[0]['geometry']['coordinates'][0][0]
-    lat_dif = new_nodes[-1]['geometry']['coordinates'][-1][1] - new_nodes[0]['geometry']['coordinates'][0][1]
-    if abs(long_dif) > abs(lat_dif):
-        if long_dif > 0:
-            direction = 'eastbound'
-        else:
-            direction = 'westbound'
-    elif lat_dif > 0:
-        direction = 'northbound'
-    else:
-        direction = 'southbound'
-
+    direction = get_average_direction(new_nodes[0]['geometry']['coordinates'])
+    
     # heading = int(rsm['regionInfo']['applicableHeading']['heading'])
     # tol = int(rsm['regionInfo']['applicableHeading']['tolerance'])
-    # if abs(heading) + abs(tol) < 45:
-    #     direction = 'northbound'
-    # elif abs(heading) + 
+    # direction = get_heading_tolerance_direction(heading, tol)
 
     for i in range(len(new_nodes)):
         if not new_nodes[i]['properties']['direction']:
@@ -165,16 +153,12 @@ def extract_nodes(rsm, wzd, ids, data_lane, info):
     num_lanes = len(lanes)
     nodes = lanes[0]['laneGeometry']['nodeSet']['NodeLLE']
     nodes_wzdx = []
-    prev_attr_list = []
-    reduced_speed_limit = int(rsm['rszContainer'].get('speedLimit').get('speed', 0))
 
-    if rsm['rszContainer']['speedLimit'].get('kph', {}) == None: #If kph, convert to mph
-        reduced_speed_limit = round(reduced_speed_limit*0.6214)
+    reduced_speed_limit = get_initial_reduced_speed_limit
+
     prev_attributes_general = {'peoplePresent': False, 'reducedSpeedLimit': reduced_speed_limit}
 
-    for k in range(len(lanes)):
-        prev_attributes_lane = {'laneClosed': False, 'merge-left': False, 'merge-right': False}
-        prev_attr_list.append(prev_attributes_lane)
+    prev_attr_list = initialize_prev_attr_list(num_lanes)
     
     for i in range(len(nodes)):
         # lanes_obj = {}
@@ -192,19 +176,13 @@ def extract_nodes(rsm, wzd, ids, data_lane, info):
             lane['order'] = int(lanes[j]['lanePosition'])
             lane['lane_number'] = int(lanes[j]['lanePosition'])
 
-            # Lane Edge Reference
-            # lane['lane_edge_reference'] = 'left' #This is an assumed value
-
-            # Generically set lane type
-            # lane, lane_type = get_lane_type(lane, num_lanes)
-
-            
             node_contents = lanes[j]['laneGeometry']['nodeSet']['NodeLLE'][i]
 
             # Lane Status
             lane_status = get_lane_status(node_contents, j, prev_attr_list)
             lane['status'] = lane_status
 
+            # Lane Type
             lane['type'] = ''
 
             # Lane Restrictions
@@ -214,7 +192,6 @@ def extract_nodes(rsm, wzd, ids, data_lane, info):
             if not lane_type: #Generally set lane type (right, middle or left)
                 lane, lane_type = get_lane_type(lane, num_lanes)
             lane['type'] = lane_type
-
 
             # Geometry
             point = lanes[j]['laneGeometry']['nodeSet']['NodeLLE'][i]['nodePoint']
@@ -238,16 +215,8 @@ def extract_nodes(rsm, wzd, ids, data_lane, info):
         lanes_obj['total_num_lanes'] = num_lanes
 
         # vehicle_impact
-        num_closed_lanes = 0
-        for lane in lanes_wzdx:
-            if lane['status'] == 'closed' or lane['status'] == 'merge-left' or lane['status'] == 'merge-right':
-                num_closed_lanes = num_closed_lanes + 1
-        if num_closed_lanes == 0:
-            lanes_obj['vehicle_impact'] = 'all-lanes-open'
-        elif num_closed_lanes == num_lanes:
-            lanes_obj['vehicle_impact'] = 'all-lanes-closed'
-        else:
-            lanes_obj['vehicle_impact'] = 'some-lanes-closed'
+        num_lanes_closed = get_num_lanes_closed(lanes_wzdx)
+        lanes_obj['vehicle_impact'] = get_vehicle_impact(num_lanes_closed, num_lanes)
 
         # workser_present
         lanes_obj['workers_present'] = people_present
@@ -474,3 +443,262 @@ def set_lane_properties(ids, info, rsm):
         lanes_obj['types_of_work'].append(type_of_work)
 
     return lanes_obj
+
+
+
+def get_UTC_time(time):
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+def get_num_lanes_closed(lanes):
+    num_lanes_closed = 0
+    for lane in lanes:
+        if lane['status'] == 'closed' or lane['status'] == 'merge-left' or lane['status'] == 'merge-right':
+            num_lanes_closed = num_lanes_closed + 1
+    return num_lanes_closed
+
+def get_vehicle_impact(num_lanes_closed, num_lanes):
+    if num_lanes_closed == 0:
+        vehicle_impact = 'all-lanes-open'
+    elif num_lanes_closed == num_lanes:
+        vehicle_impact = 'all-lanes-closed'
+    else:
+        vehicle_impact = 'some-lanes-closed'
+    return vehicle_impact
+
+def initialize_prev_attr_list(num_lanes):
+    prev_attr_list = []
+    for k in range(num_lanes):
+        prev_attributes_lane = {'laneClosed': False, 'merge-left': False, 'merge-right': False}
+        prev_attr_list.append(prev_attributes_lane)
+    return prev_attr_list
+
+def get_initial_reduced_speed_limit(rsz_container):
+    speed_limit = rsz_container.get('speedLimit', {})
+    reduced_speed_limit = int(speed_limit.get('speed', 0))
+
+    if speed_limit.get('speedUnits', {}).get('kph', {}) == None: #If kph, convert to mph
+        reduced_speed_limit = convert_kph_to_mph(reduced_speed_limit)
+        print(reduced_speed_limit)
+
+    return reduced_speed_limit
+
+def convert_kph_to_mph(speed_kph):
+    kph_to_mph = 0.6214
+    speed_mph = speed_kph * kph_to_mph
+    return round(speed_mph)
+
+def get_average_direction(coordinates):
+    # new_nodes[0]['geometry']['coordinates']
+    long_dif = coordinates[-1][0] - coordinates[0][0]
+    lat_dif = coordinates[-1][1] - coordinates[0][1]
+    if abs(long_dif) > abs(lat_dif):
+        if long_dif > 0:
+            direction = 'eastbound'
+        else:
+            direction = 'westbound'
+    elif lat_dif > 0:
+        direction = 'northbound'
+    else:
+        direction = 'southbound'
+    return direction
+
+def get_heading_tolerance_direction(heading, tolerance):
+    avg_heading = heading % 365
+    max_heading = (heading + tolerance) % 365
+    min_heading = (heading - tolerance) % 365
+
+    avg_direction = get_heading_direction(avg_heading)
+    max_direction = get_heading_direction(max_heading)
+    min_direction = get_heading_direction(min_heading)
+
+    if avg_direction == max_direction and avg_direction == min_direction:
+        return avg_direction
+    else:
+        return None
+
+def get_heading_direction(heading):
+    heading = heading % 360
+
+    Nu = 0 + 45
+    Nl = 360 - 45
+    if heading <= Nu or heading > Nl:
+        return 'northbound'
+
+    Eu = 90 + 45
+    El = 90 - 45
+    if heading <= Eu and heading > El:
+        return 'eastbound'
+
+    Su = 180 + 45
+    Sl = 180 - 45
+    if heading <= Su and heading > Sl:
+        return 'southbound'
+
+    Wu = 270 + 45
+    Wl = 270 - 45
+    if heading <= Wu and heading > Wl:
+        return 'westbound'
+
+
+########################################## UNIT TESTS ##########################################
+
+def test_get_UTC_time():
+    reference_time = '2019-11-08T00:00:00Z'
+    time = datetime.strptime(reference_time, "%Y-%m-%dT%H:%M:%SZ")
+    time_string = get_UTC_time(time)
+    valid_time_string = reference_time
+
+    assert time_string == valid_time_string
+
+def test_get_num_lanes_closed():
+    lanes = [
+        {
+            'status': 'open'
+        },
+        {
+            'status': 'closed'
+        },
+        {
+            'status': 'merge-right'
+        },
+        {
+            'status': 'merge-left'
+        }
+    ]
+    num_lanes_closed = get_num_lanes_closed(lanes)
+    valid_num_lanes_closed = 3
+    assert num_lanes_closed == valid_num_lanes_closed
+
+def test_get_vehicle_impact():
+    num_lanes_closed = 0
+    num_lanes = 2
+    vehicle_impact = get_vehicle_impact(num_lanes_closed, num_lanes)
+    valid_vehicle_impact = 'all-lanes-open'
+    assert vehicle_impact == valid_vehicle_impact
+
+    num_lanes_closed = 1
+    num_lanes = 2
+    vehicle_impact = get_vehicle_impact(num_lanes_closed, num_lanes)
+    valid_vehicle_impact = 'some-lanes-closed'
+    assert vehicle_impact == valid_vehicle_impact
+
+    num_lanes_closed = 2
+    num_lanes = 2
+    vehicle_impact = get_vehicle_impact(num_lanes_closed, num_lanes)
+    valid_vehicle_impact = 'all-lanes-closed'
+    assert vehicle_impact == valid_vehicle_impact
+
+def test_initialize_prev_attr_list():
+    num_lanes = 2
+    attr_list = initialize_prev_attr_list(num_lanes)
+    valid_attr_list = [
+        {'laneClosed': False, 'merge-left': False, 'merge-right': False}, 
+        {'laneClosed': False, 'merge-left': False, 'merge-right': False}
+    ]
+
+    assert attr_list == valid_attr_list
+
+def test_get_initial_reduced_speed_limit():
+    rsz_container = {'speedLimit': {'speed': 45, 'speedUnits': {'mph': None}}}
+    reduced_speed_limit = get_initial_reduced_speed_limit(rsz_container)
+    valid_reduced_speed_limit = 45
+    assert reduced_speed_limit == valid_reduced_speed_limit
+
+    rsz_container = {'speedLimit': {'speed': 72, 'speedUnits': {'kph': None}}}
+    reduced_speed_limit = get_initial_reduced_speed_limit(rsz_container)
+    valid_reduced_speed_limit = 45
+    assert reduced_speed_limit == valid_reduced_speed_limit
+
+    rsz_container = {'speedLimit': {'speed': 45}}
+    reduced_speed_limit = get_initial_reduced_speed_limit(rsz_container)
+    valid_reduced_speed_limit = 45
+    assert reduced_speed_limit == valid_reduced_speed_limit
+
+    rsz_container = {'speedLimit': {}}
+    reduced_speed_limit = get_initial_reduced_speed_limit(rsz_container)
+    valid_reduced_speed_limit = 0
+    assert reduced_speed_limit == valid_reduced_speed_limit
+
+    rsz_container = {}
+    reduced_speed_limit = get_initial_reduced_speed_limit(rsz_container)
+    valid_reduced_speed_limit = 0
+    assert reduced_speed_limit == valid_reduced_speed_limit
+
+def test_convert_kph_to_mph():
+    speed_kph = 72
+    speed_mph = convert_kph_to_mph(speed_kph)
+    valid_speed_mph = 45
+    
+    assert speed_mph == valid_speed_mph
+
+def test_get_average_direction():
+    coordinates = [
+        [
+            -104.9669913,
+            40.4692372
+        ],
+        [
+            -104.9669916,
+            40.4692801
+        ]
+    ]
+    direction = get_average_direction(coordinates)
+    valid_direction = 'northbound'
+    assert direction == valid_direction
+
+def test_get_heading_tolerance_direction():
+    heading = 0
+    tolerance = 20
+
+    direction = get_heading_tolerance_direction(heading, tolerance)
+    valid_direction = 'northbound'
+
+    assert direction == valid_direction
+
+    heading = 40
+    tolerance = 20
+
+    direction = get_heading_tolerance_direction(heading, tolerance)
+    valid_direction = None
+
+    assert direction == valid_direction
+
+def test_get_heading_direction():
+    heading1 = 20
+    heading2 = -20
+    heading3 = 340
+    heading4 = 45
+    direction1 = get_heading_direction(heading1)
+    direction2 = get_heading_direction(heading2)
+    direction3 = get_heading_direction(heading3)
+    direction4 = get_heading_direction(heading4)
+    valid_direction = 'northbound'
+    assert direction1 == valid_direction and direction2 == valid_direction and direction3 == valid_direction and direction4 == valid_direction
+    
+    heading1 = 110
+    heading2 = 70
+    heading3 = 135
+    direction1 = get_heading_direction(heading1)
+    direction2 = get_heading_direction(heading2)
+    direction3 = get_heading_direction(heading3)
+    valid_direction = 'eastbound'
+    assert direction1 == valid_direction and direction2 == valid_direction and direction3 == valid_direction
+    
+    heading1 = 200
+    heading2 = 160
+    heading3 = 225
+    direction1 = get_heading_direction(heading1)
+    direction2 = get_heading_direction(heading2)
+    direction3 = get_heading_direction(heading3)
+    valid_direction = 'southbound'
+    assert direction1 == valid_direction and direction2 == valid_direction and direction3 == valid_direction
+    
+    heading1 = 290
+    heading2 = 250
+    heading3 = 315
+    direction1 = get_heading_direction(heading1)
+    direction2 = get_heading_direction(heading2)
+    direction3 = get_heading_direction(heading3)
+    valid_direction = 'westbound'
+    assert direction1 == valid_direction and direction2 == valid_direction and direction3 == valid_direction
+
