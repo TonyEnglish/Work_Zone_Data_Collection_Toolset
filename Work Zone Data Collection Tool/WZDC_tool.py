@@ -1461,7 +1461,7 @@ def uploadFile():
             blob_client.upload_blob(data, overwrite=True)
         log_msg('Closing log file in Message Builder and Export')
         log_file.close()
-        messagebox.showinfo('Upload Successful', 'Data upload successful! Please navigate to\nhttp://www.neaeraconsulting.com/V2x_Verification\nto view and verify the mapped workzone.\nYou will find your data under\n' + name_id)
+        messagebox.showinfo('Upload Successful', 'Data upload successful! Please navigate to\n**Insert Website Link**\nto view and verify the mapped workzone.\nYou will find your data under\n' + name_id)
         sys.exit(0)
     else:
         log_msg('Attempted uploadArchive, no internet connection detected')
@@ -1502,7 +1502,7 @@ def prepare_data_file():
         for msg in msgs:
             messages = messages + msg + '\n'
         message = 'CSV Data File Not Valid' + '\n' + '------' + messages + '------' + '\n' + 'Fix these issues before uploading' + '\n'
-        messagebox.showerror('Data File Invalid',message + 'After fixing, upload to to https://neaeraconsulting.com/V2X_Upload')
+        messagebox.showerror('Data File Invalid',message + 'After fixing, upload to to **Insert Website Link**')
         sys.exit(0)
 
     if has_azure_connection:
@@ -1516,7 +1516,7 @@ def prepare_data_file():
     else:
         log_msg('Closing log file in Message Builder and Export')
         log_file.close()
-        messagebox.showinfo('Upload Data File', 'Data file generation complete. Please upload the\ngenerated CSV file: ' + veh_path_data_file.split('/')[-1] + '\nto https://neaeraconsulting.com/V2X_Upload')
+        messagebox.showinfo('Upload Data File', 'Data file generation complete. Please upload the\ngenerated CSV file: ' + veh_path_data_file.split('/')[-1] + '\nto **Insert Website Link**')
         sys.exit(0)
 
 def validate_data_file():

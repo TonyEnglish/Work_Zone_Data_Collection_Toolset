@@ -7,7 +7,7 @@
 
 ## Project Description
 
-This project is an open source, proof of concept work zone data collection tool. The purpose of this tool is to allow a construction manager in the field and transportation system manager at the Infrastructure Owner Operator (IOO) back-office  to map work zones and distribute generated map messages to third parties. This project is part of a larger effort on understanding mapping needs for V2X applications, funded by USDOT. This repository is a deliverable under the project and supports the Development and Demonstration of Proof-of-Concept of an Integrated Work Zone Mapping Toolset.
+This project is an open source, proof of concept work zone data collection tool. The purpose of this tool is to allow a construction manager in the field and transportation system manager at the Infrastructure Owner Operator (IOO) back-office to map work zones and distribute generated map messages to third parties. This project is part of a larger effort on understanding mapping needs for V2X applications, funded by USDOT. This repository is a deliverable under the project and supports the Development and Demonstration of Proof-of-Concept of an Integrated Work Zone Mapping Toolset.
 
 ![Tasks 6-7 Diagram](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/images/POC_WZ_Toolset.jpg)
 
@@ -18,6 +18,7 @@ This repository contains the following components:
 - Sample Files
 
 Related repositories:
+
 - [V2X Mobile Application](https://github.com/TonyEnglish/V2X_MobileApplication)
 - [V2X Website](https://github.com/TonyEnglish/V2X_Website)
 - [V2X Azure Functions](https://github.com/TonyEnglish/V2X_AzureFunctions)
@@ -37,6 +38,8 @@ Requires:
 
 ## Usage
 
+This toolset utilizes a website for configuration file creation and visualization of work zones. This website is not currently hosted. If you would like to host your own WZDC tool website, please see the [V2X Azure Functions](https://github.com/TonyEnglish/V2X_AzureFunctions) repository for more information.
+
 The WZDC tool is a python-based tool that utilizes a user interface. Steps for starting and running the tool are listed below and are described in further detail here: [POC Toolset User Guide](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/POC%20Toolset%20User%20Guide.pdf)
 
 Video tutorials for each tool:
@@ -44,7 +47,6 @@ Website- Edit Work Zone - https://youtu.be/fBRkcWIBCWI
 WZDC Mobile app - https://youtu.be/PMs6gDkm7NY
 WZDC Computer app - https://youtu.be/pfD8pcYpGcE
 Website - Config File - https://youtu.be/mm1Cm24tOIc
-
 
 ### Building
 
@@ -65,7 +67,7 @@ python WZDC_tool.py
 #### Step 2: Load configuration file and confirm GPS connection
 
 ![Config Loading UI](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/images/WZDC_tool_initialization_screen.jpg)
-This component of the application enables a user to load a configuration file and verify their GPS connection. This configuration file can be loaded from the Cloud or from a local directory. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator.
+This component of the application enables a user to load a configuration file and verify their GPS connection. This configuration file can be loaded from the Cloud or from a local directory.
 The tool automatically scans usb COM ports for a GPS device. The baudrate and data rate can be configured if needed
 When a configuration file is loaded and a GPS connection is confirmed, data collection may begin
 
@@ -75,18 +77,18 @@ When a configuration file is loaded and a GPS connection is confirmed, data coll
 This is the data collection component. Data collection begins when a set starting location is reached and ends when the ending location is reached (both set in configuration file). A user can mark lane closures and the presence of workers. The user interface shows the current state of the work zone, including the vehicle lane (set in configuration file). All of the data collected is saved in a CSV path data file, which will be used for message generation
 
 ![Data Colelction UI](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/images/WZDC_tool_manual_data_collection_screen.JPG)
-This is the Manual Detection mode of the data collection component. In this mode, data collection starts when the user presses the 'Mark Start of Work Zone' button. Data collection ends when the user presses the 'Mark End of Work Zone' button. These locations are saved as the automatic start/end locations for use the next time that work zone is mapped. 
+This is the Manual Detection mode of the data collection component. In this mode, data collection starts when the user presses the 'Mark Start of Work Zone' button. Data collection ends when the user presses the 'Mark End of Work Zone' button. These locations are saved as the automatic start/end locations for use the next time that work zone is mapped.
 
 #### Step 4: Upload generated messages to the cloud
 
 ![Upload UI](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/images/upload_ui_screenshot.jpg)
-After data collection is completed, message generation begins. The recorded path data (including lane closure/worker presence) is processed into an RSM (xml) message. This message is then converted into binary (UPER format). The xml message, along with some additional information included in the configuration file, is then converted into a WZDx message. These messages (and the CSV data file) are added to a ZIP archive. When the user has an internet conenction, they can initiate the upload to the cloud, where the messages are unzipped and organized. These messages are available to visualize, verify and publish on https://neaeraconsulting.com/V2x_Home.
+After data collection is completed, message generation begins. The recorded path data (including lane closure/worker presence) is processed into an RSM (xml) message. This message is then converted into binary (UPER format). The xml message, along with some additional information included in the configuration file, is then converted into a WZDx message. These messages (and the CSV data file) are added to a ZIP archive. When the user has an internet conenction, they can initiate the upload to the cloud, where the messages are unzipped and organized.
 
 ## Additional Notes
 
 This toolset was developed as a proof of concept and is not able to provide a full solution for all types of work zones. Future work may expand the functionality of the tool to address more work zone types and add other features such as authentication or a mobile app version of the tool.
 
-This tool functions alongside a POC TMC website (https://neaeraconsulting.com/V2x_Home). Instructions for utilizing this website are located here: [POC Toolset User Guide](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/POC%20Toolset%20User%20Guide.pdf)
+This tool functions alongside a POC TMC website (no longer actively hosted). Instructions for utilizing this website are located here: [POC Toolset User Guide](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/POC%20Toolset%20User%20Guide.pdf)
 
 Documentation for this project is located here: [Documentation](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/tree/master/Documentation). This documentation includes:
 
@@ -108,7 +110,7 @@ Documentation for this project is located here: [Documentation](https://github.c
 
 ## License
 
-This project is licensed under the CMIT License - see the [License.md](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/LICENSE.md) for more details. 
+This project is licensed under the CMIT License - see the [License.md](https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/LICENSE.md) for more details.
 
 ## Contributions
 
@@ -150,4 +152,3 @@ RSM: Roadside Safety Message
 WZDC Tool: Work Zone Data Collection Tool
 
 WZDx: Workzone Data Exchange
-
